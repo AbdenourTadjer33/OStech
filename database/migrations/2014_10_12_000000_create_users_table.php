@@ -13,12 +13,19 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->uuid()->unique();
+            $table->string('name')->index();
+            $table->string('email')->unique()->index();
+            $table->string('phone')->unique()->index()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->boolean('status')->default(true);
+            $table->boolean('recive_email')->default(true);
+            $table->enum('type', ['admin', 'client'])->default('client');
+            $table->foreignId('role_id')->nullable()->constrained('roles');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
