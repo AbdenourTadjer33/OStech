@@ -1,9 +1,8 @@
 import { useRef, useState } from 'react';
-import DangerButton from '@/Components/DangerButton';
+import Button from '@/Components/Button';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
 
@@ -86,11 +85,11 @@ export default function DeleteUserForm({ className = '' }) {
                     </div>
 
                     <div className="mt-6 flex justify-end">
-                        <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
+                        <Button btn='secondary' onClick={closeModal}>Cancel</Button>
 
-                        <DangerButton className="ms-3" disabled={processing}>
+                        <Button btn='danger' className="ms-3" disabled={processing}>
                             Delete Account
-                        </DangerButton>
+                        </Button>
                     </div>
                 </form>
             </Modal>

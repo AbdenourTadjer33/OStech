@@ -1,10 +1,10 @@
-import { useState, createContext, useContext, Fragment } from 'react';
-import { Link } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
+import { useState, createContext, useContext, Fragment } from "react";
+import { Link } from "@inertiajs/react";
+import { Transition } from "@headlessui/react";
 
 const DropDownContext = createContext();
 
-const Dropdown = ({ children }) => {
+const Dropdown = ({ dismissOnClick = true, children }) => {
     const [open, setOpen] = useState(false);
 
     const toggleOpen = () => {
@@ -12,7 +12,7 @@ const Dropdown = ({ children }) => {
     };
 
     return (
-        <DropDownContext.Provider value={{ open, setOpen, toggleOpen }}>
+        <DropDownContext.Provider value={{ open, setOpen, toggleOpen, dismissOnClick }}>
             <div className="relative">{children}</div>
         </DropDownContext.Provider>
     );
@@ -25,26 +25,30 @@ const Trigger = ({ children }) => {
         <>
             <div onClick={toggleOpen}>{children}</div>
 
-            {open && <div className="fixed inset-0 z-40" onClick={() => setOpen(false)}></div>}
+            {open && (
+                <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setOpen(false)}
+                ></div>
+            )}
         </>
     );
 };
 
-const Content = ({ align = 'right', width = '48', contentClasses = 'py-1 bg-white', children }) => {
-    const { open, setOpen } = useContext(DropDownContext);
+const Content = ({
+    align = "right",
+    width = "w-48",
+    contentClasses = "bg-white dark:bg-gray-700",
+    children,
+}) => {
+    const { open, setOpen, dismissOnClick } = useContext(DropDownContext);
 
-    let alignmentClasses = 'origin-top';
+    let alignmentClasses = "origin-top";
 
-    if (align === 'left') {
-        alignmentClasses = 'ltr:origin-top-left rtl:origin-top-right start-0';
-    } else if (align === 'right') {
-        alignmentClasses = 'ltr:origin-top-right rtl:origin-top-left end-0';
-    }
-
-    let widthClasses = '';
-
-    if (width === '48') {
-        widthClasses = 'w-48';
+    if (align === "left") {
+        alignmentClasses = "ltr:origin-top-left rtl:origin-top-right start-0";
+    } else if (align === "right") {
+        alignmentClasses = "ltr:origin-top-right rtl:origin-top-left end-0";
     }
 
     return (
@@ -60,22 +64,29 @@ const Content = ({ align = 'right', width = '48', contentClasses = 'py-1 bg-whit
                 leaveTo="opacity-0 scale-95"
             >
                 <div
-                    className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${widthClasses}`}
-                    onClick={() => setOpen(false)}
+                    className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${width}`}
+                    onClick={() => setOpen(dismissOnClick ? false : true)}
                 >
-                    <div className={`rounded-md ring-1 ring-black ring-opacity-5 ` + contentClasses}>{children}</div>
+                    <div
+                        className={
+                            `rounded-md ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-600 ` +
+                            contentClasses
+                        }
+                    >
+                        {children}
+                    </div>
                 </div>
             </Transition>
         </>
     );
 };
 
-const DropdownLink = ({ className = '', children, ...props }) => {
+const DropdownLink = ({ className = "", children, ...props }) => {
     return (
         <Link
             {...props}
             className={
-                'block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out ' +
+                "block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out " +
                 className
             }
         >
