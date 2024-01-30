@@ -1,9 +1,14 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
+use App\Models\User;
 use Inertia\Inertia;
+use App\Models\Category;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +28,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('welcome');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -35,4 +40,38 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::get('test', function () {
+    DB::transaction(function () {
+        $category = Category::create([
+            'name' => 'Accessoire',
+            'slug' => 'accessoire',
+        ]);
+
+        $category->subCategories()->insert([
+            [
+                'name' => 'iphone',
+                'slug' => 'iphone',
+                'parent_id' => $category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Galaxy',
+                'slug' => 'galaxy',
+                'parent_id' => $category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'autre',
+                'slug' => 'autre',
+                'parent_id' => $category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+    });
+    dump(true);
+});
+
+require __DIR__ . '/auth.php';
