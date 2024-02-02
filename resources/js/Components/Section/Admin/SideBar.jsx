@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { AdminLayoutContext } from "@/Layouts/AdminLayout";
-import SidebarData from "@/Data/SidebarData";
+import SidebarData from "@/Logic/SidebarData";
 
 export default function SideBar() {
     const { isOpen, toggleSideBar } = useContext(AdminLayoutContext);
@@ -9,10 +9,10 @@ export default function SideBar() {
     return (
         <Aside>
             <ul className="space-y-2 font-medium">
-                {SidebarData.map(({ name, route, icon }) => {
+                {SidebarData.map(({ name, route, icon }, idx) => {
                     return (
                         <SideBarLink
-                            key={crypto.randomUUID()}
+                            key={idx}
                             name={name}
                             link={route}
                             Icon={icon}

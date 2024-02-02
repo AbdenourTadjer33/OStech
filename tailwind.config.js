@@ -17,6 +17,7 @@ export default {
             primary: colors.blue,
             secondary: colors.gray,
             danger: colors.red,
+            info: colors.indigo,
         },
         extend: {
             fontFamily: {

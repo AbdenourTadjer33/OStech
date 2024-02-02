@@ -21,7 +21,13 @@ class Category extends Model
         'parent_id',
     ];
 
-    public function scopeSubCategory(Builder $query) {
+    protected $casts = [
+        'created_at' => 'datetime:d-m-Y H:i',
+        'updated_at' => 'datetime:d-m-Y H:i',
+    ];
+
+    public function scopeSubCategory(Builder $query)
+    {
         $query->where('parent_id', '<>', 'null');
     }
 
@@ -41,19 +47,13 @@ class Category extends Model
     }
 
     // Accessor to check if a category is a main category (no parent)
-    public function isMainCategory() {
+    public function isMainCategory()
+    {
         return $this->parent_id === null;
     }
 
-    public function products(): HasMany|bool
+    public function products(): HasMany
     {
-        if ($this->isMainCategory()) {
-            return false;
-        }
         return $this->hasMany(Product::class, 'category_id', 'id');
     }
-
-    
-
-
 }

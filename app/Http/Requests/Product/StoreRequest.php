@@ -13,7 +13,7 @@ class StoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,15 +24,15 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => ['required', Rule::exists('categories', 'id')->where(fn (Builder $builder) => $builder->where('parent_id', null))],
-            'brand_id' => ['nullable', Rule::exists('brands', 'id')],
+            'category' => ['required'],
+            'brand' => ['nullable'],
             'name' => ['required', 'string', 'min:4', 'max:60'],
             'description' => ['nullable', 'string'],
             'details' => ['nullable', 'array'],
             'choices' => ['nullable', 'array'],
-            'qte' => ['nullable', 'integer'],
-            'promo' => ['nullable', 'float'],
-            'price' => ['required', 'float'],
+            'qte' => ['nullable', 'integer', 'numeric'],
+            'promo' => ['nullable', 'numeric'],
+            'price' => ['required', 'numeric'],
             'status' => ['required', 'boolean'],
             'catalogue' => ['required', 'boolean'],
             'images' => ['nullable', 'array'],

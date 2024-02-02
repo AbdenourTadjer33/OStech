@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Brand;
 
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BrandRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class BrandRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:40', Rule::unique('brands', 'name')],
+            'name' => ['required', 'string', 'min:2', 'max:40', Rule::unique('brands', 'name')],
             'logo' => ['required', 'image'],
             'logo_alt' => ['nullable', 'string'],
         ];

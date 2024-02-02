@@ -1,7 +1,15 @@
-import { Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { VscChromeClose } from "react-icons/vsc";
 
-export default function Modal({ children, show = false, maxWidth = '2xl', closeable = true, onClose = () => {}, className }) {
+export default function Modal({
+    children,
+    show = false,
+    maxWidth = "2xl",
+    closeable = true,
+    onClose = () => {},
+    className,
+}) {
     const close = () => {
         if (closeable) {
             onClose();
@@ -9,11 +17,15 @@ export default function Modal({ children, show = false, maxWidth = '2xl', closea
     };
 
     const maxWidthClass = {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
+        sm: "sm:max-w-sm",
+        md: "sm:max-w-md",
+        lg: "sm:max-w-lg",
+        xl: "sm:max-w-xl",
+        "2xl": "sm:max-w-2xl",
+        "3xl": "sm:max-w-3xl",
+        "4xl": "sm:max-w-4xl",
+        "5xl": "sm:max-w-5xl",
+        "6xl": "sm:max-w-6xl",
     }[maxWidth];
 
     return (
@@ -49,6 +61,15 @@ export default function Modal({ children, show = false, maxWidth = '2xl', closea
                         className={`mb-6 bg-white dark:bg-gray-700 rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full mx-auto ${maxWidthClass} ${className}`}
                     >
                         {children}
+                        {closeable && (
+                            <button
+                                type="button"
+                                onClick={(e) => close()}
+                                className="absolute top-5 right-5 p-2 rounded-full text-gray-300  hover:bg-gray-100 hover:bg-opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:bg-opacity-70 dark:focus:ring-gray-600 cursor-pointer transition duration-200 "
+                            >
+                                <VscChromeClose className="w-8 h-8" />
+                            </button>
+                        )}
                     </Dialog.Panel>
                 </Transition.Child>
             </Dialog>

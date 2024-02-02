@@ -3,20 +3,31 @@
 namespace App\Services;
 
 use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Media;
 use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager as Image;
 
 class MediaService
 {
-
-    public function storeBrandLogo(UploadedFile $media, Brand $brand): void
+    public function storeBrandLogo(UploadedFile $media, Brand $brand, null|array $cropInformation): void
     {
+        if ($cropInformation) {
+            $manager = new Image(new Driver());
+            $img = $manager->read($media);
+            $img->crop($cropInformation['width'], $cropInformation['height'], $cropInformation['x'], $cropInformation['y']);
+
+            $path = 'media/brand/' . Str::random(20) . '-' . $brand->slug . '.png';
+            $img->save($path);
+        }
+
         $brand->logo()->create([
-            'file_path' => $media->store('brand', 'media'),
+            'file_path' => isset($path) ? $path : $media->store('brand', 'media'),
             'file_type' => $media->getMimeType(),
             'file_size' => $media->getSize(),
             'file_status' => true,

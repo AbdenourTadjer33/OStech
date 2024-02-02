@@ -7,15 +7,23 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\MediaService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\BrandRequest;
+use App\Http\Requests\Brand\StoreRequest;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class BrandController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('precognitive')->only(['store', 'update']);
+    }
+
     public function index()
     {
-        return Inertia::render('Admin/Brand/Index');
+        return Inertia::render('Admin/Brand/Index', [
+            'brands' => Brand::with('logo:id,file_path,mediable_id,mediable_type')->paginate(5)
+        ]);
     }
 
     public function show(Request $request, Brand $brand)
@@ -25,11 +33,12 @@ class BrandController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Brand/Create');
+        // (new MediaService)->test();
     }
 
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        dd($request);
+        sleep(10);
         /**
          * @var \App\Models\Brand
          */
@@ -38,9 +47,14 @@ class BrandController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        (new MediaService)->storeBrandLogo($request->file('logo'), $brand);
+        (new MediaService)->storeBrandLogo($request->file('logo'), $brand, $request->logoCropInformation);
 
-        return session()->flash('');
+        session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'Brand créer avec succés.'
+        ]);
+
+        return redirect(route('admin.brands.index'));
     }
 
     public function edit(Brand $brand)
@@ -60,7 +74,7 @@ class BrandController extends Controller
         $logo = $request->file('logo');
         if ($logo && (new MediaService)->unLinkImage($brand->logo)) {
             $brand->logo->delete();
-            (new MediaService)->storeBrandLogo($logo, $brand);
+            (new MediaService)->storeBrandLogo($logo, $brand, null);
         }
 
         return session()->flash('');

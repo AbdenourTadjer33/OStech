@@ -9,13 +9,47 @@ use App\Services\MediaService;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Category\StoreRequest;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\StoreSubCategoryRequest;
+
 use App\Http\Requests\Category\UpdateRequest;
 use App\Models\Media;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
-    public function storeCategory(StoreRequest $request)
+
+    public function __construct()
+    {
+        $this->middleware('precognitive')->only('storeCategory', 'storeSubCategory');
+    }
+
+    public function index()
+    {
+        /**
+         * @var \Illuminate\Support\Collection
+         */
+        $categories = Category::get();
+
+
+        $parentCategories = $categories->filter(fn (Category $category) => $category->isMainCategory())->flatten();
+
+        $subCategories = $categories
+            ->filter(fn (Category $category) => !$category->isMainCategory())
+            ->flatten()
+            ->map(fn (Category $category) => [
+                ...$category->toArray(),
+                'parent' => $categories->where('id', $category->parent_id)->first()->only('name')
+            ]);
+
+        return Inertia::render('Admin/Category/Index', [
+            'categories' => $categories->toArray(),
+            'parentCategories' => $parentCategories->toArray(),
+            'subCategories' => $subCategories,
+        ]);
+    }
+
+    public function storeCategory(StoreCategoryRequest $request)
     {
         DB::transaction(function () use ($request) {
             Category::create([
@@ -25,24 +59,30 @@ class CategoryController extends Controller
             ]);
         });
 
-        return session()->flash('');
+        return session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'Catégorie créer avec succés'
+        ]);
     }
 
-    public function storeSubCategory(StoreRequest $request)
+    public function storeSubCategory(StoreSubCategoryRequest $request)
     {
         DB::transaction(function () use ($request) {
             $subCategory = Category::create([
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
                 'description' => $request->description,
-                'parent_id' => $request->parent_id,
+                'parent_id' => $request->category_id,
             ]);
 
             if ($banner = $request->file('banner')) {
                 (new MediaService)->storeCategoryBanner($banner, $subCategory);
             }
         });
-        return session()->flash('');
+        return session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'Sous-catégorie créer avec succés'
+        ]);
     }
 
     public function updateCategory(UpdateRequest $request)
@@ -91,15 +131,25 @@ class CategoryController extends Controller
     public function destroyCategory(Request $request)
     {
         $category = Category::where('id', $request->id)->withCount('subCategories')->firstOrFail();
-        if ($category->subCategories_count > 0) {
-            // return throw an error
+
+        if ($category->sub_categories_count) {
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'La catégorie ' . $category->name  . ' ne peut pas étre supprimé.'
+            ]);
         }
 
         if (!DB::transaction(fn () => $category->delete())) {
-            // return somthing went wrong
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'Quel que chose est mal passé, Please retry later.',
+            ]);
         }
 
-        return session()->flash('');
+        return session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'La catégorie ' . $category->name . ' est supprimé avec succés.'
+        ]);
     }
 
     public function destroySubCategory(Request $request)
@@ -107,18 +157,31 @@ class CategoryController extends Controller
         /**
          * @var \App\Models\Category
          */
-        $subCategory = Category::where('id', $request->id)->withCount('products')->with('banner')->firstOrFail();
-        if ($subCategory->products_count > 0) {
-            // return we cant delete this subcategory
+        $subCategory = Category::where('id', $request->id)->withCount('products')->firstOrFail();
+        if ($subCategory->products_count) {
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'La sous-catégorie ' . $subCategory?->name  . ' ne peut pas étre supprimé.'
+            ]);
         }
 
-        DB::transaction(function () use($subCategory) {
-            (new MediaService)->unLinkImage($subCategory->banner);
-            $subCategory->banner->delete();
-            $subCategory->delete();
+        if (!DB::transaction(fn () => $subCategory->delete())) {
+            return
+                session()->flash('alert', [
+                    'status' => 'danger',
+                    'message' => 'Quel que chose est mal passé, Please retry later.',
+                ]);
+        }
 
-        });
+        return session()->flash('alert', [
+                'status' => 'success',
+                'message' => 'La sous-catégorie ' . $subCategory?->name . ' est supprimé avec succés.'
+            ]);
 
-        return session()->flash('');
+        // DB::transaction(function () use ($subCategory) {
+        // (new MediaService)->unLinkImage($subCategory->banner);
+        // $subCategory->banner->delete();
+        // $subCategory->delete();
+        // });
     }
 }

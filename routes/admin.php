@@ -23,12 +23,15 @@ Route::prefix('brand')->controller(BrandController::class)->group(function () {
 
 Route::prefix('category')->controller(CategoryController::class)->group(function () {
     Route::get('/', 'index')->name('admin.categories.index');
-    // Route::get('/{id}', 'show')->name('admin.categories.show');
-    Route::get('/create', 'create')->name('admin.categories.create');
-    Route::post('/create', 'store')->name('admin.categories.store');
-    Route::get('/edit/{id}', 'edit')->name('admin.categories.edit');
-    Route::post('/edit/{id}', 'update')->name('admin.categories.update');
-    Route::delete('/destroy/{id}', 'destroy')->name('admin.categories.destroy');
+
+    Route::post('/create-category', 'storeCategory')->name('admin.categories.storeCategory');
+    Route::post('/create-subcategory', 'storeSubCategory')->name('admin.categories.storeSubCategory');
+
+    Route::post('/edit-category/{id}', 'updateCategory')->name('admin.categories.updateCategory');
+    Route::post('/edit-subcategory/{id}', 'updateSubCategory')->name('admin.categories.updateSubCategory');
+
+    Route::delete('/delete-category/{id}', 'destroyCategory')->name('admin.categories.destroyCategory');
+    Route::delete('/delete-subcategory/{id}', 'destroySubCategory')->name('admin.categories.destroySubCategory');
 });
 
 Route::prefix('product')->controller(ProductController::class)->group(function () {

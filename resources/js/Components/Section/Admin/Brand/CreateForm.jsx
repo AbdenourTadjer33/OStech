@@ -1,14 +1,15 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import { useForm } from "laravel-precognition-react-inertia";
 
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-import FileUpload from "@/Components/FileUpload";
 import Button from "@/Components/Button";
 import LogoUpload from "./LogoUpload";
+import ProgressBar from "@/Components/ProgressBar";
+import Spinner from "@/Components/Icons/Spinner";
 
-const CreateBrandFormContext = createContext();
+export const CreateBrandFormContext = createContext();
 
 const CreateForm = ({}) => {
     const {
@@ -16,35 +17,33 @@ const CreateForm = ({}) => {
         setData,
         post,
         processing,
+        progress,
         errors,
         validate,
         forgetError,
         reset,
-    } = useForm("post", route("admin.settings.roles.store"), {
+    } = useForm("post", route("admin.brands.store"), {
         name: "",
         logo: "",
+        logoCropInformation: null,
     });
+
+    const cleanError = (name) => {
+        forgetError(name);
+        errors.name = "";
+    };
 
     const submitHandler = (e) => {
         e.preventDefault();
-        const triggers = ["submitAndRedirect", "submitAndDontRedirect"];
-        const submitTrigger = e.nativeEvent.submitter;
-        if (triggers.includes(submitTrigger.id)) {
-            post(
-                route("admin.brands.store", {
-                    redirect: submitTrigger.id == "submitAndRedirect" ? 1 : 0,
-                }),
-                {
-                    onSuccess: () => reset(),
-                }
-            );
-        }
+        post(route("admin.brands.store"));
     };
     return (
-        <CreateBrandFormContext.Provider value={null}>
+        <CreateBrandFormContext.Provider
+            value={{ progress, data, setData, errors, cleanError }}
+        >
             <div className="mx-auto mt-5 p-4 max-w-4xl dark:bg-gray-900 rounded-lg shadow-xl border dark:border-gray-700">
-                <h1 className="text-4xl font-bold mb-7">Créer un Brand</h1>
 
+                <h1 className="text-4xl font-bold mb-7">Créer un Brand</h1>
                 <form onSubmit={submitHandler} encType="multipart/form-data">
                     <div className="mb-5">
                         <div>
@@ -59,7 +58,7 @@ const CreateForm = ({}) => {
                                 value={data.name}
                                 onChange={(e) => {
                                     setData("name", e.target.value);
-                                    forgetError("name");
+                                    cleanError("name");
                                 }}
                                 onBlur={(e) => validate("name")}
                             />
@@ -72,20 +71,13 @@ const CreateForm = ({}) => {
 
                     <div className="mb-5">
                         <InputLabel value="logo" className="mb-2" />
-                        {/* <FileUpload /> */}
                         <LogoUpload />
                     </div>
 
                     <div className="flex items-center justify-end gap-4">
-                        <Button
-                            id="submitAndDontRedirect"
-                            disabled={processing}
-                        >
+                        <Button btn="secondary" disabled={processing}>
+                            {processing && <Spinner />}
                             Ajouté
-                        </Button>
-
-                        <Button id="submitAndRedirect" disabled={processing}>
-                            Ajouté et revenir à la page précedents
                         </Button>
                     </div>
                 </form>

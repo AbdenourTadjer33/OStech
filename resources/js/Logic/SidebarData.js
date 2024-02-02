@@ -15,7 +15,6 @@ export default [
     {
         name: "Brand",
         route: "admin.brands.index",
-        iconType: "react-icons/md",
         icon: MdBrandingWatermark,
     },
     {
