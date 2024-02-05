@@ -6,17 +6,17 @@ import {
 
 const AccordionContext = createContext();
 
-const Accordion = ({ children, title, state = false, className }) => {
+const Accordion = ({ children, title, state = false }) => {
     const [open, setOpen] = useState(state);
     return (
         <AccordionContext.Provider value={{ setOpen, open }}>
             <div
                 onClick={(e) => setOpen(!open)}
-                className={`flex items-center justify-between p-4 bg-gray-200 hover:bg-opacity-70 dark:bg-gray-600 dark:hover:bg-opacity-70 rounded-lg ${
+                className={`flex items-center justify-between p-4 dark:bg-gray-600 rounded-lg ${
                     open && "rounded-b-none"
-                } shadow select-none cursor-pointer ${className}`}
+                } select-none cursor-pointer`}
             >
-                <h3 className="text-2xl">{title}</h3>
+                <h3 className="text-3xl">{title}</h3>
                 {open ? <AD className="w-6 h-6" /> : <AT className="w-6 h-6" />}
             </div>
             {children}
@@ -30,7 +30,7 @@ const Body = ({ children, className }) => {
     if (open) {
         return (
             <div
-                className={`p-4 border border-gray-200 dark:border-gray-600 ${className}`}
+                className={`p-4  ${className}`}
             >
                 {children}
             </div>

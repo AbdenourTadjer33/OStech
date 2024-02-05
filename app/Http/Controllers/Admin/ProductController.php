@@ -7,11 +7,13 @@ use App\Models\Brand;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\MediaService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\StoreRequest;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class ProductController extends Controller
 {
@@ -23,7 +25,17 @@ class ProductController extends Controller
 
     public function index()
     {
-        return Inertia::render('Admin/Product/Index');
+        $products = Product::with([
+            'category:id,name',
+            'assets' => fn (Builder $query) => $query->orderBy('file_sort', 'asc'),
+            'brand:id,name'
+        ])->paginate(5);
+
+        // dump($products->toArray());
+
+        return Inertia::render('Admin/Product/Index', [
+            'products' => $products
+        ]);
     }
 
     public function create()
@@ -44,27 +56,30 @@ class ProductController extends Controller
 
     public function store(StoreRequest $request)
     {
-        dd($request->all());
-        // DB::transaction(function () use ($request) {
-        //     $category = Category::subCategory()->where('id', $request->id)->firstOrFail();
+        DB::transaction(function () use ($request) {
+            $product = Product::create([
+                'name' => $request->input('name'),
+                'ref' => Product::generateRef(),
+                'slug' => Str::slug(now()->timestamp . '-' . $request->input('name')),
+                'description' => $request->input('description'),
+                'sku' => $request->input('sku'),
+                'qte' => $request->input('qte'),
+                'price' => $request->input('price'),
+                'promo' => $request->input('promo'),
+                'status' => $request->input('status'),
+                'catalogue' => $request->input('catalogue'),
+                'features' => $request->input('features'),
+                'category_id' => $request->input('category')['id'],
+                'brand_id' => $request?->brand ? $request->brand['id'] : null,
+            ]);
 
-        //     $product = $category->products()->create([
-        //         'name' => $request->name,
-        //         'ref' => $request->ref,
-        //         'slug' => $request->slug,
-        //         'description' => $request->description,
-        //         'details' => $request->details,
-        //         'choices' => $request->choices,
-        //         'qte' => $request->qte,
-        //         'promo' => $request->promo,
-        //         'price' => $request->price,
-        //         'status' => $request->status,
-        //         'catalogue' => $request->catalogue,
-        //         'brand_id' => $request->brand_id,
-        //     ]);
+            (new MediaService)->storeProductsImages($request->images, $product);
+        });
 
-        //     (new MediaService)->storeProductsImages($request->images, $product);
-        // });
+        return session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'product created successfully',
+        ]);
     }
 
     public function updateInformations(Request $request)

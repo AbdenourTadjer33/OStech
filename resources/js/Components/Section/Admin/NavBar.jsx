@@ -60,7 +60,7 @@ export default function NavBar() {
                                         </li>
                                         <li>
                                             <Dropdown.Link
-                                                href={route("welcome")}
+                                                // href={route("welcome")}
                                             >
                                                 Site web
                                             </Dropdown.Link>

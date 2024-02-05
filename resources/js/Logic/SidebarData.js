@@ -4,6 +4,7 @@ import {
     MdBrandingWatermark,
     MdCategory,
     MdOutlineProductionQuantityLimits,
+    MdOutlineLocalShipping,
 } from "react-icons/md";
 
 export default [
@@ -26,6 +27,11 @@ export default [
         name: "Produit",
         route: "admin.products.index",
         icon: MdOutlineProductionQuantityLimits,
+    },
+    {
+        name: "Livraison Company",
+        route: "admin.shippings.index",
+        icon: MdOutlineLocalShipping,
     },
     {
         name: "configuration",

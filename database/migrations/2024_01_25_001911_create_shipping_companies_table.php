@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('shipping_companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->nullable();
-            $table->string('description')->nullable();
-            $table->float('cost');
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

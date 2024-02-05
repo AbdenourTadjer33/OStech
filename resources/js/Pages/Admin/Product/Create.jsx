@@ -8,7 +8,7 @@ const Create = ({ brands, subCategories }) => {
         <AdminLayout>
             <Head title="Créer un produit" />
 
-            <div className="p-4 mx-auto max-w-8xl min-w-[25rem] dark:bg-gray-900 rounded-lg shadow-xl border dark:border-gray-700">
+            <div className="p-4 mx-auto max-w-7xl min-w-[25rem] dark:bg-gray-900 rounded-lg shadow-xl border dark:border-gray-700">
                 <CreateForm brands={brands} subCategories={subCategories} />
             </div>
 

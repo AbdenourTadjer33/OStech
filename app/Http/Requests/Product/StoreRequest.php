@@ -26,16 +26,20 @@ class StoreRequest extends FormRequest
         return [
             'category' => ['required'],
             'brand' => ['nullable'],
-            'name' => ['required', 'string', 'min:4', 'max:60'],
+            'name' => ['required', 'string', 'min:2'],
             'description' => ['nullable', 'string'],
-            'details' => ['nullable', 'array'],
-            'choices' => ['nullable', 'array'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['nullable', 'array'],
+            'features.*.title' => ['string'],
+            'features.*.description' => ['string'],
             'qte' => ['nullable', 'integer', 'numeric'],
             'promo' => ['nullable', 'numeric'],
             'price' => ['required', 'numeric'],
             'status' => ['required', 'boolean'],
             'catalogue' => ['required', 'boolean'],
             'images' => ['nullable', 'array'],
+            'images.*' => ['array'],
+            'images.*.file' => ['image', 'max:6000'],
         ];
     }
 }

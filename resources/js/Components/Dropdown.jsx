@@ -69,7 +69,7 @@ const Content = ({
                 >
                     <div
                         className={
-                            `rounded-md ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-600 ` +
+                            `rounded-md ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-600` +
                             contentClasses
                         }
                     >

@@ -72,7 +72,7 @@ const Index = ({ roles }) => {
                         <Table.Row>
                             <Table.Title className="px-6 py-3">id</Table.Title>
                             <Table.Title className="px-2 py-3">
-                                name
+                                role
                             </Table.Title>
                             <Table.Title className="px-2 py-3">
                                 description

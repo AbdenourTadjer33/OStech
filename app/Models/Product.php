@@ -2,29 +2,28 @@
 
 namespace App\Models;
 
+use App\Traits\ReferanceGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, ReferanceGenerator;
 
     protected $fillable = [
-        'sku',
         'ref',
         'name',
         'slug',
         'description',
-        'details',
-        'choice',
-        'promo',
+        'sku',
         'qte',
         'price',
+        'promo',
+        'features',
         'status',
         'catalogue',
         'category_id',
@@ -32,16 +31,13 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'details' => 'array',
-        'choice' => 'array',
+        'price' => 'double',
         'status' => 'boolean',
         'catalogue' => 'boolean',
+        'features' => 'array',
+        'created_at' => 'datetime:d-m-Y H:i',
+        'updated_at' => 'datetime:d-m-Y H:i'
     ];
-
-    public function productDetails(): HasMany
-    {
-        return $this->hasMany(ProductDetail::class);
-    }
 
     public function assets(): MorphMany
     {

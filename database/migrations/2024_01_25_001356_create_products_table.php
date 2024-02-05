@@ -13,18 +13,17 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('sku')->nullable()->unique();
             $table->string('ref')->unique();
             $table->string('name')->index();
             $table->string('slug')->nullable()->unique();
             $table->text('description')->nullable();
-            $table->json('details')->nullable();
-            $table->json('choice')->nullable();
+            $table->string('sku')->nullable()->unique();
             $table->integer('qte')->nullable();
-            $table->float('promo')->nullable();
             $table->float('price')->nullable();
+            $table->float('promo')->nullable();
             $table->boolean('status')->default(false);
             $table->boolean('catalogue')->default(false);
+            $table->json('features')->nullable();
             $table->foreignId('category_id')->nullable()->constrained('categories', 'id');
             $table->foreignId('brand_id')->nullable()->constrained('brands', 'id')->nullOnDelete();
             $table->timestamps();

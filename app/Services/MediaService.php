@@ -50,13 +50,13 @@ class MediaService
             /**
              * @var UploadedFile $media
              */
-            $media = $image['image'];
+            $media = $image['file'];
             $product->assets()->create([
-                'file_path' => $media->store('products', 'media'),
+                'file_path' => $media->store('product', 'media'),
                 'file_type' => $media->getMimeType(),
                 'file_size' => $media->getSize(),
                 'file_status' => true,
-                'file_sort' => $image['id'],
+                'file_sort' => $image['sort'],
             ]);
         }
     }

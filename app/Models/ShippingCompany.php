@@ -12,14 +12,21 @@ class ShippingCompany extends Model
 
     protected $fillable = [
         'name',
-        'code',
-        'description',
-        'cost',
         'status',
-    ];    
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
+    public function shippingPricings(): HasMany
+    {
+        return $this->hasMany(ShippingPricing::class);
+    }
 
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
+
 }

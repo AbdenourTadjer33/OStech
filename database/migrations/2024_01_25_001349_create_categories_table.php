@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->foreignId('parent_id')->nullable()->constrained('categories', 'id')->nullOnDelete();
             $table->timestamps();
-
-            $table->index(['name', 'slug']);
         });
     }
 

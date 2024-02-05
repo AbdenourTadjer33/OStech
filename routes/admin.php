@@ -8,12 +8,14 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\WilayaController;
+use App\Http\Controllers\Admin\ShippingController;
 
+Route::get('/', fn () => to_route('admin.dashboard'))->name('admin');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 Route::prefix('brand')->controller(BrandController::class)->group(function () {
     Route::get('/', 'index')->name('admin.brands.index');
-    // Route::get('/{id}', 'show')->name('admin.brands.show');
     Route::get('/create', 'create')->name('admin.brands.create');
     Route::post('/create', 'store')->name('admin.brands.store');
     Route::get('edit/{id}', 'edit')->name('admin.brands.edit');
@@ -36,12 +38,20 @@ Route::prefix('category')->controller(CategoryController::class)->group(function
 
 Route::prefix('product')->controller(ProductController::class)->group(function () {
     Route::get('/', 'index')->name('admin.products.index');
-    // Route::get('/{id}', 'show')->name('admin.products.show');
     Route::get('/create', 'create')->name('admin.products.create');
     Route::post('/create', 'store')->name('admin.products.store');
     Route::get('/edit/{id}', 'edit')->name('admin.products.edit');
     Route::post('/edit/{id}', 'update')->name('admin.products.update');
     Route::delete('/destroy/{id}', 'destroy')->name('admin.products.destroy');
+});
+
+Route::prefix('shipping-companies')->controller(ShippingController::class)->group(function () {
+    Route::get('/', 'index')->name('admin.shippings.index');
+    Route::get('/create', 'create')->name('admin.shippings.create');
+    Route::post('/create', 'store')->name('admin.shippings.store');
+
+    Route::get('/edit/{id}', 'edit')->name('admin.shippings.edit');
+    Route::post('/edit/{id}', 'update')->name('admin.shippings.update');
 });
 
 
@@ -71,4 +81,7 @@ Route::prefix('settings')->group(function () {
     Route::get('/users/edit/{uuid}', [AdminController::class, 'edit'])->name('admin.settings.users.edit');
     Route::post('/users/edit/{uuid}', [AdminController::class, 'update'])->name('admin.settings.users.update');
     Route::delete('/users/destroy/{uuid}', [AdminController::class, 'destroy'])->name('admin.settings.users.destroy');
+
+    Route::get('/wilaya', [WilayaController::class, 'index'])->name('admin.settings.wilaya.index');
+    Route::get('/wilaya/update', [WilayaController::class, "update"])->name('admin.settings.wilaya.update');
 });

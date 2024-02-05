@@ -4,7 +4,7 @@ const Table = ({ className = "", children, ...props }) => {
     return (
         <table
             {...props}
-            className={`w-full text-base text-left rtl:text-right text-gray-500 dark:text-gray-400 ${className}`}
+            className={`w-full text-base text-left rtl:text-right text-gray-500 dark:text-gray-400 rounded-md ${className}`}
         >
             {children}
         </table>
@@ -32,11 +32,11 @@ const Row = ({ className = "", children }) => (
 );
 
 const Title = ({ className = "", children }) => (
-    <th className={`whitespace-nowrap ${className}`}>{children}</th>
+    <th className={`${className}`}>{children}</th>
 );
 
 const Column = ({ className = "", children }) => (
-    <td className={`whitespace-nowrap ${className}`}>{children}</td>
+    <td className={`${className}`}>{children}</td>
 );
 
 Table.Row = Row;
@@ -45,5 +45,7 @@ Table.Body = Body;
 Table.Foot = Foot;
 Table.Title = Title;
 Table.Column = Column;
+
+// whitespace-nowrap;
 
 export default Table;

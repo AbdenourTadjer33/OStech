@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('coupon_code')->nullable();
             $table->float('discount')->nullable();
             $table->string('shipping_company_name')->nullable();
-            $table->float('shipping_company_cost')->default('0.00');
+            $table->float('shipping_cost')->default('0.00');
             $table->float('total');
             $table->enum('status', ['New order', 'Paid', 'Under process','Finished', 'Canceled', 'Refund requested', 'Returned order', 'Refunded order'])->default('New order');
             $table->boolean('is_online')->default(true);
