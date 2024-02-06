@@ -1,0 +1,466 @@
+[
+    {
+        "id": 1,
+        "shipping_company_id": 2,
+        "wilaya_id": 1,
+        "delay": "3",
+        "cost_home": "1450",
+        "cost_stop_desk": "1150"
+    },
+    {
+        "id": 2,
+        "shipping_company_id": 2,
+        "wilaya_id": 2,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 3,
+        "shipping_company_id": 2,
+        "wilaya_id": 3,
+        "delay": "1",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 4,
+        "shipping_company_id": 2,
+        "wilaya_id": 4,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 5,
+        "shipping_company_id": 2,
+        "wilaya_id": 5,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 6,
+        "shipping_company_id": 2,
+        "wilaya_id": 6,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 7,
+        "shipping_company_id": 2,
+        "wilaya_id": 7,
+        "delay": "1",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 8,
+        "shipping_company_id": 2,
+        "wilaya_id": 8,
+        "delay": "3",
+        "cost_home": "1450",
+        "cost_stop_desk": "1150"
+    },
+    {
+        "id": 9,
+        "shipping_company_id": 2,
+        "wilaya_id": 9,
+        "delay": "1",
+        "cost_home": "650",
+        "cost_stop_desk": "600"
+    },
+    {
+        "id": 10,
+        "shipping_company_id": 2,
+        "wilaya_id": 10,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 11,
+        "shipping_company_id": 2,
+        "wilaya_id": 11,
+        "delay": "5",
+        "cost_home": "1650",
+        "cost_stop_desk": "1550"
+    },
+    {
+        "id": 12,
+        "shipping_company_id": 2,
+        "wilaya_id": 12,
+        "delay": "1",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 13,
+        "shipping_company_id": 2,
+        "wilaya_id": 13,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 14,
+        "shipping_company_id": 2,
+        "wilaya_id": 14,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 15,
+        "shipping_company_id": 2,
+        "wilaya_id": 15,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 16,
+        "shipping_company_id": 2,
+        "wilaya_id": 16,
+        "delay": "1",
+        "cost_home": "550",
+        "cost_stop_desk": "450"
+    },
+    {
+        "id": 17,
+        "shipping_company_id": 2,
+        "wilaya_id": 17,
+        "delay": "1",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 18,
+        "shipping_company_id": 2,
+        "wilaya_id": 18,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 19,
+        "shipping_company_id": 2,
+        "wilaya_id": 19,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 20,
+        "shipping_company_id": 2,
+        "wilaya_id": 20,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 21,
+        "shipping_company_id": 2,
+        "wilaya_id": 21,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 22,
+        "shipping_company_id": 2,
+        "wilaya_id": 22,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 23,
+        "shipping_company_id": 2,
+        "wilaya_id": 23,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 24,
+        "shipping_company_id": 2,
+        "wilaya_id": 24,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 25,
+        "shipping_company_id": 2,
+        "wilaya_id": 25,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 26,
+        "shipping_company_id": 2,
+        "wilaya_id": 26,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 27,
+        "shipping_company_id": 2,
+        "wilaya_id": 27,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 28,
+        "shipping_company_id": 2,
+        "wilaya_id": 28,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 29,
+        "shipping_company_id": 2,
+        "wilaya_id": 29,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 30,
+        "shipping_company_id": 2,
+        "wilaya_id": 30,
+        "delay": "2",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 31,
+        "shipping_company_id": 2,
+        "wilaya_id": 31,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 32,
+        "shipping_company_id": 2,
+        "wilaya_id": 32,
+        "delay": "2",
+        "cost_home": "1450",
+        "cost_stop_desk": "1150"
+    },
+    {
+        "id": 33,
+        "shipping_company_id": 2,
+        "wilaya_id": 33,
+        "delay": "6",
+        "cost_home": "1650",
+        "cost_stop_desk": "1550"
+    },
+    {
+        "id": 34,
+        "shipping_company_id": 2,
+        "wilaya_id": 34,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 35,
+        "shipping_company_id": 2,
+        "wilaya_id": 35,
+        "delay": "1",
+        "cost_home": "650",
+        "cost_stop_desk": "600"
+    },
+    {
+        "id": 36,
+        "shipping_company_id": 2,
+        "wilaya_id": 36,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 37,
+        "shipping_company_id": 2,
+        "wilaya_id": 37,
+        "delay": "5",
+        "cost_home": "1650",
+        "cost_stop_desk": "1550"
+    },
+    {
+        "id": 38,
+        "shipping_company_id": 2,
+        "wilaya_id": 38,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 39,
+        "shipping_company_id": 2,
+        "wilaya_id": 39,
+        "delay": "1",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 40,
+        "shipping_company_id": 2,
+        "wilaya_id": 40,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 41,
+        "shipping_company_id": 2,
+        "wilaya_id": 41,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 42,
+        "shipping_company_id": 2,
+        "wilaya_id": 42,
+        "delay": "1",
+        "cost_home": "650",
+        "cost_stop_desk": "600"
+    },
+    {
+        "id": 43,
+        "shipping_company_id": 2,
+        "wilaya_id": 43,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 44,
+        "shipping_company_id": 2,
+        "wilaya_id": 44,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 45,
+        "shipping_company_id": 2,
+        "wilaya_id": 45,
+        "delay": "3",
+        "cost_home": "1450",
+        "cost_stop_desk": "1150"
+    },
+    {
+        "id": 46,
+        "shipping_company_id": 2,
+        "wilaya_id": 46,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 47,
+        "shipping_company_id": 2,
+        "wilaya_id": 47,
+        "delay": "2",
+        "cost_home": "1000",
+        "cost_stop_desk": "850"
+    },
+    {
+        "id": 48,
+        "shipping_company_id": 2,
+        "wilaya_id": 48,
+        "delay": "1",
+        "cost_home": "850",
+        "cost_stop_desk": "700"
+    },
+    {
+        "id": 49,
+        "shipping_company_id": 2,
+        "wilaya_id": 49,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 50,
+        "shipping_company_id": 2,
+        "wilaya_id": 50,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 51,
+        "shipping_company_id": 2,
+        "wilaya_id": 51,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 52,
+        "shipping_company_id": 2,
+        "wilaya_id": 52,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 53,
+        "shipping_company_id": 2,
+        "wilaya_id": 53,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 54,
+        "shipping_company_id": 2,
+        "wilaya_id": 54,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 55,
+        "shipping_company_id": 2,
+        "wilaya_id": 55,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 56,
+        "shipping_company_id": 2,
+        "wilaya_id": 56,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 57,
+        "shipping_company_id": 2,
+        "wilaya_id": 57,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    },
+    {
+        "id": 58,
+        "shipping_company_id": 2,
+        "wilaya_id": 58,
+        "delay": null,
+        "cost_home": null,
+        "cost_stop_desk": null
+    }
+]

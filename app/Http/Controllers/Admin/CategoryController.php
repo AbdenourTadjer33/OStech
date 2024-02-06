@@ -49,6 +49,13 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function get(Request $request)
+    {
+        return DB::table('categories')
+            ->select(['id', 'name', 'parent_id'])
+            ->get();
+    }
+
     public function storeCategory(StoreCategoryRequest $request)
     {
         DB::transaction(function () use ($request) {
@@ -174,9 +181,9 @@ class CategoryController extends Controller
         }
 
         return session()->flash('alert', [
-                'status' => 'success',
-                'message' => 'La sous-catégorie ' . $subCategory?->name . ' est supprimé avec succés.'
-            ]);
+            'status' => 'success',
+            'message' => 'La sous-catégorie ' . $subCategory?->name . ' est supprimé avec succés.'
+        ]);
 
         // DB::transaction(function () use ($subCategory) {
         // (new MediaService)->unLinkImage($subCategory->banner);

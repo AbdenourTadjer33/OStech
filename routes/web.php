@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Client\WelcomeController;
 use Inertia\Inertia;
-use App\Models\Wilaya;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ProfileController;
+
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 Route::get('/product', function () {
     return Inertia::render('Client/Product');

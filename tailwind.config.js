@@ -10,6 +10,7 @@ export default {
         "./storage/framework/views/*.php",
         "./resources/views/**/*.blade.php",
         "./resources/js/**/*.jsx",
+        "node_modules/flowbite-react/lib/esm/**/*.js",
     ],
 
     theme: {
@@ -18,6 +19,7 @@ export default {
             secondary: colors.gray,
             danger: colors.red,
             info: colors.indigo,
+            slate: colors.slate,
         },
         extend: {
             fontFamily: {

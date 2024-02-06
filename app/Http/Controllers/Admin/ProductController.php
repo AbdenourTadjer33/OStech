@@ -29,9 +29,7 @@ class ProductController extends Controller
             'category:id,name',
             'assets' => fn (Builder $query) => $query->orderBy('file_sort', 'asc'),
             'brand:id,name'
-        ])->paginate(5);
-
-        // dump($products->toArray());
+        ])->paginate(15);
 
         return Inertia::render('Admin/Product/Index', [
             'products' => $products
@@ -79,6 +77,23 @@ class ProductController extends Controller
         return session()->flash('alert', [
             'status' => 'success',
             'message' => 'product created successfully',
+        ]);
+    }
+
+    public function edit(Request $request)
+    {
+        /**
+         * @var \App\Models\Product
+         */
+        $product = Product::where('id', $request->id)->with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name'])->first();
+
+        // $brands = DB::table('brands')
+        //     ->join('media', 'brands.id', '=', 'media.mediable_id')
+        //     ->where('media.mediable_type', '=', Brand::class)
+        //     ->select('brands.id', 'brands.name', 'media.file_path')
+        //     ->get();
+        return Inertia::render('Admin/Product/Edit', [
+            'product' => $product,
         ]);
     }
 

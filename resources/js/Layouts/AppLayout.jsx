@@ -1,11 +1,16 @@
 import React, { createContext } from "react";
+import NavBar from "@/Components/Section/Client/NavBar";
 
 export const AppLayoutContext = createContext();
 
 const AppLayout = ({ children }) => {
     return (
         <AppLayoutContext.Provider value={{}}>
-            <main>{children}</main>
+            <div className="bg-gray-50 w-full min-h-screen">
+                <NavBar />
+
+                <main>{children}</main>
+            </div>
         </AppLayoutContext.Provider>
     );
 };

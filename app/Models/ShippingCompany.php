@@ -17,6 +17,8 @@ class ShippingCompany extends Model
 
     protected $casts = [
         'status' => 'boolean',
+        'created_at' => 'datetime:d-m-Y H:i',
+        'updated_at' => 'datetime:d-m-Y H:i',
     ];
 
     public function shippingPricings(): HasMany

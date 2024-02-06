@@ -12,12 +12,10 @@ const Accordion = ({ children, title, state = false }) => {
         <AccordionContext.Provider value={{ setOpen, open }}>
             <div
                 onClick={(e) => setOpen(!open)}
-                className={`flex items-center justify-between p-4 dark:bg-gray-600 rounded-lg ${
-                    open && "rounded-b-none"
-                } select-none cursor-pointer`}
+                className={`flex items-center justify-between px-4 py-1 select-none cursor-pointer`}
             >
-                <h3 className="text-3xl">{title}</h3>
-                {open ? <AD className="w-6 h-6" /> : <AT className="w-6 h-6" />}
+                <h3 className="text-base">{title}</h3>
+                {open ? <AD className="w-4 h-4" /> : <AT className="w-4 h-4" />}
             </div>
             {children}
         </AccordionContext.Provider>
@@ -30,7 +28,7 @@ const Body = ({ children, className }) => {
     if (open) {
         return (
             <div
-                className={`p-4  ${className}`}
+                className={`p-1 ${className}`}
             >
                 {children}
             </div>

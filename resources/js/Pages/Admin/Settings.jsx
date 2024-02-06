@@ -14,7 +14,7 @@ const Settings = () => {
                 <div>
                     <h5>Ici vous pouvez configurez votre application.</h5>
 
-                    <div className="grid gap-4 my-5 md:grid-cols-4">
+                    <div className="grid gap-4 my-5 lg:grid-cols-4">
                         {SettingsData.map((setting, idx) => (
                             <SettingCard key={idx} link={route(setting.route)}>
                                 <SettingCard.Title>

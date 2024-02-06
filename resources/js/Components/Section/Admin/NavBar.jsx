@@ -18,7 +18,10 @@ export default function NavBar() {
                             href={route("admin.dashboard")}
                             className="flex ms-2 md:me-24"
                         >
-                            <ApplicationLogo className="h-8 w-auto me-3" />
+                            <ApplicationLogo
+                                type="dark"
+                                className="h-8 w-auto me-3"
+                            />
                         </Link>
                     </div>
 
@@ -60,7 +63,7 @@ export default function NavBar() {
                                         </li>
                                         <li>
                                             <Dropdown.Link
-                                                // href={route("welcome")}
+                                            // href={route("welcome")}
                                             >
                                                 Site web
                                             </Dropdown.Link>

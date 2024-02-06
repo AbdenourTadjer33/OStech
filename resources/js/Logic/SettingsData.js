@@ -15,3 +15,4 @@ export default [
         route: "admin.settings.wilaya.index",
     },
 ];
+// 

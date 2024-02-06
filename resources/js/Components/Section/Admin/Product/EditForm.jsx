@@ -13,10 +13,13 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import SelectCategory from "./SelectCategory";
 import SelectBrand from "./SelectBrand";
 import DescriptionInput from "./DescriptionInput";
+import { useEffect } from "react";
+import RichEditor from "@/Components/RichEditor";
+import EditCategory from "./Edit/EditCategory";
 
-export const CreateProductFormContext = createContext();
+export const EditProductFormContext = createContext();
 
-const CreateForm = ({ brands, subCategories }) => {
+const EditForm = ({ product }) => {
     const {
         data,
         setData,
@@ -27,128 +30,45 @@ const CreateForm = ({ brands, subCategories }) => {
         validate,
         forgetError,
         reset,
-    } = useForm("post", route("admin.products.store"), {
-        category: "",
-        brand: "",
-        name: "",
-        description: "",
-        qte: "",
-        promo: "",
-        price: "",
-        features: [],
-        status: true,
-        catalogue: true,
-        images: [],
+    } = useForm("post", route("admin.products.update", { id: product.id }), {
+        parentCategory: product?.category?.parent_category,
+        category: product?.category,
+        brand: product?.brand,
+        name: product?.name,
+        description: product?.description,
+        qte: product?.qte,
+        promo: product?.promo,
+        price: product?.price,
+        features: product?.features,
+        status: product?.status,
+        catalogue: product?.catalogue,
+        images: product?.assets,
     });
 
     const [option, setOption] = useState({
-        qte: false,
-        promo: false,
-        brand: false,
-        sku: false,
+        qte: true,
+        promo: true,
+        brand: true,
+        sku: true,
     });
 
     const submitHandler = (e) => {
         e.preventDefault();
-        post(route("admin.products.store"), {
+        post(route("admin.products.update", { id: product.id }), {
             onSuccess: () => reset(),
         });
     };
 
-    return (
-        <CreateProductFormContext.Provider
-            value={{ data, setData, errors, progress, subCategories, brands }}
-        >
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-2xl sm:text-4xl font-bold">
-                    Créer un produit
-                </h1>
+    // useEffect(() => {
+    //     console.log(brands);
+    //     console.log(categories);
+    //     console.log(product);
+    // }, []);
 
-                <Dropdown dismissOnClick={false}>
-                    <Dropdown.Trigger>
-                        <Button type="button" btn="info">
-                            Plus d'option
-                            <MdKeyboardArrowDown className="h-5 w-5 ms-2" />
-                        </Button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Content align="right" width="w-56">
-                        <div className="p-4 text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white overflow-hidden">
-                            <h5 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-                                Ajouter plus de formulaire
-                            </h5>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="sku"
-                                        value={option?.sku}
-                                        checked={option?.sku}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                sku: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="sku"
-                                        value="Ajouté un sku"
-                                    />
-                                </li>
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="brand"
-                                        value={option?.brand}
-                                        checked={option?.brand}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                brand: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="brand"
-                                        value="Attribuer à un brand"
-                                    />
-                                </li>
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="qte"
-                                        value={option?.qte}
-                                        checked={option?.qte}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                qte: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="qte"
-                                        value="Quantité"
-                                    />
-                                </li>
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="promo"
-                                        value={option?.promo}
-                                        checked={option?.promo}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                promo: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="promo"
-                                        value="Ajouté une promotion"
-                                    />
-                                </li>
-                            </ul>
-                        </div>
-                    </Dropdown.Content>
-                </Dropdown>
+    return (
+        <EditProductFormContext.Provider value={{ data, setData, errors }}>
+            <div className="flex items-center justify-between mb-8">
+                <h1 className="text-2xl sm:text-4xl font-bold">Edit product</h1>
             </div>
 
             <form onSubmit={submitHandler} encType="multipart/form-data">
@@ -161,17 +81,13 @@ const CreateForm = ({ brands, subCategories }) => {
                         <TextInput
                             id="name"
                             name="name"
-                            value={data.name}
+                            value={data.name || ""}
                             onChange={(e) => setData("name", e.target.value)}
                             onBlur={(e) => validate("name")}
                         />
 
                         <InputError message={errors.name} className="mt-2" />
                     </div>
-
-                    <SelectCategory />
-                    
-                    {option?.brand && <SelectBrand />}
 
                     {option?.sku && (
                         <div>
@@ -183,7 +99,7 @@ const CreateForm = ({ brands, subCategories }) => {
                             <TextInput
                                 id="sku"
                                 name="sku"
-                                value={data.sku}
+                                value={data.sku || ""}
                                 onChange={(e) => {
                                     setData("sku", e.target.value);
                                 }}
@@ -206,7 +122,7 @@ const CreateForm = ({ brands, subCategories }) => {
                                 <TextInput
                                     id="qte"
                                     name="qte"
-                                    value={data.qte}
+                                    value={data.qte || ""}
                                     onChange={(e) =>
                                         setData("qte", e.target.value)
                                     }
@@ -218,12 +134,23 @@ const CreateForm = ({ brands, subCategories }) => {
                     )}
 
                     <div className="sm:col-span-3">
-                        <DescriptionInput />
+                        <RichEditor
+                            value={data.description || ""}
+                            onChange={(e) => setData("description", e)}
+                        />
                     </div>
+
+                    <div className="sm:col-span-3">
+                        <EditCategory />
+                    </div>
+
+                    {/* <SelectCategory /> */}
+
+                    {/* <SelectBrand /> */}
 
                     <div>
                         <InputLabel htmlFor="price" required className="mb-2">
-                            Prix de produit
+                            Prix produit
                         </InputLabel>
 
                         <div className="relative">
@@ -235,7 +162,7 @@ const CreateForm = ({ brands, subCategories }) => {
                             <TextInput
                                 id="price"
                                 name="price"
-                                value={data.price}
+                                value={data.price || ""}
                                 className=""
                                 onChange={(e) =>
                                     setData("price", e.target.value)
@@ -247,11 +174,9 @@ const CreateForm = ({ brands, subCategories }) => {
 
                     {option?.promo && (
                         <div>
-                            <InputLabel
-                                htmlFor="promo"
-                                value="Ajouté une promotion pour le produit"
-                                className="mb-2"
-                            />
+                            <InputLabel htmlFor="promo" className="mb-2">
+                                Promotion produit
+                            </InputLabel>
                             <div className="relative">
                                 <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
                                     <span className="text-gray-500 dark:text-gray-200">
@@ -261,7 +186,7 @@ const CreateForm = ({ brands, subCategories }) => {
                                 <TextInput
                                     id="promo"
                                     name="promo"
-                                    value={data.promo}
+                                    value={data.promo || ""}
                                     onChange={(e) =>
                                         setData("promo", e.target.value)
                                     }
@@ -324,11 +249,9 @@ const CreateForm = ({ brands, subCategories }) => {
                     </label>
                 </div>
 
-                <DetailsSection />
+                {/* <DetailsSection /> */}
 
-                <div className="mb-5">
-                    <ImageUpload />
-                </div>
+                <div className="mb-5">{/* <ImageUpload /> */}</div>
 
                 <div className="text-center">
                     <Button type="submit" btn="primary">
@@ -336,8 +259,8 @@ const CreateForm = ({ brands, subCategories }) => {
                     </Button>
                 </div>
             </form>
-        </CreateProductFormContext.Provider>
+        </EditProductFormContext.Provider>
     );
 };
 
-export default CreateForm;
+export default EditForm;

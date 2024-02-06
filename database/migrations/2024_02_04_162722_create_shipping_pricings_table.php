@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('shipping_company_id')->constrained();
             $table->foreignId('wilaya_id')->constrained('wilayas');
-            $table->string('delay')->nullable();
-            $table->string('cost_home')->nullable();
-            $table->string('cost_stop_desk')->nullable();
+            $table->float('delay')->nullable();
+            $table->float('cost_home')->nullable();
+            $table->float('cost_stop_desk')->nullable();
         });
     }
 

@@ -23,8 +23,13 @@ class ShippingController extends Controller
 
     public function index()
     {
+        $shippingCompany = ShippingCompany::with('shippingPricings')->paginate(10);
+
+        $pricings = ShippingPricing::paginate(10);
+
         return Inertia::render('Admin/Shipping/Index', [
-        'shippings' => ShippingCompany::all(),
+            'shippings' => $shippingCompany,
+            'pricings' => $pricings
         ]);
     }
 

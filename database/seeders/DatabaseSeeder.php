@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\ShippingCompany;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -100,5 +101,12 @@ class DatabaseSeeder extends Seeder
         }, $cities);
 
         DB::table('cities')->insert($cities);
+
+        $shipping = ShippingCompany::create([
+            'name' => 'yalidine',
+            'status' => true,
+        ]);
+
+        $shipping->shippingPricings()->createMany(Storage::json('data/yalidinePrices.json'));
     }
 }
