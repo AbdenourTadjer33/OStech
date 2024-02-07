@@ -34,17 +34,24 @@ import "axios";
 const ImageUpload = () => {
     const { data, setData, errors } = useContext(CreateProductFormContext);
 
+    // image importation states
     const [importModal, setImportModal] = useState(false);
     const [importedFiles, setImportedFiles] = useState([]);
+
+    // loading state
     const [isLoading, setIsLoading] = useState(false);
 
+    // dnd states
     const [draggedRow, setDraggedRow] = useState(null);
     const [dragOverRow, setDragOverRow] = useState(null);
+
+    // feature state's
     const [img, setImg] = useState(null);
     const [seeModal, setSeeModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState({ status: false });
-    const [editModal, setEditModal] = useState(false);
+    const [editModal, setEditModal] = useState({ status: false });
 
+    // crop state
     const [crop, setCrop] = useState({});
 
     const imgRef = useRef();
@@ -62,8 +69,6 @@ const ImageUpload = () => {
             });
         });
     };
-
-    const closeImportModal = () => {};
 
     const removeImportedFile = (idx) => {
         const files = [...importedFiles];
@@ -133,9 +138,7 @@ const ImageUpload = () => {
     const openDeleteModal = (idx) => {
         setDeleteModal({ status: true, imageId: idx });
     };
-    useEffect(() => {
-        console.log(data.images);
-    }, [data.images]);
+
     const deleteImg = async () => {
         setIsLoading(true);
         const idx = deleteModal.imageId;
@@ -149,6 +152,7 @@ const ImageUpload = () => {
                 images.splice(idx, 1);
                 setData("images", images);
                 setIsLoading(false);
+                setDeleteModal({ status: false });
             } else {
                 alert("un probleme est sourvenu, veuillez contactez le dev");
             }
@@ -158,8 +162,29 @@ const ImageUpload = () => {
         }
     };
 
-    const openEditModal = () => {
-        setEditModal(() => true);
+    const openEditModal = (idx) => {
+        setEditModal({ status: true, imageId: idx });
+    };
+
+    useEffect(() => {
+        console.log(data.images);
+    }, [data.images])
+
+    const editImg = async (cropInfo) => {
+        setIsLoading(true);
+        const idx = editModal.imageId;
+        try {
+            const response = await axios.post(route("api.edit.temp.img"), {
+                path: data.images[idx],
+                cropInfo,
+            });
+            setData("images", [...data.images]);
+            setIsLoading(false);
+            setEditModal({ status: false });
+        } catch (error) {
+            console.error("Error when editing img on the serve", error);
+            setIsLoading(false);
+        }
     };
 
     const onImageLoad = (e) => {
@@ -185,10 +210,12 @@ const ImageUpload = () => {
 
     return (
         <>
+            {/* title */}
             <div className="flex justify-between items-center mb-5">
                 <h2 className="text-3xl">Images</h2>
             </div>
 
+            {/* main */}
             <div className={`h-full overflow-auto rounded-lg shadow-lg`}>
                 <div className="bg-gray-50 dark:bg-gray-700 shadow-sm py-3 px-4 flex justify-end gap-4">
                     <Button
@@ -254,7 +281,7 @@ const ImageUpload = () => {
                                             btn="info"
                                             onClick={(e) => {
                                                 setImg("/media/" + image);
-                                                openEditModal();
+                                                openEditModal(idx);
                                             }}
                                             className="capitalize"
                                         >
@@ -283,6 +310,7 @@ const ImageUpload = () => {
                 )}
             </div>
 
+            {/* import modal */}
             <Modal show={importModal} maxWidth="4xl" closeable={false}>
                 <div className="py-4 px-5 bg-gray-100 dark:bg-gray-600">
                     <h1 className="text-3xl font-semibold dark:text-white text-gray-900 mb-6">
@@ -364,6 +392,7 @@ const ImageUpload = () => {
                 </div>
             </Modal>
 
+            {/* display image modal */}
             <Transition show={seeModal} as={Fragment} leave="duration-200">
                 <Dialog
                     as="div"
@@ -411,7 +440,8 @@ const ImageUpload = () => {
                 </Dialog>
             </Transition>
 
-            <Modal show={editModal} maxWidth="2xl" closeable={false}>
+            {/* edit modal */}
+            <Modal show={editModal.status} maxWidth="2xl" closeable={false}>
                 <div className="p-4">
                     <h1 className="text-3xl font-semibold capitalize dark:text-white text-gray-900">
                         éditer image
@@ -435,21 +465,25 @@ const ImageUpload = () => {
                         </ReactCrop>
                     </div>
 
-                    <div className="mt-4">
-                        {crop && (
-                            <canvas
-                                ref={previewCanvasRef}
-                                className="mt-4"
-                                style={{
-                                    // display: "none",
-                                    border: "1px solid black",
-                                    objectFit: "contain",
-                                    width: 150,
-                                    height: 150,
-                                }}
-                            />
-                        )}
-                    </div>
+                    {crop && (
+                        <canvas
+                            ref={previewCanvasRef}
+                            className="mt-4"
+                            style={{
+                                display: "none",
+                                border: "1px solid black",
+                                objectFit: "contain",
+                                width: 150,
+                                height: 150,
+                            }}
+                        />
+                    )}
+
+                    {isLoading && (
+                        <div className="progress-bar">
+                            <div className="progress-bar-value"></div>
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-2 justify-center mt-4">
                         <Button
@@ -463,11 +497,8 @@ const ImageUpload = () => {
                                         imgRef.current.height
                                     )
                                 );
-                                // setData("logoCropInformation", cropInfo);
-                                // setImg(() =>
-                                // previewCanvasRef.current.toDataURL()
-                                // );
-                                // setEditModal(false);
+                                // here you may send http request to update the reel image
+                                editImg(cropInfo);
                             }}
                         >
                             éditer
@@ -475,7 +506,7 @@ const ImageUpload = () => {
                         <Button
                             btn="danger"
                             onClick={() => {
-                                setEditModal(false), setImg(null);
+                                setEditModal({ status: false }), setImg(null);
                             }}
                         >
                             Cancel
@@ -484,6 +515,7 @@ const ImageUpload = () => {
                 </div>
             </Modal>
 
+            {/* delete modal */}
             <Modal show={deleteModal.status} maxWidth="2xl" closeable={false}>
                 <div className="py-6 px-4">
                     <div className="mb-3 text-gray-400 dark:text-gray-200">
