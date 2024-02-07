@@ -1,6 +1,6 @@
 import React, {forwardRef} from "react";
 
-const Button = ({ btn = "primary", className, children, disabled, ...props }) => {
+const Button = ({ btn = "primary", className="", children, disabled, ...props }) => {
     
     const basedStyle = `inline-flex items-center text-white focus:ring-2 focus:ring-info-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none dark:focus:ring-info-800 disabled:opacity-25 transition ease-in-out duration-150 ${disabled && "opacity-25"} ${className}`;
 

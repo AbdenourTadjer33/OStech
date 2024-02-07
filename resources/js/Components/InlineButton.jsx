@@ -1,6 +1,6 @@
 import React from "react";
 
-const InlineButton = ({ btn="primary", children, className, type = "button", ...props }) => {
+const InlineButton = ({ btn="primary", children, className="", type = "button", ...props }) => {
 
     const btnsStyles = {
         primary: `text-primary-700 hover:text-primary-800 dark:text-primary-600 dark:hover:text-primary-700`,

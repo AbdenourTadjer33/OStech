@@ -49,13 +49,6 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function get(Request $request)
-    {
-        return DB::table('categories')
-            ->select(['id', 'name', 'parent_id'])
-            ->get();
-    }
-
     public function storeCategory(StoreCategoryRequest $request)
     {
         DB::transaction(function () use ($request) {

@@ -1,10 +1,10 @@
 import React, { createRef, useContext, useEffect } from "react";
-import { CreateProductFormContext } from "./CreateForm";
+import { CreateProductFormContext } from "../CreateForm";
 import TextInput from "@/Components/TextInput";
 import Button from "@/Components/Button";
 import { MdDelete } from "react-icons/md";
 
-const DetailsSection = () => {
+const Features = () => {
     const { data, setData } = useContext(CreateProductFormContext);
 
     const handleAdd = (e) => {
@@ -33,33 +33,35 @@ const DetailsSection = () => {
                 </Button>
             </div>
 
-            {data.features.map((feature, idx) => {
-                return (
-                    <div key={idx} className="flex items-center gap-4 mb-4">
-                        <TextInput
-                            name="title"
-                            value={feature.title}
-                            onChange={(e) => handleChange(e, idx)}
-                            placeholder="Titre"
-                            className="basis-1/3"
-                        />
-                        <TextInput
-                            name="description"
-                            value={feature.description}
-                            onChange={(e) => handleChange(e, idx)}
-                            placeholder="Description"
-                            className="basis-2/3"
-                        />
-                        <button
-                            type="button"
-                            onClick={(e) => handleDelete(e, idx)}
-                            className="p-2.5 bg-red-700 hover:bg-red-800 rounded-lg"
-                        >
-                            <MdDelete className="w-5 h-5" />
-                        </button>
-                    </div>
-                );
-            })}
+            <div className="space-y-4">
+                {data.features.map((feature, idx) => {
+                    return (
+                        <div key={idx} className="flex items-center gap-4">
+                            <TextInput
+                                name="title"
+                                value={feature.title}
+                                onChange={(e) => handleChange(e, idx)}
+                                placeholder="Titre"
+                                className="basis-1/3"
+                            />
+                            <TextInput
+                                name="description"
+                                value={feature.description}
+                                onChange={(e) => handleChange(e, idx)}
+                                placeholder="Description"
+                                className="basis-2/3"
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => handleDelete(e, idx)}
+                                className="p-2.5 bg-red-700 hover:bg-red-800 rounded-lg"
+                            >
+                                <MdDelete className="w-5 h-5" />
+                            </button>
+                        </div>
+                    );
+                })}
+            </div>
 
             {/* <div className="mb-5">
                 <ul className="mt-5 rounded-lg overflow-hidden w-full  mx-auto divide-y divide-gray-200">
@@ -89,4 +91,4 @@ const DetailsSection = () => {
     );
 };
 
-export default DetailsSection;
+export default Features;

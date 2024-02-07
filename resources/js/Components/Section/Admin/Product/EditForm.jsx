@@ -1,21 +1,16 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { useForm } from "laravel-precognition-react-inertia";
+
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-import Dropdown from "@/Components/Dropdown";
 import Button from "@/Components/Button";
-import Checkbox from "@/Components/Checkbox";
 import Toggle from "@/Components/Toggle";
-import ImageUpload from "./ImageUpload";
-import DetailsSection from "./DetailsSection";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import SelectCategory from "./SelectCategory";
-import SelectBrand from "./SelectBrand";
-import DescriptionInput from "./DescriptionInput";
-import { useEffect } from "react";
 import RichEditor from "@/Components/RichEditor";
-import EditCategory from "./Edit/EditCategory";
+
+import EditCategoryBrand from "./Edit/EditCategoryBrand";
+import EditFeatures from "./Edit/EditFeatures";
+import EditImages from "./Edit/EditImages";
 
 export const EditProductFormContext = createContext();
 
@@ -39,10 +34,10 @@ const EditForm = ({ product }) => {
         qte: product?.qte,
         promo: product?.promo,
         price: product?.price,
-        features: product?.features,
+        features: product?.features || [],
         status: product?.status,
         catalogue: product?.catalogue,
-        images: product?.assets,
+        images: product?.assets || [],
     });
 
     const [option, setOption] = useState({
@@ -54,16 +49,11 @@ const EditForm = ({ product }) => {
 
     const submitHandler = (e) => {
         e.preventDefault();
-        post(route("admin.products.update", { id: product.id }), {
-            onSuccess: () => reset(),
-        });
+        console.log(data);
+        // post(route("admin.products.update", { id: product.id }), {
+        // onSuccess: () => reset(),
+        // });
     };
-
-    // useEffect(() => {
-    //     console.log(brands);
-    //     console.log(categories);
-    //     console.log(product);
-    // }, []);
 
     return (
         <EditProductFormContext.Provider value={{ data, setData, errors }}>
@@ -89,64 +79,61 @@ const EditForm = ({ product }) => {
                         <InputError message={errors.name} className="mt-2" />
                     </div>
 
-                    {option?.sku && (
-                        <div>
-                            <InputLabel
-                                htmlFor="sku"
-                                value="SKU"
-                                className="mb-2"
-                            />
-                            <TextInput
-                                id="sku"
-                                name="sku"
-                                value={data.sku || ""}
-                                onChange={(e) => {
-                                    setData("sku", e.target.value);
-                                }}
-                            />
-                            <InputError message={errors.sku} className="mt-2" />
-                        </div>
-                    )}
+                    <div>
+                        <InputLabel
+                            htmlFor="sku"
+                            value="SKU"
+                            className="mb-2"
+                        />
+                        <TextInput
+                            id="sku"
+                            name="sku"
+                            value={data.sku || ""}
+                            onChange={(e) => {
+                                setData("sku", e.target.value);
+                            }}
+                        />
+                        <InputError message={errors.sku} className="mt-2" />
+                    </div>
 
-                    {option?.qte && (
-                        <div>
-                            <InputLabel htmlFor="qte" className="mb-2">
-                                Quantité de produit desponibe
-                            </InputLabel>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
-                                    <span className="text-gray-500 dark:text-gray-200">
-                                        pc
-                                    </span>
-                                </div>
-                                <TextInput
-                                    id="qte"
-                                    name="qte"
-                                    value={data.qte || ""}
-                                    onChange={(e) =>
-                                        setData("qte", e.target.value)
-                                    }
-                                />
+                    <div>
+                        <InputLabel htmlFor="qte" className="mb-2">
+                            Quantité de produit desponibe
+                        </InputLabel>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
+                                <span className="text-gray-500 dark:text-gray-200">
+                                    pc
+                                </span>
                             </div>
-
-                            <InputError message={errors.qte} className="mt-2" />
+                            <TextInput
+                                id="qte"
+                                name="qte"
+                                value={data.qte || ""}
+                                onChange={(e) => setData("qte", e.target.value)}
+                            />
                         </div>
-                    )}
+
+                        <InputError message={errors.qte} className="mt-2" />
+                    </div>
 
                     <div className="sm:col-span-3">
+                        <InputLabel className="mb-2">
+                            Description de produit
+                        </InputLabel>
                         <RichEditor
                             value={data.description || ""}
                             onChange={(e) => setData("description", e)}
                         />
+                        <InputError
+                            message={errors.description}
+                            className="mt-2"
+                        />
                     </div>
 
                     <div className="sm:col-span-3">
-                        <EditCategory />
+                        <EditCategoryBrand />
                     </div>
-
-                    {/* <SelectCategory /> */}
-
-                    {/* <SelectBrand /> */}
 
                     <div>
                         <InputLabel htmlFor="price" required className="mb-2">
@@ -172,33 +159,30 @@ const EditForm = ({ product }) => {
                         <InputError message={errors.price} className="mt-2" />
                     </div>
 
-                    {option?.promo && (
-                        <div>
-                            <InputLabel htmlFor="promo" className="mb-2">
-                                Promotion produit
-                            </InputLabel>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
-                                    <span className="text-gray-500 dark:text-gray-200">
-                                        %
-                                    </span>
-                                </div>
-                                <TextInput
-                                    id="promo"
-                                    name="promo"
-                                    value={data.promo || ""}
-                                    onChange={(e) =>
-                                        setData("promo", e.target.value)
-                                    }
-                                />
+                    <div>
+                        <InputLabel htmlFor="promo" className="mb-2">
+                            Promotion produit
+                        </InputLabel>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
+                                <span className="text-gray-500 dark:text-gray-200">
+                                    %
+                                </span>
                             </div>
-                            <InputError
-                                message={errors.promo}
-                                className="mt-2"
+                            <TextInput
+                                id="promo"
+                                name="promo"
+                                value={data.promo || ""}
+                                onChange={(e) =>
+                                    setData("promo", e.target.value)
+                                }
                             />
                         </div>
-                    )}
+                        <InputError message={errors.promo} className="mt-2" />
+                    </div>
                 </div>
+
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
                 <div className="flex gap-4 flex-col justify-center lg:flex-row mb-5">
                     <label htmlFor="status">
@@ -249,9 +233,17 @@ const EditForm = ({ product }) => {
                     </label>
                 </div>
 
-                {/* <DetailsSection /> */}
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
-                <div className="mb-5">{/* <ImageUpload /> */}</div>
+                <div className="mb-5">
+                    <EditFeatures />
+                </div>
+
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
+
+                <div className="mb-5">
+                    <EditImages />
+                </div>
 
                 <div className="text-center">
                     <Button type="submit" btn="primary">

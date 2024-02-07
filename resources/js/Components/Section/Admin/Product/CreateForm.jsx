@@ -3,20 +3,16 @@ import { useForm } from "laravel-precognition-react-inertia";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-import Dropdown from "@/Components/Dropdown";
 import Button from "@/Components/Button";
-import Checkbox from "@/Components/Checkbox";
 import Toggle from "@/Components/Toggle";
-import ImageUpload from "./ImageUpload";
-import DetailsSection from "./DetailsSection";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import SelectCategory from "./SelectCategory";
-import SelectBrand from "./SelectBrand";
-import DescriptionInput from "./DescriptionInput";
+import ImageUpload from "./Create/ImageUpload";
+import RichEditor from "@/Components/RichEditor";
+import CategoryBrand from "./Create/CategoryBrand";
+import Features from "./Create/Features";
 
 export const CreateProductFormContext = createContext();
 
-const CreateForm = ({ brands, subCategories }) => {
+const CreateForm = ({}) => {
     const {
         data,
         setData,
@@ -28,8 +24,9 @@ const CreateForm = ({ brands, subCategories }) => {
         forgetError,
         reset,
     } = useForm("post", route("admin.products.store"), {
-        category: "",
-        brand: "",
+        parentCategory: [],
+        category: [],
+        brand: [],
         name: "",
         description: "",
         qte: "",
@@ -41,118 +38,26 @@ const CreateForm = ({ brands, subCategories }) => {
         images: [],
     });
 
-    const [option, setOption] = useState({
-        qte: false,
-        promo: false,
-        brand: false,
-        sku: false,
-    });
-
     const submitHandler = (e) => {
         e.preventDefault();
-        post(route("admin.products.store"), {
-            onSuccess: () => reset(),
-        });
+        console.log(data);
+        // post(route("admin.products.store"), {
+        //     onSuccess: () => reset(),
+        // });
     };
 
     return (
         <CreateProductFormContext.Provider
-            value={{ data, setData, errors, progress, subCategories, brands }}
+            value={{ data, setData, errors, progress }}
         >
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl sm:text-4xl font-bold">
                     Créer un produit
                 </h1>
-
-                <Dropdown dismissOnClick={false}>
-                    <Dropdown.Trigger>
-                        <Button type="button" btn="info">
-                            Plus d'option
-                            <MdKeyboardArrowDown className="h-5 w-5 ms-2" />
-                        </Button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Content align="right" width="w-56">
-                        <div className="p-4 text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white overflow-hidden">
-                            <h5 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-                                Ajouter plus de formulaire
-                            </h5>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="sku"
-                                        value={option?.sku}
-                                        checked={option?.sku}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                sku: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="sku"
-                                        value="Ajouté un sku"
-                                    />
-                                </li>
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="brand"
-                                        value={option?.brand}
-                                        checked={option?.brand}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                brand: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="brand"
-                                        value="Attribuer à un brand"
-                                    />
-                                </li>
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="qte"
-                                        value={option?.qte}
-                                        checked={option?.qte}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                qte: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="qte"
-                                        value="Quantité"
-                                    />
-                                </li>
-                                <li className="flex items-center">
-                                    <Checkbox
-                                        id="promo"
-                                        value={option?.promo}
-                                        checked={option?.promo}
-                                        onChange={(e) =>
-                                            setOption({
-                                                ...option,
-                                                promo: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <InputLabel
-                                        htmlFor="promo"
-                                        value="Ajouté une promotion"
-                                    />
-                                </li>
-                            </ul>
-                        </div>
-                    </Dropdown.Content>
-                </Dropdown>
             </div>
 
             <form onSubmit={submitHandler} encType="multipart/form-data">
-                <div className="grid gap-4 mb-5 md:grid-cols-3">
+                {/* <div className="grid gap-4 mb-5 md:grid-cols-3">
                     <div>
                         <InputLabel htmlFor="name" required className="mb-2">
                             Nom de produit
@@ -169,56 +74,62 @@ const CreateForm = ({ brands, subCategories }) => {
                         <InputError message={errors.name} className="mt-2" />
                     </div>
 
-                    <SelectCategory />
-                    
-                    {option?.brand && <SelectBrand />}
+                    <div>
+                        <InputLabel
+                            htmlFor="sku"
+                            value="SKU"
+                            className="mb-2"
+                        />
+                        <TextInput
+                            id="sku"
+                            name="sku"
+                            value={data.sku}
+                            onChange={(e) => {
+                                setData("sku", e.target.value);
+                            }}
+                        />
+                        <InputError message={errors.sku} className="mt-2" />
+                    </div>
 
-                    {option?.sku && (
-                        <div>
-                            <InputLabel
-                                htmlFor="sku"
-                                value="SKU"
-                                className="mb-2"
-                            />
-                            <TextInput
-                                id="sku"
-                                name="sku"
-                                value={data.sku}
-                                onChange={(e) => {
-                                    setData("sku", e.target.value);
-                                }}
-                            />
-                            <InputError message={errors.sku} className="mt-2" />
-                        </div>
-                    )}
-
-                    {option?.qte && (
-                        <div>
-                            <InputLabel htmlFor="qte" className="mb-2">
-                                Quantité de produit desponibe
-                            </InputLabel>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
-                                    <span className="text-gray-500 dark:text-gray-200">
-                                        pc
-                                    </span>
-                                </div>
-                                <TextInput
-                                    id="qte"
-                                    name="qte"
-                                    value={data.qte}
-                                    onChange={(e) =>
-                                        setData("qte", e.target.value)
-                                    }
-                                />
+                    <div>
+                        <InputLabel htmlFor="qte" className="mb-2">
+                            Quantité de produit desponibe
+                        </InputLabel>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
+                                <span className="text-gray-500 dark:text-gray-200">
+                                    pc
+                                </span>
                             </div>
-
-                            <InputError message={errors.qte} className="mt-2" />
+                            <TextInput
+                                id="qte"
+                                name="qte"
+                                value={data.qte}
+                                onChange={(e) => setData("qte", e.target.value)}
+                            />
                         </div>
-                    )}
+
+                        <InputError message={errors.qte} className="mt-2" />
+                    </div>
 
                     <div className="sm:col-span-3">
-                        <DescriptionInput />
+                        <InputLabel className="mb-2">
+                            Description de produit
+                        </InputLabel>
+
+                        <RichEditor
+                            name="description"
+                            value={data.description}
+                            onChange={(e) => setData("description", e)}
+                        />
+                        <InputError
+                            message={errors.description}
+                            className="mt-2"
+                        />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                        <CategoryBrand />
                     </div>
 
                     <div>
@@ -245,35 +156,32 @@ const CreateForm = ({ brands, subCategories }) => {
                         <InputError message={errors.price} className="mt-2" />
                     </div>
 
-                    {option?.promo && (
-                        <div>
-                            <InputLabel
-                                htmlFor="promo"
-                                value="Ajouté une promotion pour le produit"
-                                className="mb-2"
-                            />
-                            <div className="relative">
-                                <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
-                                    <span className="text-gray-500 dark:text-gray-200">
-                                        %
-                                    </span>
-                                </div>
-                                <TextInput
-                                    id="promo"
-                                    name="promo"
-                                    value={data.promo}
-                                    onChange={(e) =>
-                                        setData("promo", e.target.value)
-                                    }
-                                />
+                    <div>
+                        <InputLabel htmlFor="promo" className="mb-2">
+                            Promotion produit
+                        </InputLabel>
+
+                        <div className="relative">
+                            <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 pointer-events-none">
+                                <span className="text-gray-500 dark:text-gray-200">
+                                    %
+                                </span>
                             </div>
-                            <InputError
-                                message={errors.promo}
-                                className="mt-2"
+                            <TextInput
+                                id="promo"
+                                name="promo"
+                                value={data.promo}
+                                onChange={(e) =>
+                                    setData("promo", e.target.value)
+                                }
                             />
                         </div>
-                    )}
+
+                        <InputError message={errors.promo} className="mt-2" />
+                    </div>
                 </div>
+
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
                 <div className="flex gap-4 flex-col justify-center lg:flex-row mb-5">
                     <label htmlFor="status">
@@ -323,8 +231,13 @@ const CreateForm = ({ brands, subCategories }) => {
                         </div>
                     </label>
                 </div>
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
-                <DetailsSection />
+                <div className="mb-5">
+                    <Features />
+                </div>
+
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" /> */}
 
                 <div className="mb-5">
                     <ImageUpload />

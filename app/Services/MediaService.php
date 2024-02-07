@@ -63,7 +63,7 @@ class MediaService
 
     public function unLinkImage(Media $media): bool
     {
-        if (File::exists($media)) {
+        if (File::exists($media->file_path)) {
             return Storage::disk('media')->delete($media->file_path);
         }
         return false;

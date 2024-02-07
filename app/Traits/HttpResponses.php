@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Traits;
 
-Trait HttpResponses {
-  protected function success($data, $message = null, int $code = 200) 
+trait HttpResponses
+{
+  protected function success($data, $message = null, int $code = 200)
   {
     return response()->json([
       'status' => 'Success',

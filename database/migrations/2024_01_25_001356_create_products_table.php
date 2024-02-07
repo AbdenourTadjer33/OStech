@@ -26,6 +26,7 @@ return new class extends Migration
             $table->json('features')->nullable();
             $table->foreignId('category_id')->nullable()->constrained('categories', 'id');
             $table->foreignId('brand_id')->nullable()->constrained('brands', 'id')->nullOnDelete();
+            $table->json('images')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -1,11 +1,10 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
-const DropZoneInput = ({ className, label, ...props }) => {
+const DropZoneInput = forwardRef(({ className="", ...props }, ref) => {
     return (
         <div className={`flex items-center justify-center w-full ${className}`}>
             <label
-                htmlFor={label}
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-600 hover:bg-gray-100 dark:border-gray-800 dark:hover:border-gray-500 dark:hover:bg-gray-600"
             >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <svg
@@ -31,10 +30,10 @@ const DropZoneInput = ({ className, label, ...props }) => {
                         {"SVG, PNG, JPG or GIF (MAX. 800x400px)"}
                     </p>
                 </div>
-                <input id={label} type="file" className="hidden" {...props} />
+                <input type="file" className="hidden" {...props} ref={ref} />
             </label>
         </div>
     );
-};
+});
 
 export default DropZoneInput;
