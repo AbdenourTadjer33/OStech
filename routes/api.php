@@ -17,5 +17,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/categories_brands', [ApiService::class, 'getCategoriesBrands'])->name('api.categiries.brands');
 
     Route::post('/save-temp-images', [ProductController::class, 'saveTempImages'])->name('api.save.temp.imgs');
+    Route::post('/edit-temp-image', [ProductController::class, 'editTempImage'])->name('api.edit.temp.img');
     Route::post('/destroy-temp-image', [ProductController::class, 'destroyTempImage'])->name('api.destroy.temp.img');
 });

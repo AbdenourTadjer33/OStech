@@ -14,21 +14,31 @@ const AdminLayout = ({ children }) => {
         JSON.parse(localStorage.getItem("sideBar")) == true ? true : false
     );
 
+    const [alert, setAlert] = useState();
+    const [showAlert, setShowAlert] = useState(false);
+
     const toggleSideBar = (e) => {
         localStorage.setItem("sideBar", !isOpen);
         SetIsOpen(!isOpen);
     };
 
-    const clickAlertHandler = (e) => {
-        setIsShown(false);
-    }
+    const clickAlertHandler = (e) => {};
+
+    useEffect(() => {
+        if (alert) {
+            setShowAlert(true);
+            setTimeout(() => {
+                setShowAlert(false);
+            }, 10000);
+        }
+    }, [alert]);
 
     useEffect(() => {
         if (flash.alert) {
             setIsShown(true);
             setTimeout(() => {
                 setIsShown(false);
-            },10000);
+            }, 10000);
         }
     }, [flash.alert]);
 
@@ -59,12 +69,28 @@ const AdminLayout = ({ children }) => {
                         leaveTo="translate-y-full"
                     >
                         <Alert
-                            onClick={clickAlertHandler}
+                            onClick={() => setIsShown(false)}
                             type={flash.alert.status}
                             content={flash.alert.message}
                         />
                     </Transition>
                 )}
+
+                <Transition
+                    show={showAlert}
+                    enter="transition ease-in-out duration-100 transform"
+                    enterFrom="translate-y-full"
+                    enterTo="translate-y-0"
+                    leave="transition ease-in-out duration-100 transform"
+                    leaveFrom="translate-y-0"
+                    leaveTo="translate-y-full"
+                >
+                    <Alert
+                        onClick={() => setShowAlert(false)}
+                        type={alert?.status}
+                        content={alert?.message}
+                    />
+                </Transition>
             </div>
         </AdminLayoutContext.Provider>
     );

@@ -13,11 +13,12 @@ use App\Services\MediaService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\File;
 use App\Http\Requests\Product\StoreRequest;
 use App\Traits\HttpResponses;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager as Image;
 
 class ProductController extends Controller
 {
@@ -109,7 +110,7 @@ class ProductController extends Controller
 
 
 
-    
+
 
     public function saveTempImages(Request $request)
     {
@@ -126,8 +127,37 @@ class ProductController extends Controller
             $paths[] = $image->store('temp', 'media');
         }
 
-        sleep(1);
         return $paths;
+    }
+
+    public function editTempImage(Request $request)
+    {
+        $request->validate([
+            'path' => ['required'],
+            'cropInfo' => ['required', 'array'],
+        ]);
+
+        if (!Storage::disk('media')->exists($request->path)) {
+            return $this->error(null, 'image non trouvé', 404);
+        }
+
+        $cropInfo = $request->cropInfo;
+
+        $img = Image::gd()->read(Storage::disk('media')->get($request->path));
+
+        $img->crop($cropInfo['width'], $cropInfo['height'], $cropInfo['x'], $cropInfo['y']);
+
+        $img->toPng();
+
+        $filename = 'media/temp/cropped_' . time() . '_' . uniqid() . '.png';
+
+        $img->save($filename);
+
+        Storage::disk('media')->delete($request->path);
+
+        return $this->success([
+            'path' => substr($filename, strpos($filename, '/') + 1),
+        ], 'image modifier avec succés');
     }
 
     public function destroyTempImage(Request $request)

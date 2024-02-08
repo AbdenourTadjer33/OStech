@@ -168,17 +168,28 @@ const ImageUpload = () => {
 
     useEffect(() => {
         console.log(data.images);
-    }, [data.images])
+    }, [data.images]);
 
     const editImg = async (cropInfo) => {
         setIsLoading(true);
         const idx = editModal.imageId;
+
         try {
             const response = await axios.post(route("api.edit.temp.img"), {
                 path: data.images[idx],
                 cropInfo,
             });
-            setData("images", [...data.images]);
+            if (response.status === 200) {
+                const status = response.data.status;
+                const message = response.data.message;
+                const path = response?.data?.data?.path;
+
+                const images = [...data.images];
+                images.splice(idx, 1);
+                images.push(path);
+                setData("images", images);
+            }
+
             setIsLoading(false);
             setEditModal({ status: false });
         } catch (error) {
@@ -234,77 +245,81 @@ const ImageUpload = () => {
                 ) : (
                     <table className="w-full">
                         <tbody>
-                            {data.images?.map((image, idx) => (
-                                <tr
-                                    draggable
-                                    onDragStart={(e) =>
-                                        handleDragStart(e, image)
-                                    }
-                                    onDragOver={(e) => handleDragOver(e, idx)}
-                                    onDrop={(e) => handleDrop(e, idx)}
-                                    key={idx}
-                                    className={`px-5 py-2 bg-gray-50 border border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-opacity-75 ${
-                                        idx === dragOverRow
-                                            ? "border-t-2 border-blue-500 dark:border-blue-700"
-                                            : ""
-                                    } `}
-                                >
-                                    <td className="py-2 w-16 cursor-move">
-                                        <button
-                                            type="button"
-                                            className="w-full cursor-move inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-                                        >
-                                            <TbGridDots className="w-5 h-5 mx-auto" />
-                                        </button>
-                                    </td>
-                                    <td className="pe-4 py-2">
-                                        <img
-                                            className="w-16 md:w-28 max-h-full"
-                                            src={"/media/" + image}
-                                        />
-                                    </td>
-                                    <td className="px-4 py-2 space-x-4 text-center">
-                                        <InlineButton
-                                            btn="primary"
-                                            onClick={(e) => {
-                                                setImg("/media/" + image);
-                                                openSeeModal();
-                                            }}
-                                            className="capitalize"
-                                        >
-                                            <MdOpenInNew className="w-5 h-5 md:hidden" />
-                                            <span className="hidden md:block">
-                                                voir
-                                            </span>
-                                        </InlineButton>
-                                        <InlineButton
-                                            btn="info"
-                                            onClick={(e) => {
-                                                setImg("/media/" + image);
-                                                openEditModal(idx);
-                                            }}
-                                            className="capitalize"
-                                        >
-                                            <MdModeEdit className="w-5 h-5 md:hidden" />
-                                            <span className="hidden md:block">
-                                                éditer
-                                            </span>
-                                        </InlineButton>
-                                        <InlineButton
-                                            btn="danger"
-                                            onClick={(e) => {
-                                                openDeleteModal(idx);
-                                            }}
-                                            className="capitalize"
-                                        >
-                                            <MdDelete className="w-5 h-5 md:hidden" />
-                                            <span className="hidden md:block">
-                                                Supprimer
-                                            </span>
-                                        </InlineButton>
-                                    </td>
-                                </tr>
-                            ))}
+                            {data.images?.map((image, idx) => {
+                                return (
+                                    <tr
+                                        draggable
+                                        onDragStart={(e) =>
+                                            handleDragStart(e, image)
+                                        }
+                                        onDragOver={(e) =>
+                                            handleDragOver(e, idx)
+                                        }
+                                        onDrop={(e) => handleDrop(e, idx)}
+                                        key={idx}
+                                        className={`px-5 py-2 bg-gray-50 border border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-opacity-75 ${
+                                            idx === dragOverRow
+                                                ? "border-t-2 border-blue-500 dark:border-blue-700"
+                                                : ""
+                                        } `}
+                                    >
+                                        <td className="py-2 w-16 cursor-move">
+                                            <button
+                                                type="button"
+                                                className="w-full cursor-move inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+                                            >
+                                                <TbGridDots className="w-5 h-5 mx-auto" />
+                                            </button>
+                                        </td>
+                                        <td className="pe-4 py-2">
+                                            <img
+                                                className="w-16 md:w-28 max-h-full"
+                                                src={"/media/" + image}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2 space-x-4 text-center">
+                                            <InlineButton
+                                                btn="primary"
+                                                onClick={(e) => {
+                                                    setImg("/media/" + image);
+                                                    openSeeModal();
+                                                }}
+                                                className="capitalize"
+                                            >
+                                                <MdOpenInNew className="w-5 h-5 md:hidden" />
+                                                <span className="hidden md:block">
+                                                    voir
+                                                </span>
+                                            </InlineButton>
+                                            <InlineButton
+                                                btn="info"
+                                                onClick={(e) => {
+                                                    setImg("/media/" + image);
+                                                    openEditModal(idx);
+                                                }}
+                                                className="capitalize"
+                                            >
+                                                <MdModeEdit className="w-5 h-5 md:hidden" />
+                                                <span className="hidden md:block">
+                                                    éditer
+                                                </span>
+                                            </InlineButton>
+                                            <InlineButton
+                                                btn="danger"
+                                                onClick={(e) => {
+                                                    openDeleteModal(idx);
+                                                }}
+                                                className="capitalize"
+                                            >
+                                                <MdDelete className="w-5 h-5 md:hidden" />
+                                                <span className="hidden md:block">
+                                                    Supprimer
+                                                </span>
+                                            </InlineButton>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 )}
