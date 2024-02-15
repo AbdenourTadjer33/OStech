@@ -26,8 +26,8 @@ const EditForm = ({ product }) => {
         forgetError,
         reset,
     } = useForm("post", route("admin.products.update", { id: product.id }), {
-        parentCategory: product?.category?.parent_category,
         category: product?.category,
+        parentCategory: product?.category?.parent_category,
         brand: product?.brand,
         name: product?.name,
         description: product?.description,
@@ -37,7 +37,7 @@ const EditForm = ({ product }) => {
         features: product?.features || [],
         status: product?.status,
         catalogue: product?.catalogue,
-        images: product?.assets || [],
+        images: product?.images || [],
     });
 
     const [option, setOption] = useState({
@@ -50,9 +50,9 @@ const EditForm = ({ product }) => {
     const submitHandler = (e) => {
         e.preventDefault();
         console.log(data);
-        // post(route("admin.products.update", { id: product.id }), {
-        // onSuccess: () => reset(),
-        // });
+        post(route("admin.products.update", { id: product.id }), {
+            onSuccess: () => reset(),
+        });
     };
 
     return (

@@ -8,7 +8,9 @@ const ApplicationLogo = ({ type = "white", className = "" }) => {
         indigo: "indigo.png",
     };
 
-    return <img className={`h-20 ${className}`} src={PATH + logos?.[type]} />;
+    return <img className={` ${className}`} src={PATH + logos?.[type]} />;
 };
+
+// h-12 lg:h-20 md:h-16 sm:h-14
 
 export default ApplicationLogo;

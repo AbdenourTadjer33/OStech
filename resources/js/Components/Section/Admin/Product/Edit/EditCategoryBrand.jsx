@@ -40,16 +40,16 @@ const EditCategoryBrand = () => {
         });
     }, [categories]);
 
-    useEffect(() => {
+    const handleParentCategoryChange = (value) => {
         setSubCategories([]);
         categories.forEach((category) => {
             if (category.parent_id == data.parentCategory?.id) {
                 setSubCategories((prevData) => [...prevData, category]);
             }
         });
+        setData("parentCategory", value);
         setData("category", "");
-    }, [data.parentCategory]);
-
+    };
 
     const filteredParentCategories =
         query === ""
@@ -90,7 +90,7 @@ const EditCategoryBrand = () => {
 
                 <Combobox
                     value={data.parentCategory}
-                    onChange={(e) => setData("parentCategory", e)}
+                    onChange={(value) => handleParentCategoryChange(value)}
                 >
                     <div className="relative">
                         <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-black text-left">

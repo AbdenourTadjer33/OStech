@@ -6,6 +6,7 @@ import { HiMiniChevronUpDown } from "react-icons/hi2";
 import { FaCheck } from "react-icons/fa";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
+import { media } from "@/Logic/helper";
 
 const CategoryBrand = () => {
     const { data, setData, errors } = useContext(CreateProductFormContext);
@@ -356,7 +357,7 @@ const CategoryBrand = () => {
                                             {({ selected, active }) => (
                                                 <>
                                                     <img
-                                                        src={`/media/${brand.file_path}`}
+                                                        src={media(brand?.logo)}
                                                         loading="lazy"
                                                         className="h-10 w-10 object-contain"
                                                     />

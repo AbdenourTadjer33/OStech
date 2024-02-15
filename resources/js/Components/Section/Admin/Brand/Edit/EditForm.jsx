@@ -1,17 +1,17 @@
-import React, { createContext, useEffect } from "react";
+import React, { createContext } from "react";
 import { useForm } from "laravel-precognition-react-inertia";
-
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import Button from "@/Components/Button";
-import LogoUpload from "./LogoUpload";
-import ProgressBar from "@/Components/ProgressBar";
+import LogoEdit from "./LogoEdit";
 import Spinner from "@/Components/Icons/Spinner";
 
-export const CreateBrandFormContext = createContext();
 
-const CreateForm = ({}) => {
+
+export const EditBrandFormContext = createContext();
+
+const EditForm = ({brand}) => {
     const {
         data,
         setData,
@@ -22,10 +22,9 @@ const CreateForm = ({}) => {
         validate,
         forgetError,
         reset,
-    } = useForm("post", route("admin.brands.store"), {
-        name: "",
-        logo: "",
-        logoCropInformation: null,
+    } = useForm("post", route("admin.brands.update", {id: brand.id}), {
+        name: brand.name,
+        image: brand.logo,
     });
 
     const cleanError = (name) => {
@@ -35,15 +34,13 @@ const CreateForm = ({}) => {
 
     const submitHandler = (e) => {
         e.preventDefault();
-        post(route("admin.brands.store"));
+        post(route("admin.brands.update", {id: brand.id}));
     };
-    return (
-        <CreateBrandFormContext.Provider
-            value={{ progress, data, setData, errors, cleanError }}
-        >
-            <div className="mx-auto mt-5 p-4 max-w-4xl dark:bg-gray-900 rounded-lg shadow-xl border dark:border-gray-700">
 
-                <h1 className="text-4xl font-bold mb-7">Créer un Brand</h1>
+    return (
+        <EditBrandFormContext.Provider value={{data, setData}}>
+            <div className="mx-auto mt-5 p-4 max-w-4xl dark:bg-gray-900 rounded-lg shadow-xl border dark:border-gray-700">
+                <h1 className="text-4xl font-bold mb-7">Editer un brand</h1>
                 <form onSubmit={submitHandler} encType="multipart/form-data">
                     <div className="mb-5">
                         <div>
@@ -70,20 +67,19 @@ const CreateForm = ({}) => {
                     </div>
 
                     <div className="mb-5">
-                        <InputLabel value="logo" className="mb-2" />
-                        <LogoUpload />
+                        <LogoEdit/>
                     </div>
 
                     <div className="flex items-center justify-end gap-4">
-                        <Button btn="secondary" disabled={processing}>
+                        <Button disabled={processing}>
                             {processing && <Spinner />}
-                            Ajouté
+                            Edit
                         </Button>
                     </div>
                 </form>
             </div>
-        </CreateBrandFormContext.Provider>
+        </EditBrandFormContext.Provider>
     );
 };
 
-export default CreateForm;
+export default EditForm;

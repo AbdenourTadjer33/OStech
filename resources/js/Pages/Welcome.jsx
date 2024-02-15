@@ -5,7 +5,7 @@ import AppLayout from '@/Layouts/AppLayout'
 const Welcome = () => {
   return (
     <AppLayout>
-      <Head title="Welcome" />
+      <Head title="Accueil" />
     </AppLayout>
   )
 }

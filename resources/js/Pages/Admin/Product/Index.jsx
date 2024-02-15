@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import Button from "@/Components/Button";
 import { FaFilter, FaSearch } from "react-icons/fa";
@@ -11,6 +11,12 @@ import ReadMore from "@/Components/ReadMore";
 import CurrencyFormat from "@/Components/CurrencyFormat";
 import { Dropdown } from "flowbite-react";
 import Accordion from "@/Components/Accordion";
+import { media } from "@/Logic/helper";
+import Modal from "@/Components/Modal";
+import { IoMdInformationCircleOutline } from "react-icons/io";
+import { FaSpinner } from "react-icons/fa";
+import TrueIcon from "@/Components/Icons/TrueIcon";
+import FalseIcon from "@/Components/Icons/FalseIcon";
 
 const Index = ({ products }) => {
     const {
@@ -24,8 +30,13 @@ const Index = ({ products }) => {
         last_page,
     } = products;
 
+    const { delete: destroy, post, processing } = useForm();
+
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(data);
+
+    const [archiveModal, setArchiveModal] = useState({ status: false });
+    const [deleteModal, setDeleteModal] = useState({ status: false });
 
     const handleSearch = (e) => {
         const query = e.target.value.toLowerCase();
@@ -41,6 +52,34 @@ const Index = ({ products }) => {
 
         setFilteredData(filtered);
     };
+
+    const archive = () => {
+        destroy(
+            route("admin.products.destroy", { id: archiveModal.product.id }),
+            {
+                onSuccess: () => setArchiveModal({ status: false }),
+            }
+        );
+    };
+
+    const forceDelete = () => {
+        destroy(
+            route("admin.products.forceDestroy", {
+                id: deleteModal.product.id,
+            }),
+            {
+                onSuccess: () => setDeleteModal({ status: false }),
+            }
+        );
+    };
+
+    const restore = (productId) => {
+        post(route("admin.products.restore", { id: productId }));
+    };
+
+    useEffect(() => {
+        setFilteredData(data);
+    }, [data]);
 
     return (
         <AdminLayout>
@@ -256,6 +295,9 @@ const Index = ({ products }) => {
                                     <Table.Title className="px-2 py-3">
                                         Créer à
                                     </Table.Title>
+                                    <Table.Title className="px-2 py-3">
+                                        Archive
+                                    </Table.Title>
                                     <Table.Title className="px-2 py-3"></Table.Title>
                                 </Table.Row>
                             </Table.Head>
@@ -267,22 +309,19 @@ const Index = ({ products }) => {
                                             className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                                         >
                                             <Table.Column className="px-2 py-3 w-16 md:w-32">
-                                                {record?.assets?.[0]
-                                                    ?.file_path ? (
-                                                    <img
-                                                        className="max-w-full max-h-full"
-                                                        src={
-                                                            "/media/" +
-                                                            record?.assets?.[0]
-                                                                ?.file_path
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <p>
-                                                        Pas de photo disponible
-                                                        pour ce produit
-                                                    </p>
-                                                )}
+                                                <img
+                                                    className="max-w-fill max-h-full"
+                                                    src={
+                                                        record?.images?.[0]
+                                                            ? media(
+                                                                  record
+                                                                      ?.images?.[0]
+                                                              )
+                                                            : media(
+                                                                  "default.png"
+                                                              )
+                                                    }
+                                                />
                                             </Table.Column>
                                             <Table.Column className="px-2 py-3">
                                                 ref: {record.ref}
@@ -311,72 +350,16 @@ const Index = ({ products }) => {
                                             </Table.Column>
                                             <Table.Column className="px-2 py-4">
                                                 {record.status ? (
-                                                    <svg
-                                                        className="w-5 h-5 text-green-500"
-                                                        aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 16 12"
-                                                    >
-                                                        <path
-                                                            stroke="currentColor"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="M1 5.917 5.724 10.5 15 1.5"
-                                                        />
-                                                    </svg>
+                                                    <TrueIcon className="m-auto" />
                                                 ) : (
-                                                    <svg
-                                                        className="w-5 h-5 text-red-500"
-                                                        aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 14 14"
-                                                    >
-                                                        <path
-                                                            stroke="currentColor"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                                                        />
-                                                    </svg>
+                                                    <FalseIcon className="m-auto" />
                                                 )}
                                             </Table.Column>
                                             <Table.Column className="px-2 py-4">
                                                 {record.catalogue ? (
-                                                    <svg
-                                                        className="w-5 h-5 text-green-500"
-                                                        aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 16 12"
-                                                    >
-                                                        <path
-                                                            stroke="currentColor"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="M1 5.917 5.724 10.5 15 1.5"
-                                                        />
-                                                    </svg>
+                                                    <TrueIcon className="m-auto" />
                                                 ) : (
-                                                    <svg
-                                                        className="w-5 h-5 text-red-500"
-                                                        aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 14 14"
-                                                    >
-                                                        <path
-                                                            stroke="currentColor"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                                                        />
-                                                    </svg>
+                                                    <FalseIcon className="m-auto" />
                                                 )}
                                             </Table.Column>
                                             <Table.Column className="px-2 py-4">
@@ -388,7 +371,15 @@ const Index = ({ products }) => {
                                             <Table.Column className="px-2 py-4">
                                                 {record.created_at}
                                             </Table.Column>
+                                            <Table.Column className="px-2 py-4 ">
+                                                {record.deleted_at ? (
+                                                    <TrueIcon className="m-auto" />
+                                                ) : (
+                                                    <FalseIcon className="m-auto" />
+                                                )}
+                                            </Table.Column>
                                             <Table.Column className="px-2 py-4">
+                                                
                                                 <Dropdown
                                                     label=""
                                                     dismissOnClick
@@ -407,12 +398,9 @@ const Index = ({ products }) => {
                                                             aria-labelledby="apple-imac-27-dropdown-button"
                                                         >
                                                             <li>
-                                                                <a
-                                                                    href="#"
-                                                                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                >
-                                                                    Show
-                                                                </a>
+                                                                <button className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                                    Afficher
+                                                                </button>
                                                             </li>
                                                             <li>
                                                                 <Link
@@ -429,12 +417,49 @@ const Index = ({ products }) => {
                                                             </li>
                                                         </ul>
                                                         <div className="py-1">
-                                                            <a
-                                                                href="#"
-                                                                className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                                            {record.deleted_at && (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        restore(
+                                                                            record.id
+                                                                        )
+                                                                    }
+                                                                    className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                                                >
+                                                                    Restorer
+                                                                </button>
+                                                            )}
+                                                            {!record.deleted_at && (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        setArchiveModal(
+                                                                            {
+                                                                                status: true,
+                                                                                product:
+                                                                                    record,
+                                                                            }
+                                                                        )
+                                                                    }
+                                                                    className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                                                >
+                                                                    Archivé
+                                                                </button>
+                                                            )}
+
+                                                            <button
+                                                                onClick={() =>
+                                                                    setDeleteModal(
+                                                                        {
+                                                                            status: true,
+                                                                            product:
+                                                                                record,
+                                                                        }
+                                                                    )
+                                                                }
+                                                                className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                                                             >
-                                                                Delete
-                                                            </a>
+                                                                Supprimé
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </Dropdown>
@@ -459,6 +484,88 @@ const Index = ({ products }) => {
                     </nav>
                 </div>
             </div>
+
+            <Modal show={archiveModal.status} maxWidth="lg">
+                <div className="py-6 px-4">
+                    <div className="mb-3 text-gray-400 dark:text-gray-200">
+                        {processing ? (
+                            <FaSpinner className="animate-spin w-12 h-12 mx-auto" />
+                        ) : (
+                            <IoMdInformationCircleOutline className="w-12 h-12 mx-auto" />
+                        )}
+                    </div>
+                    {archiveModal.product && (
+                        <>
+                            <h3 className="text-center mb-4 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                Vous étes sur de vouloir archivé ce produit{" "}
+                                <span className="font-medium text-gray-700 dark:text-gray-200">
+                                    {archiveModal.product.name}
+                                </span>
+                            </h3>
+                            <div className="flex items-center gap-4 justify-center">
+                                <Button
+                                    disabled={processing}
+                                    onClick={archive}
+                                    btn="danger"
+                                >
+                                    Archivé
+                                </Button>
+
+                                <Button
+                                    btn="primary"
+                                    disabled={processing}
+                                    onClick={() =>
+                                        setArchiveModal({ status: false })
+                                    }
+                                >
+                                    Annuler
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </Modal>
+
+            <Modal show={deleteModal.status} maxWidth="lg">
+                <div className="py-6 px-4">
+                    <div className="mb-3 text-gray-400 dark:text-gray-200">
+                        {processing ? (
+                            <FaSpinner className="animate-spin w-12 h-12 mx-auto" />
+                        ) : (
+                            <IoMdInformationCircleOutline className="w-12 h-12 mx-auto" />
+                        )}
+                    </div>
+                    {deleteModal.product && (
+                        <>
+                            <h3 className="text-center mb-4 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                Vous étes sur de vouloir supprimé le produit{" "}
+                                <span className="font-medium text-gray-700 dark:text-gray-200">
+                                    {deleteModal.product.name}
+                                </span>
+                            </h3>
+                            <div className="flex items-center gap-4 justify-center">
+                                <Button
+                                    disabled={processing}
+                                    onClick={forceDelete}
+                                    btn="danger"
+                                >
+                                    Supprimé
+                                </Button>
+
+                                <Button
+                                    btn="primary"
+                                    disabled={processing}
+                                    onClick={() =>
+                                        setDeleteModal({ status: false })
+                                    }
+                                >
+                                    Annuler
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </Modal>
         </AdminLayout>
     );
 };

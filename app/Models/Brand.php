@@ -17,6 +17,11 @@ class Brand extends Model
         'logo',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:d-m-Y H:i',
+        'updated_at' => 'datetime:d-m-Y H:i'
+    ];
+
     public function logo(): MorphOne
     {
         return $this->morphOne(Media::class, 'mediable');
@@ -26,7 +31,4 @@ class Brand extends Model
     {
         return $this->hasMany(Product::class, 'brand_id', 'id');
     }
-
-   
-    
 }

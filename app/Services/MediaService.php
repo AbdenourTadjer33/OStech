@@ -15,6 +15,7 @@ use Intervention\Image\ImageManager as Image;
 
 class MediaService
 {
+
     public function storeBrandLogo(UploadedFile $media, Brand $brand, null|array $cropInformation): void
     {
         if ($cropInformation) {

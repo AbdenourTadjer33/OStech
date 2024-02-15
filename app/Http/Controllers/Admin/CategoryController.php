@@ -14,6 +14,7 @@ use App\Http\Requests\Category\StoreSubCategoryRequest;
 
 use App\Http\Requests\Category\UpdateRequest;
 use App\Models\Media;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -29,23 +30,25 @@ class CategoryController extends Controller
         /**
          * @var \Illuminate\Support\Collection
          */
-        $categories = Category::get();
+        $categories = Cache::remember(
+            'categories',
+            now()->addDay(),
+            fn () =>
+            Category::get()
+        );
 
+        $hierarchicalCategories = $categories->filter(function ($category) {
+            return $category->isMainCategory();
+        })->map(function (Category $mainCategory) use ($categories) {
+            $mainCategory->subCategories = $categories->where('parent_id', $mainCategory->id)->all();
+            return $mainCategory;
+        })->values();
 
-        $parentCategories = $categories->filter(fn (Category $category) => $category->isMainCategory())->flatten();
-
-        $subCategories = $categories
-            ->filter(fn (Category $category) => !$category->isMainCategory())
-            ->flatten()
-            ->map(fn (Category $category) => [
-                ...$category->toArray(),
-                'parent' => $categories->where('id', $category->parent_id)->first()->only('name')
-            ]);
 
         return Inertia::render('Admin/Category/Index', [
-            'categories' => $categories->toArray(),
-            'parentCategories' => $parentCategories->toArray(),
-            'subCategories' => $subCategories,
+            'hierarchicalCategories' => $hierarchicalCategories->toArray(),
+            'parentCategories' => $categories->whereNull('parent_id')->all(),
+            'subCategories' => $categories->whereNotNull('parent_id')->all(),
         ]);
     }
 

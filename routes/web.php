@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\Client\WelcomeController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -9,9 +11,23 @@ use App\Http\Controllers\ProfileController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
-Route::get('/product', function () {
-    return Inertia::render('Client/Product');
+
+Route::get('/products', [ProductController::class, 'index'])->name('products');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/{subCategory}/products', [ProductController::class, 'subCategory'])->name('subCategory.products');
+
+Route::prefix('cart')->controller(CartController::class)->group(function () {
+    Route::get('/', 'index')->name('cart.index');
+    Route::post('/add-prodouct/{id}', 'addItem')->name('cart.add');
+    Route::post('/handle-product-qte/{id}', 'handleQte')->name('cart.handle.qte');
+    Route::post('/remove-from-cart/{id}', 'destroyItem')->name('cart.remove');
+
+    Route::get('/temp-destroy-cart', 'destroy')->name('cart.destroy');
 });
+
+
+Route::get('/catalogue', [WelcomeController::class, 'index'])->name('catalogue');
+Route::get('/contact', [WelcomeController::class, 'index'])->name('contact');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -13,17 +13,15 @@ import ReactCrop, {
 } from "react-image-crop";
 import { Dialog, Transition } from "@headlessui/react";
 import { VscChromeClose } from "react-icons/vsc";
+
 import { CreateProductFormContext } from "../CreateForm";
 
-import InputFile from "@/Components/InputFile";
-import InputError from "@/Components/InputError";
 import InlineButton from "@/Components/InlineButton";
 import Modal from "@/Components/Modal";
 import Button from "@/Components/Button";
 import setCanvasPreview from "@/Logic/setCanvasPreview";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
-import Checkbox from "@/Components/Checkbox";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 
 import { MdModeEdit, MdDelete, MdOpenInNew } from "react-icons/md";
@@ -166,10 +164,6 @@ const ImageUpload = () => {
         setEditModal({ status: true, imageId: idx });
     };
 
-    useEffect(() => {
-        console.log(data.images);
-    }, [data.images]);
-
     const editImg = async (cropInfo) => {
         setIsLoading(true);
         const idx = editModal.imageId;
@@ -221,11 +215,6 @@ const ImageUpload = () => {
 
     return (
         <>
-            {/* title */}
-            <div className="flex justify-between items-center mb-5">
-                <h2 className="text-3xl">Images</h2>
-            </div>
-
             {/* main */}
             <div className={`h-full overflow-auto rounded-lg shadow-lg`}>
                 <div className="bg-gray-50 dark:bg-gray-700 shadow-sm py-3 px-4 flex justify-end gap-4">

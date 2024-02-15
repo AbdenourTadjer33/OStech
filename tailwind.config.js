@@ -20,6 +20,8 @@ export default {
             danger: colors.red,
             info: colors.indigo,
             slate: colors.slate,
+            zinc: colors.zinc,
+            cyan: colors.cyan
         },
         extend: {
             fontFamily: {

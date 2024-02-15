@@ -14,24 +14,10 @@ const AdminLayout = ({ children }) => {
         JSON.parse(localStorage.getItem("sideBar")) == true ? true : false
     );
 
-    const [alert, setAlert] = useState();
-    const [showAlert, setShowAlert] = useState(false);
-
     const toggleSideBar = (e) => {
         localStorage.setItem("sideBar", !isOpen);
         SetIsOpen(!isOpen);
     };
-
-    const clickAlertHandler = (e) => {};
-
-    useEffect(() => {
-        if (alert) {
-            setShowAlert(true);
-            setTimeout(() => {
-                setShowAlert(false);
-            }, 10000);
-        }
-    }, [alert]);
 
     useEffect(() => {
         if (flash.alert) {
@@ -50,7 +36,7 @@ const AdminLayout = ({ children }) => {
             <SideBar />
 
             <main
-                className={`p-4 mt-14 transform transition-all duration-200 ease-in-out text-gray-900 dark:text-white  ${
+                className={`p-4 mt-16 transform transition-all duration-200 ease-in-out text-gray-900 dark:text-white  ${
                     isOpen ? "ml-64" : "ml-20"
                 }`}
             >
@@ -70,27 +56,11 @@ const AdminLayout = ({ children }) => {
                     >
                         <Alert
                             onClick={() => setIsShown(false)}
-                            type={flash.alert.status}
-                            content={flash.alert.message}
+                            type={flash.alert?.status}
+                            content={flash.alert?.message}
                         />
                     </Transition>
                 )}
-
-                <Transition
-                    show={showAlert}
-                    enter="transition ease-in-out duration-100 transform"
-                    enterFrom="translate-y-full"
-                    enterTo="translate-y-0"
-                    leave="transition ease-in-out duration-100 transform"
-                    leaveFrom="translate-y-0"
-                    leaveTo="translate-y-full"
-                >
-                    <Alert
-                        onClick={() => setShowAlert(false)}
-                        type={alert?.status}
-                        content={alert?.message}
-                    />
-                </Transition>
             </div>
         </AdminLayoutContext.Provider>
     );

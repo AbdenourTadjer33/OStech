@@ -13,9 +13,9 @@ use App\Services\MediaService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\UpdateRequest;
 use App\Http\Requests\Product\StoreRequest;
 use App\Traits\HttpResponses;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager as Image;
@@ -29,14 +29,18 @@ class ProductController extends Controller
         $this->middleware('precognitive')->only('store');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with([
-            'category:id,name',
-            'assets' => fn (Builder $query) => $query->orderBy('file_sort', 'asc'),
-            'brand:id,name'
-        ])->paginate(15);
+        /**
+         * @var \App\Models\Product
+         */
+        $productQuery = Product::withTrashed()->with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name']);
 
+        if ($request->input('count_orders')) {
+            $productQuery->loadCount('orders');
+        }
+
+        $products = $productQuery->paginate($request->pagination ?? 10)->appends(request()->query());
         return Inertia::render('Admin/Product/Index', [
             'products' => $products
         ]);
@@ -44,32 +48,29 @@ class ProductController extends Controller
 
     public function create()
     {
-        $subCategories = DB::table('categories')->whereNotNull('parent_id')->select('id', 'name')->get();
-
-        $brands = DB::table('brands')
-            ->join('media', 'brands.id', '=', 'media.mediable_id')
-            ->where('media.mediable_type', '=', Brand::class)
-            ->select('brands.id', 'brands.name', 'media.file_path')
-            ->get();
-
-        return Inertia::render('Admin/Product/Create', [
-            'brands' => $brands->toArray(),
-            'subCategories' => $subCategories->toArray()
-        ]);
+        return Inertia::render('Admin/Product/Create');
     }
 
     public function store(StoreRequest $request)
     {
         DB::transaction(function () use ($request) {
 
-            $images = $request->images?->map(function ($image) {
-                dd($image);
-            });
+            $parentCategory = $request->parentCategory;
+            $subCategory = $request->category; // this represent the sub-category
 
-            $product = Product::create([
+            $images = $request->images;
+
+            $paths = [];
+            foreach ($images as $image) {
+                $newPath = "product/" . substr($image, strpos($image, '/') + 1);
+                Storage::disk('media')->move($image, $newPath);
+                $paths[] = $newPath;
+            }
+
+            Product::create([
                 'name' => $request->input('name'),
                 'ref' => Product::generateRef(),
-                'slug' => Str::slug(now()->timestamp . '-' . $request->input('name')),
+                'slug' => Str::slug($parentCategory['name'] . ' ' . $subCategory['name'] . ' ' . $request->input('name')),
                 'description' => $request->input('description'),
                 'sku' => $request->input('sku'),
                 'qte' => $request->input('qte'),
@@ -78,17 +79,15 @@ class ProductController extends Controller
                 'status' => $request->input('status'),
                 'catalogue' => $request->input('catalogue'),
                 'features' => $request->input('features'),
-                'category_id' => $request->input('category')['id'],
+                'category_id' => $subCategory['id'],
                 'brand_id' => $request?->brand ? $request->brand['id'] : null,
-                'images' => $request->images,
+                'images' => $paths,
             ]);
-
-            (new MediaService)->storeProductsImages($request->images, $product);
         });
 
         return session()->flash('alert', [
             'status' => 'success',
-            'message' => 'product created successfully',
+            'message' => 'Produit créer avec succés',
         ]);
     }
 
@@ -97,19 +96,118 @@ class ProductController extends Controller
         /**
          * @var \App\Models\Product
          */
-        $product = Product::where('id', $request->id)->with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name', 'assets'])->first();
+        $product = Product::where('id', $request->id)->with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name'])->first();
 
         return Inertia::render('Admin/Product/Edit', [
             'product' => $product,
         ]);
     }
 
+    public function update(UpdateRequest $request)
+    {
+        $product = Product::where('id', $request->id)->firstOrFail();
 
+        DB::transaction(function () use ($request, $product) {
+            dd($request->all(), $product);
 
+            $parentCategory = $request->parentCategory;
+            $subCategory = $request->subCategory;
 
+            $images = $request->images;
 
+            $paths = [];
+            foreach ($images as $image) {
+            }
 
+            $product->update([
+                'name' => $request->name,
+                'slug' => Str::slug($parentCategory['name'] . ' ' . $subCategory['name'] . ' ' . $request->input('name')),
+                'description' => $request->description,
+                'sku' => $request->input('sku'),
+                'qte' => $request->input('qte'),
+                'price' => $request->input('price'),
+                'promo' => $request->input('promo'),
+                'status' => $request->input('status'),
+                'catalogue' => $request->input('catalogue'),
+                'features' => $request->input('features'),
+                'category_id' => $subCategory['id'],
+                'brand_id' => $request?->brand ? $request->brand['id'] : null,
+                'images' => $request->images,
+            ]);
+        });
 
+        session()->flash('alert', [
+            'status' => 'success',
+            'message'
+        ]);
+    }
+
+    public function restore(Request $request)
+    {
+        $product = Product::withTrashed()->where('id', $request->id)->restore();
+
+        if (!$product) {
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'Quelque chose de mal s\'est passé!',
+            ]);
+        }
+
+        session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'Produit restoré avec succés',
+        ]);
+
+        return redirect(route('admin.products.index'));
+    }
+
+    public function destroy(Request $request)
+    {
+        $product = Product::where('id', $request->id)->first();
+
+        if (!$product) {
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'produit n\'existe pas!',
+            ]);
+        }
+
+        $product->delete();
+
+        session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'Produit archivé avec succés',
+        ]);
+
+        return redirect(route('admin.products.index'));
+    }
+
+    public function forceDestroy(Request $request)
+    {
+        $product = Product::where('id', $request->id)->first();
+
+        if (!$product) {
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'produit n\'existe pas!',
+            ]);
+        }
+
+        foreach ($product->images as $imagePath) {
+            if (Storage::disk('media')->exists($imagePath)) {
+                Storage::disk('media')->delete($imagePath);
+            }
+        }
+
+        $product->forceDelete();
+
+        session()->flash('alert', [
+            'status' => 'success',
+            'message' => 'produit supprimé avec succés',
+        ]);
+
+        return redirect(route('admin.products.index'));
+    }
 
 
     public function saveTempImages(Request $request)

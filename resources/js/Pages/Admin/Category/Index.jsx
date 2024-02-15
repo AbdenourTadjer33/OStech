@@ -5,41 +5,134 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import CreateCategoryForm from "@/Components/Section/Admin/Category/CreateCategoryForm";
 import CreateSubCategoryForm from "@/Components/Section/Admin/Category/CreateSubCategoryForm";
 
-import IndexHeader from "@/Components/Section/Admin/IndexHeader";
 import Table from "@/Components/Table";
 import Tab from "@/Components/Tab";
 import Modal from "@/Components/Modal";
 import Button from "@/Components/Button";
 import InlineButton from "@/Components/InlineButton";
-import { MdModeEdit, MdDelete, MdOpenInNew } from "react-icons/md";
+import {
+    MdModeEdit,
+    MdOutlineModeEditOutline,
+    MdDelete,
+    MdOpenInNew,
+    MdAdd,
+    MdOutlineCancelPresentation,
+} from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
 import { IoMdInformationCircleOutline } from "react-icons/io";
+import CategoryItem from "@/Components/Section/Admin/Category/Show/CategoryItem";
+// import CategoryTree from "@/Components/Section/Admin/Category/Show/CategoryTree";
 
 export const CategoiesContext = createContext();
 
-const Index = ({ categories, parentCategories, subCategories }) => {
+const Index = ({ hierarchicalCategories }) => {
     const [categoryModal, setCategoryModal] = useState(false);
     const [subCategoryModal, setSubCategoryModal] = useState(false);
 
+    const [isEdit, setIsEdit] = useState(false);
+
+    const editCategory = () => {
+        setIsEdit(true);
+    };
+
+    const cancelEdit = () => {
+        setIsEdit(false);
+    };
+
     return (
-        <CategoiesContext.Provider
-            value={{
-                setCategoryModal,
-                setSubCategoryModal,
-                parentCategories,
-                subCategories,
-            }}
-        >
+        <CategoiesContext.Provider value={{}}>
             <AdminLayout>
-                <Head title="Sections & Categoies" />
+                <Head title="Categories & sous-categories" />
+                <h1 className="text-3xl font-bold mb-3">
+                    Categories & sous-categories
+                </h1>
 
-                {/* <IndexHeader
-                title="Section et catégorie"
-                routeName="admin.categories.create"
-                action="Créer une catégorie"
-            /> */}
+                <div className="flex gap-6 py-4 w-full overflow-y-auto">
+                    {hierarchicalCategories.map((parentCategory) => (
+                        <div
+                            key={parentCategory.id}
+                            className="w-full max-w-xs"
+                        >
+                            {/* <div className="w-full flex items-center justify-between px-4 py-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                                <h2
+                                    contentEditable={isEdit}
+                                    className="[&[contenteditable]]:focus:border-none [&[contenteditable]]:focus:outline-none text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+                                >
+                                    {parentCategory.name}
+                                </h2>
 
-                <div className="mb-4 flex items-center gap-4">
+                                <div className="flex items-center gap-1">
+                                    {isEdit ? (
+                                        <>
+                                            <div className="text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer">
+                                                <MdOutlineModeEditOutline className="w-6 h-6" />
+                                            </div>
+                                            <div
+                                                onClick={cancelEdit}
+                                                className="text-gray-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 cursor-pointer"
+                                            >
+                                                <MdOutlineCancelPresentation className="w-6 h-6" />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer">
+                                                <MdAdd className="w-6 h-6" />
+                                            </div>
+                                            <div
+                                                onClick={editCategory}
+                                                className="text-gray-900 dark:text-white hover:text-info-600 dark:hover:text-info-400 cursor-pointer"
+                                            >
+                                                <MdModeEdit className="w-5 h-5" />
+                                            </div>
+                                            <div className="text-gray-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 cursor-pointer">
+                                                <MdDelete className="w-5 h-5" />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div> */}
+
+                            <CategoryItem category={parentCategory} />
+
+                            <ul className="flex flex-col space-y-4 mt-4">
+                                {Object.values(
+                                    parentCategory?.subCategories
+                                ).map((subCategory) => (
+                                    <li
+                                        key={subCategory.id}
+                                        className="w-full flex items-center justify-between p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800/80 dark:border-gray-700/70 dark:hover:bg-gray-700"
+                                    >
+                                        <h4 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                                            {subCategory.name}
+                                        </h4>
+
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-gray-900 dark:text-white hover:text-info-600 dark:hover:text-info-400 cursor-pointer">
+                                                <MdModeEdit className="w-4 h-4" />
+                                            </div>
+                                            <div className="text-gray-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 cursor-pointer">
+                                                <MdDelete className="w-4 h-4" />
+                                            </div>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+
+                {/* <div className="">
+                    <div className="flex items-center justify-between">
+                        {hierarchicalCategories.map((parentCategory) => (
+                            <div key={parentCategory.id}>
+                                {parentCategory.name}
+                            </div>
+                        ))}
+                    </div>
+                </div> */}
+
+                {/* <div className="mb-4 flex items-center gap-4">
                     <Button onClick={(e) => setCategoryModal(true)}>
                         Create Category
                     </Button>
@@ -73,7 +166,7 @@ const Index = ({ categories, parentCategories, subCategories }) => {
 
                 <Modal show={subCategoryModal} closeable={false} maxWidth="4xl">
                     <CreateSubCategoryForm />
-                </Modal>
+                </Modal> */}
             </AdminLayout>
         </CategoiesContext.Provider>
     );
@@ -315,7 +408,9 @@ const SubCategoryData = () => {
                             <div className="flex items-center gap-4 justify-end">
                                 <Button
                                     onClick={(e) =>
-                                        deleteCategory(deleteModal.subCategory?.id)
+                                        deleteCategory(
+                                            deleteModal.subCategory?.id
+                                        )
                                     }
                                     btn="danger"
                                     disabled={processing}

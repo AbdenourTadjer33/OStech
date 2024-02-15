@@ -6,7 +6,7 @@ export default function Modal({
     children,
     show = false,
     maxWidth = "Zxl",
-    closeable = true,
+    closeable = false,
     onClose = () => {},
     className,
 }) {

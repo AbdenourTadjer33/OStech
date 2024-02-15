@@ -15,11 +15,11 @@ class ApiService
 			->select(['id', 'name', 'parent_id'])
 			->get();
 
-		$brands = DB::table('brands')
+			$brands = DB::table('brands')
 			->select(['id', 'name', 'logo'])
 			->get();
 
-		return [
+			return [
 			'categories' => $categories,
 			'brands' => $brands
 		];

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UploadController;
 use App\Services\ApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,4 +20,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/save-temp-images', [ProductController::class, 'saveTempImages'])->name('api.save.temp.imgs');
     Route::post('/edit-temp-image', [ProductController::class, 'editTempImage'])->name('api.edit.temp.img');
     Route::post('/destroy-temp-image', [ProductController::class, 'destroyTempImage'])->name('api.destroy.temp.img');
+
+    Route::post('/save-temp', [UploadController::class, 'saveTemp'])->name('api.save.temp');
+    Route::post('/edit-temp', [UploadController::class, 'editTemp'])->name('api.edit.temp');
+    Route::post('/destroy-temp', [UploadController::class, 'destroyTemp'])->name('api.destroy.temp');
 });

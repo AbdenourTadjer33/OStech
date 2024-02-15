@@ -20,7 +20,7 @@
     @inertiaHead
 </head>
 
-<body class="font-sans antialiased bg-gray-50 {{ request()->routeIs('admin.*') ? 'dark:bg-gray-900' : '' }}">
+<body class="font-sans antialiased bg-white dark:bg-gray-900">
     @inertia
 </body>
 

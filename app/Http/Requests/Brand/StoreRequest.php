@@ -24,8 +24,6 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:40', Rule::unique('brands', 'name')],
-            'logo' => ['required', 'image'],
-            'logo_alt' => ['nullable', 'string'],
         ];
     }
 }

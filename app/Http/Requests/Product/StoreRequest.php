@@ -24,22 +24,26 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => ['required'],
-            'brand' => ['nullable'],
+            'parentCategory' => ['required', 'array'],
+            'parentCategory.id' => ['required', Rule::exists('categories', 'id')],
+            'category' => ['required', 'array'], // the sub category
+            'category.id' => ['required', Rule::exists('categories', 'id')],
+            'brand' => ['nullable', 'array'],
+            'brand.id' => ['nullable', Rule::exists('brands', 'id')],
             'name' => ['required', 'string', 'min:2'],
             'description' => ['nullable', 'string'],
             'features' => ['nullable', 'array'],
             'features.*' => ['nullable', 'array'],
             'features.*.title' => ['string'],
+            'features.*.label' => ['string'],
             'features.*.description' => ['string'],
+
             'qte' => ['nullable', 'integer', 'numeric'],
             'promo' => ['nullable', 'numeric'],
             'price' => ['required', 'numeric'],
             'status' => ['required', 'boolean'],
             'catalogue' => ['required', 'boolean'],
             'images' => ['nullable', 'array'],
-            'images.*' => ['array'],
-            'images.*.file' => ['image', 'max:6000'],
         ];
     }
 }

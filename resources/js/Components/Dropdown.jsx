@@ -12,7 +12,9 @@ const Dropdown = ({ dismissOnClick = true, children }) => {
     };
 
     return (
-        <DropDownContext.Provider value={{ open, setOpen, toggleOpen, dismissOnClick }}>
+        <DropDownContext.Provider
+            value={{ open, setOpen, toggleOpen, dismissOnClick }}
+        >
             <div className="relative">{children}</div>
         </DropDownContext.Provider>
     );
@@ -68,10 +70,7 @@ const Content = ({
                     onClick={() => setOpen(dismissOnClick ? false : true)}
                 >
                     <div
-                        className={
-                            `rounded-md ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-600` +
-                            contentClasses
-                        }
+                        className={`rounded-md ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-600 ${contentClasses}`}
                     >
                         {children}
                     </div>

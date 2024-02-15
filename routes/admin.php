@@ -42,7 +42,9 @@ Route::prefix('product')->controller(ProductController::class)->group(function (
     Route::post('/create', 'store')->name('admin.products.store');
     Route::get('/edit/{id}', 'edit')->name('admin.products.edit');
     Route::post('/edit/{id}', 'update')->name('admin.products.update');
+    Route::post('/restore/{id}', 'restore')->name('admin.products.restore');
     Route::delete('/destroy/{id}', 'destroy')->name('admin.products.destroy');
+    Route::delete('/force-destroy/{id}', 'forceDestroy')->name('admin.products.forceDestroy');
 });
 
 Route::prefix('shipping-companies')->controller(ShippingController::class)->group(function () {

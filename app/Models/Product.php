@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use App\Traits\ReferanceGenerator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory, ReferanceGenerator;
+    use HasFactory, ReferanceGenerator, SoftDeletes;
 
     protected $fillable = [
         'ref',
@@ -28,6 +30,7 @@ class Product extends Model
         'catalogue',
         'category_id',
         'brand_id',
+        'images',
     ];
 
     protected $casts = [
@@ -35,13 +38,13 @@ class Product extends Model
         'status' => 'boolean',
         'catalogue' => 'boolean',
         'features' => 'array',
+        'images' => 'array',
         'created_at' => 'datetime:d-m-Y H:i',
         'updated_at' => 'datetime:d-m-Y H:i'
     ];
 
-    public function assets(): MorphMany
-    {
-        return $this->morphMany(Media::class, 'mediable');
+    public function scopeStatus(Builder $query) {
+        $query->where('status', true);
     }
 
     public function brand(): BelongsTo
@@ -52,11 +55,6 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class, 'product_tags', 'product_id', 'tag_id');
     }
 
     public function orders(): BelongsToMany

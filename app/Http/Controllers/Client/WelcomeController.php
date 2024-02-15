@@ -10,6 +10,6 @@ class WelcomeController extends Controller
 {
     public function index() 
     {
-        return Inertia::render('Client/Welcome');
+        return Inertia::render('Welcome');
     }
 }
