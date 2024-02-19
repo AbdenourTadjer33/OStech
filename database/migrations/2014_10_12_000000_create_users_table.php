@@ -22,6 +22,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->boolean('status')->default(true);
             $table->boolean('recive_email')->default(true);
+            $table->json('data')->nullable();
             $table->enum('type', ['admin', 'client'])->default('client');
             $table->foreignId('role_id')->nullable()->constrained('roles');
             $table->timestamps();

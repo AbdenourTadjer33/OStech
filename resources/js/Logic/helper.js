@@ -1,6 +1,5 @@
 export const capitalize = (str) => {
-    if (isStr(str) || !str.length > 0) return str;
-
+    if (!isStr(str) || !str.length > 0) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
@@ -39,3 +38,18 @@ export function debounce(func, delay) {
 
     return debouncedFunction;
 }
+
+export const comboFilterData = (query, data, ...key) => {
+    console.log(key);
+    if (typeof key === "string") {
+        return "is String";
+    }
+    return query === ""
+        ? data
+        : data.filter((record) =>
+              record?.[key]
+                  .toLowerCase()
+                  .replace(/\s+/g, "")
+                  .includes(query.toLowerCase().replace(/\s+/g, ""))
+          );
+};

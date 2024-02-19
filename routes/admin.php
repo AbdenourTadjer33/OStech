@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ShippingController;
 Route::get('/', fn () => to_route('admin.dashboard'))->name('admin');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
+// localohost:8000/admin/brand/edit/{]id}
 Route::prefix('brand')->controller(BrandController::class)->group(function () {
     Route::get('/', 'index')->name('admin.brands.index');
     Route::get('/create', 'create')->name('admin.brands.create');

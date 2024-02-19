@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UploadController;
+use App\Http\Controllers\Client\CouponController;
 use App\Services\ApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,3 +26,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/edit-temp', [UploadController::class, 'editTemp'])->name('api.edit.temp');
     Route::post('/destroy-temp', [UploadController::class, 'destroyTemp'])->name('api.destroy.temp');
 });
+
+
+Route::post('/coupon/verify', [CouponController::class, 'verify'])->name('coupon.verify');
+
+// Route::get('/shipping-prices', [])
+
+Route::post('test-api', function (Request $request) {
+    return session()->get('cart');
+})->name('test.api');

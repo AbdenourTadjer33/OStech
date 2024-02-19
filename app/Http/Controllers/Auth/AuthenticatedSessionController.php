@@ -38,8 +38,8 @@ class AuthenticatedSessionController extends Controller
         /**
          * @var \App\Models\User
          */
-        $user = User::where('email', $request->username)
-            ->where('status', true)
+        $user = User::status()
+            ->where('email', $request->username)
             ->orWhere('phone', $request->username)
             ->first();
 
@@ -49,7 +49,7 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        Auth::login($user);
+        Auth::login($user, $request->remember);
 
         RateLimiter::clear($request->throttleKey());
 

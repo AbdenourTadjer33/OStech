@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('code', 8);
             $table->enum('type', ['fixed', 'percentage']);
             $table->float('value');
-            $table->date('start_date')->nullable();
-            $table->date('expire_date')->nullable();
-            $table->integer('max_user')->default(1);
+            $table->datetime('start_at')->nullable();
+            $table->datetime('expire_at')->nullable();
+            $table->integer('max_use')->default(1);
             $table->integer('used_times')->default(0);
-            $table->float('max_amount');
+            $table->float('max_amount')->nullable();
             $table->boolean('status')->default(true);
             $table->enum('scope', ['simple', 'customized'])->default('simple');
             $table->json('scope_users')->nullable();

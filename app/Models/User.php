@@ -82,6 +82,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'status' => 'boolean',
         'recive_email' => 'boolean',
+        'data' => 'array',
         'created_at' => 'datetime:d-m-Y H:i',
         'updated_at' => 'datetime:d-m-Y H:i',
     ];
@@ -103,6 +104,6 @@ class User extends Authenticatable
 
     public function scopeStatus(Builder $query)
     {
-        $query->where('status', true);
+        return $query->where('status', true);
     }
 }

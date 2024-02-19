@@ -31,7 +31,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'user' => $request->user()?->only('uuid', 'name', 'email', 'phone'),
+            'user' => $request->user()?->only('uuid', 'name', 'email', 'phone', 'data'),
             'flash' => [
                 'alert' => fn () => $request->session()->get('alert'),
             ],

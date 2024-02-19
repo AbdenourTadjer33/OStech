@@ -5,14 +5,16 @@ import DynamicNavBar from "@/Components/Section/Client/Navigation/DynamicNavBar"
 import Footer from "@/Components/Footer";
 import { MdClose } from "react-icons/md";
 import { Transition } from "@headlessui/react";
+import { capitalize } from "@/Logic/helper";
 
 export const AppLayoutContext = createContext();
 
 const AppLayout = ({ children }) => {
-    const { user, categories, cart, flash } = usePage().props;
+    const { user, categories, cart, coupon, flash } = usePage().props;
+
     const [isShown, setIsShown] = useState(false);
     useEffect(() => {
-        if (flash.alert) {
+        if (flash.alert && flash.alert?.show != false) {
             setIsShown(true);
             setTimeout(() => {
                 setIsShown(false);
@@ -26,25 +28,19 @@ const AppLayout = ({ children }) => {
 
             <DynamicNavBar />
 
-            <main className="my-10">{children}</main>
+            <main className="my-5">{children}</main>
 
-            {/* <Footer/> */}
+            <Footer />
 
-            <div className="fixed top-20 right-5 z-[90] max-w-xl min-w-[25rem]">
+            <div className="fixed top-[4.125rem] right-0 px-4 z-50 w-full sm:max-w-sm sm:min-w-[22rem] ">
                 <Transition
                     show={isShown}
-                    // enter="transition-transform duration-250 ease-out"
-                    // enterFrom="translate-x-full"
-                    // enterTo="translate-x-0"
-                    // leave="transition-transform duration-150 ease-in"
-                    // leaveFrom="translate-x-0"
-                    // leaveTo="translate-x-full"
                     enter="transition-opacity transition-transform duration-200 ease-out"
                     enterFrom="opacity-0 translate-x-full"
                     enterTo="opacity-100 translate-x-0"
-                    leave="transition-opacity transition-transform duration-200 ease-in"
-                    leaveFrom="opacity-100 translate-x-0"
-                    leaveTo="opacity-0 translate-x-full"
+                    leave="transition-opacity duration-150 ease-in"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
                 >
                     {flash.alert && (
                         <Alert alert={flash.alert} setIsShown={setIsShown} />
@@ -58,23 +54,22 @@ const AppLayout = ({ children }) => {
 export default AppLayout;
 
 const Alert = ({ alert, setIsShown }) => {
-    console.log(alert);
     const { status, title, message, link } = alert;
 
     const styles = {
-        success: `border-green-500 text-green-400`,
-        danger: `border-danger-500 text-danger-400`,
-        warning: `border-yellow-500 text-yellow-400`,
-        info: `border-info-500 text-info-400`,
+        success: `border-green-500`,
+        danger: `border-danger-500`,
+        warning: `border-yellow-500`,
+        info: `border-info-500`,
     };
 
     return (
         <>
             <div
-                className={`relative bg-white ${styles[status]} border-l-4  p-4 shadow-2xl rounded-tr-lg rounded-br-lg`}
+                className={`relative bg-white text-gray-600 ${styles[status]} border-l-4 p-4 pe-6 shadow-2xl rounded-tr-lg rounded-br-lg`}
             >
-                <p className="font-bold">{title || "Alert"}</p>
-                <p>{message}</p>
+                <p className="text-md font-medium">{capitalize(message)}</p>
+
                 <button
                     className="absolute top-2 right-2 text-gray-400 hover:text-gray-500"
                     onClick={() => setIsShown(false)}

@@ -30,12 +30,13 @@ class CategoryController extends Controller
         /**
          * @var \Illuminate\Support\Collection
          */
-        $categories = Cache::remember(
-            'categories',
-            now()->addDay(),
-            fn () =>
-            Category::get()
-        );
+        $categories = Category::get();
+        // Cache::remember(
+            // 'categories',
+            // now()->addDay(),
+            // fn () =>
+            // Category::get()
+        // );
 
         $hierarchicalCategories = $categories->filter(function ($category) {
             return $category->isMainCategory();

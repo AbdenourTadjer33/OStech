@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Product;
 use Closure;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class LoadData
     public function handle(Request $request, Closure $next)
     {
         if (!$request->routeIs('admin*')) {
-            $categories = Cache::remember('categories', now()->addDay(), fn () => Category::get());
+            // $categories = Cache::remember('categories', now()->addDay(), fn () => Category::get());
+            $categories = Category::get();
 
             $hierarchicalCategories = $categories->filter(function ($category) {
                 return $category->isMainCategory();
@@ -37,6 +39,10 @@ class LoadData
                 return $cartItem;
             }, session()->get('cart', []));
 
+
+            if ($request->routeIs('cart*') && Cache::get('coupon-' . session()->getId())) {
+                Inertia::share('coupon', session()->get('coupon'));
+            }
 
             Inertia::share('categories', $hierarchicalCategories);
             Inertia::share('cart', $cart);

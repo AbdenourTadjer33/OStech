@@ -7,11 +7,13 @@ use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class CartController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         return Inertia::render('Cart/Index');
     }
@@ -40,7 +42,7 @@ class CartController extends Controller
                 'message' => 'Ce produit est déja présent dans le panier.',
             ]);
         }
- 
+
         session()->push('cart', $cartItem);
         return session()->flash('alert', [
             'status' => 'success',

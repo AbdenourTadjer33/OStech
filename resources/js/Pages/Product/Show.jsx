@@ -12,6 +12,7 @@ const Show = ({ product }) => {
     
     const addToCart = (id) => {
         post(route('cart.add', { id }), {
+            preserveScroll: true
         });
     }
     return (

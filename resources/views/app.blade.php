@@ -8,6 +8,7 @@
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <link rel="manifest" href="/assets/manifest.json">
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

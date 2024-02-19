@@ -15,7 +15,6 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products', 'id')->nullOnDelete();
             $table->foreignId('order_id')->constrained('orders', 'id')->cascadeOnDelete();
             $table->json('product')->nullable();
-            $table->json('choice')->nullable();
             $table->integer('qte');
             $table->json('prices')->nullable();
             $table->float('total');

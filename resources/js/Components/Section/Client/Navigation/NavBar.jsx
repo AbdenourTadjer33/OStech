@@ -42,7 +42,7 @@ const NavBar = () => {
 
     return (
         <>
-            <nav className="fixed top-0 w-full border-b bg-white">
+            <nav className="fixed top-0 w-full border-b bg-white z-50">
                 <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
                     <Link
                         href={route("welcome")}
@@ -152,7 +152,7 @@ const NavBar = () => {
                 leave="ease-in-out duration-300"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
-                className="fixed inset-0 overflow-hidden z-50"
+                className="fixed inset-0 overflow-hidden z-[51]"
             >
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">

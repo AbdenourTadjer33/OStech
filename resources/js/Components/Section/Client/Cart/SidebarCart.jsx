@@ -1,18 +1,24 @@
 import React, { Fragment } from "react";
+import { Link } from "@inertiajs/react";
 import { Dialog, Transition } from "@headlessui/react";
-import { useForm } from "@inertiajs/react";
+import { currencyFormat } from "@/Logic/helper";
 import { MdClose } from "react-icons/md";
-import Minus from "@/Components/Icons/Minus";
-import Plus from "@/Components/Icons/Plus";
-import { currencyFormat, media, debounce } from "@/Logic/helper";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useRef } from "react";
+import CartItem from "./CartItem";
 
 const SidebarCart = ({ open, setOpen, cart }) => {
+    const totalCart = () => {
+        let sum = 0;
+        cart.forEach((item) => {
+            const qte = item.qte;
+            const price = item.product?.price;
+            sum += qte * price;
+        });
+        return sum;
+    };
+
     return (
         <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={setOpen}>
+            <Dialog as="div" className="relative z-50" onClose={setOpen}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-in-out duration-500"
@@ -38,7 +44,7 @@ const SidebarCart = ({ open, setOpen, cart }) => {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
+                                    <div className="flex h-full flex-col bg-white shadow-xl">
                                         <div className="flex-1 overflow-y-auto px-4 py-6">
                                             <div className="flex items-start justify-between">
                                                 <Dialog.Title className="text-lg font-medium text-gray-900">
@@ -61,69 +67,67 @@ const SidebarCart = ({ open, setOpen, cart }) => {
                                                 </div>
                                             </div>
 
-                                            <hr className="-mx-4 my-8 mt-4" />
+                                            <hr className="-mx-4 mt-4" />
 
-                                            <div className="">
-                                                <div className="flow-root">
-                                                    <ul
-                                                        role="list"
-                                                        className="-my-6 divide-y divide-gray-200"
-                                                    >
-                                                        {cart.map(
-                                                            (item, idx) => (
-                                                                <li
-                                                                    key={idx}
-                                                                    className="flex py-6"
-                                                                >
-                                                                    <Item
-                                                                        item={
-                                                                            item
-                                                                        }
-                                                                    />
-                                                                </li>
-                                                            )
-                                                        )}
-                                                    </ul>
-                                                </div>
+                                            <div className="flow-root">
+                                                <ul
+                                                    role="list"
+                                                    className=" divide-y divide-gray-200"
+                                                >
+                                                    {cart.map((item, idx) => (
+                                                        <li
+                                                            key={idx}
+                                                            className="flex  -mx-4"
+                                                        >
+                                                            <CartItem
+                                                                item={item}
+                                                            />
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
                                         </div>
 
-                                        {/* <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                                                <div className="flex justify-between text-base font-medium text-gray-900">
-                                                    <p>Subtotal</p>
-                                                    <p>$262.00</p>
-                                                </div>
-                                                <p className="mt-0.5 text-sm text-gray-500">
-                                                    Shipping and taxes
-                                                    calculated at checkout.
+                                        <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
+                                            <div className="flex justify-between text-base font-medium text-gray-900">
+                                                <p>Sous-total</p>
+                                                <p>
+                                                    {currencyFormat(
+                                                        totalCart()
+                                                    )}
                                                 </p>
-                                                <div className="mt-6">
-                                                    <a
-                                                        href="#"
-                                                        className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                                            </div>
+                                            <p className="mt-0.5 text-sm text-gray-500">
+                                                Frais de livraison et taxes sont
+                                                calculés à la caisse
+                                            </p>
+                                            <div className="mt-6">
+                                                <Link
+                                                    href={route("cart")}
+                                                    className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                                                >
+                                                    Finaliser ma commande
+                                                </Link>
+                                            </div>
+                                            <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                                                <p>
+                                                    ou{" "}
+                                                    <button
+                                                        type="button"
+                                                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                                                        onClick={() =>
+                                                            setOpen(false)
+                                                        }
                                                     >
-                                                        Checkout
-                                                    </a>
-                                                </div>
-                                                <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                                                    <p>
-                                                        or{" "}
-                                                        <button
-                                                            type="button"
-                                                            className="font-medium text-indigo-600 hover:text-indigo-500"
-                                                            onClick={() =>
-                                                                setOpen(false)
-                                                            }
-                                                        >
-                                                            Continue Shopping
-                                                            <span aria-hidden="true">
-                                                                {" "}
-                                                                &rarr;
-                                                            </span>
-                                                        </button>
-                                                    </p>
-                                                </div>
-                                            </div> */}
+                                                        Continuer l'achat
+                                                        <span aria-hidden="true">
+                                                            {" "}
+                                                            &rarr;
+                                                        </span>
+                                                    </button>
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>
@@ -135,113 +139,104 @@ const SidebarCart = ({ open, setOpen, cart }) => {
     );
 };
 
-const Item = ({ item }) => {
-    const { post, processing, data, setData } = useForm({
-        qte: item.qte,
-    });
-    const isFirstRender = useRef(true);
+// const Item = ({ item }) => {
+//     const { post, processing, data, setData } = useForm({
+//         qte: item.qte,
+//     });
+//     const isFirstRender = useRef(true);
 
-    useEffect(() => {
-        if (!isFirstRender.current) {
-            const debouncedApiCall = debounce(() => {
-                post(route("cart.handle.qte", { id: item?.product?.id }));
-            }, 1000);
+//     useEffect(() => {
+//         if (!isFirstRender.current) {
+//             const debouncedApiCall = debounce(() => {
+//                 post(route("cart.handle.qte", { id: item?.product?.id }));
+//             }, 1000);
 
-            debouncedApiCall();
+//             debouncedApiCall();
 
-            return () => debouncedApiCall.cancel();
-        } else {
-            isFirstRender.current = false;
-        }
-    }, [data.qte]);
+//             return () => debouncedApiCall.cancel();
+//         } else {
+//             isFirstRender.current = false;
+//         }
+//     }, [data.qte]);
 
-    const handleCounter = (increment = false) => {
-        const qte = data.qte;
-        if ((!increment && qte === 1) || (increment && qte === 5)) {
-            return;
-        }
+//     const handleCounter = (increment = false) => {
+//         const qte = data.qte;
+//         if ((!increment && qte === 1) || (increment && qte === 5)) {
+//             return;
+//         }
 
-        setData('qte', increment ? qte + 1 : qte - 1);
-        // setQte((prevQte) => {
-        //     if ((!increment && prevQte === 1) || (increment && prevQte === 5)) {
-        //         return prevQte;
-        //     }
+//         setData("qte", increment ? qte + 1 : qte - 1);
+//     };
 
-        //     let newQte = increment ? prevQte + 1 : prevQte - 1;
+//     const destroyItem = () => {
+//         post(route("cart.remove", { id: item?.product?.id }));
+//     };
 
-        //     return newQte;
-        // });
-    };
+//     return (
+//         <div className="transition duration-200 hover:bg-gray-200 p-2 w-full flex">
+//             <div className="h-24 object-contain overflow-hidden rounded border border-gray-200">
+//                 <img
+//                     src={media(item?.product?.images[0])}
+//                     alt={item?.product?.name}
+//                     className="h-full w-full object-cover object-center"
+//                 />
+//             </div>
 
-    const destroyItem = () => {
-        post(route("cart.remove", { id: item?.product?.id }));
-    };
+//             <div className="ml-4 flex flex-1 flex-col">
+//                 <div>
+//                     <div className="flex justify-between text-base font-medium text-gray-900">
+//                         <h3 className="text-sm">
+//                             <a href="#">
+//                                 {item?.product?.name.slice(0, 28) + "..."}
+//                             </a>
+//                         </h3>
+//                         <p className="ml-4">
+//                             {currencyFormat(item?.product?.price * data.qte)}
+//                         </p>
+//                     </div>
+//                     <p className="mt-1 text-sm text-gray-500">
+//                         {currencyFormat(item?.product.price)}
+//                     </p>
+//                 </div>
+//                 <div className="flex flex-1 items-end justify-between text-sm">
+//                     <div className="flex items-center">
+//                         <button
+//                             onClick={() => handleCounter(false)}
+//                             className="inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+//                             type="button"
+//                         >
+//                             <Minus />
+//                         </button>
+//                         <div>
+//                             <input
+//                                 type="text"
+//                                 className="bg-gray-50 w-10 border border-gray-300 text-gray-900 text-sm text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+//                                 value={data.qte}
+//                                 readOnly
+//                             />
+//                         </div>
+//                         <button
+//                             onClick={() => handleCounter(true)}
+//                             className="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+//                             type="button"
+//                         >
+//                             <Plus />
+//                         </button>
+//                     </div>
 
-    return (
-        <>
-            <div className="h-24 object-contain overflow-hidden rounded border border-gray-200">
-                <img
-                    src={media(item?.product?.images[0])}
-                    alt={item?.product?.name}
-                    className="h-full w-full object-cover object-center"
-                />
-            </div>
-
-            <div className="ml-4 flex flex-1 flex-col">
-                <div>
-                    <div className="flex justify-between text-base font-medium text-gray-900">
-                        <h3 className="text-sm">
-                            <a href="#">
-                                {item?.product?.name.slice(0, 28) + "..."}
-                            </a>
-                        </h3>
-                        <p className="ml-4">
-                            {currencyFormat(item?.product?.price * data.qte)}
-                        </p>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                        {currencyFormat(item?.product.price)}
-                    </p>
-                </div>
-                <div className="flex flex-1 items-end justify-between text-sm">
-                    <div className="flex items-center">
-                        <button
-                            onClick={() => handleCounter(false)}
-                            className="inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                            type="button"
-                        >
-                            <Minus />
-                        </button>
-                        <div>
-                            <input
-                                type="text"
-                                className="bg-gray-50 w-10 border border-gray-300 text-gray-900 text-sm text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                value={data.qte}
-                                readOnly
-                            />
-                        </div>
-                        <button
-                            onClick={() => handleCounter(true)}
-                            className="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                            type="button"
-                        >
-                            <Plus />
-                        </button>
-                    </div>
-
-                    <div className="flex">
-                        <button
-                            type="button"
-                            className="font-medium text-indigo-600 hover:text-indigo-500"
-                            onClick={() => destroyItem(item.product?.id)}
-                        >
-                            Remove
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
-};
+//                     <div className="flex">
+//                         <button
+//                             type="button"
+//                             className="font-medium text-red-600 hover:text-red-500"
+//                             onClick={() => destroyItem(item.product?.id)}
+//                         >
+//                             Supprimé
+//                         </button>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
 
 export default SidebarCart;

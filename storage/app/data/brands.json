@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "name": "Apple",
+        "slug": "apple",
+        "logo": "brand/t7nAeQNiJHGh4Zydhwo3Nt6FmDjNwfB5MPxPMP9b.png"
+    },
+    {
+        "id": 2,
+        "name": "JBL",
+        "slug": "jbl",
+        "logo": "brand/ZdIxbHkrkBKn7TeokJTOHFnQe2oI1umh0a5POdor.png"
+    },
+    {
+        "id": 3,
+        "name": "Samsung",
+        "slug": "samsung",
+        "logo": "brand/18dczc7dbZYR9XJ79RrRMBGUQn9RSq753lxQoT1p.png"
+    }
+]
