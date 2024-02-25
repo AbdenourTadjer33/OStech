@@ -9,19 +9,22 @@ class OrderProduct extends Model
 {
     use HasFactory;
 
+    protected $table = 'order_product';
+    public $timestamps = false;
+
     protected $fillable = [
-        'product_id',
         'order_id',
-        'product',
-        'choice',
+        'product_id',
         'qte',
         'prices',
+        'product',
         'total',
     ];
 
     protected $casts = [
-        'product' => 'array',
-        'chioce' => 'array',
+        'qte' => 'integer',
         'prices' => 'array',
+        'product' => 'array',
+        'total' => 'float',
     ];
 }

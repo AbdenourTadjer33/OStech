@@ -23,9 +23,9 @@ class CouponController extends Controller
             ]);
         }
 
-        Cache::put('coupon-' . session()->getId(), $coupon, now()->addHour());
+        Cache::put('coupon:'. $coupon->code, $coupon, $coupon->expire_at);
 
-        session()->put('coupon', $coupon->only('code', 'type', 'value', 'max_amount'));
+        session()->put('coupon', $coupon->only('id', 'code', 'type', 'value', 'max_amount'));
 
         return redirect()->back()->with('alert', [
             'show' => false,

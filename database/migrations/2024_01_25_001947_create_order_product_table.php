@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_products', function (Blueprint $table) {
+        Schema::create('order_product', function (Blueprint $table) {
             $table->foreignId('product_id')->nullable()->constrained('products', 'id')->nullOnDelete();
             $table->foreignId('order_id')->constrained('orders', 'id')->cascadeOnDelete();
-            $table->json('product')->nullable();
             $table->integer('qte');
             $table->json('prices')->nullable();
-            $table->float('total');
+            $table->json('product')->nullable();
+            $table->decimal('total', 10, 2);
         });
     }
 

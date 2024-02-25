@@ -25,7 +25,6 @@ class CartController extends Controller
         $cartItem = [
             'product_id' => $product->id,
             'qte' => 1,
-            'added_at' => now(),
         ];
 
         if (!session()->has('cart')) {

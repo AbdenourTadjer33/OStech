@@ -5,7 +5,7 @@ import { VscChromeClose } from "react-icons/vsc";
 export default function Modal({
     children,
     show = false,
-    maxWidth = "Zxl",
+    maxWidth = "2xl",
     closeable = false,
     onClose = () => {},
     className,

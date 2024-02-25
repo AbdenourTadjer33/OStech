@@ -15,29 +15,22 @@ class ProductController extends Controller
 {
     public function index()
     {
-
-        $products = Cache::get(
-            'products',
-            fn () =>
-            DB::table('products')
-                ->where('status', true)
-                ->select([
-                    'products.id',
-                    'products.slug',
-                    'products.name',
-                    'products.price',
-                    'products.promo',
-                    DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"),
-                    'brands.name as brand_name',
-                    'categories.name as category',
-                    'parent_categories.name as parent_category'
-                ])
-                ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-                ->join('categories', 'products.category_id', '=', 'categories.id')
-                ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
-                ->orderBy('products.id', 'desc')
-                ->cursorPaginate(15)
-        );
+        $products = Product::active()->select([
+            'products.id',
+            'products.slug',
+            'products.name',
+            'products.price',
+            'products.promo',
+            DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"),
+            'brands.name as brand_name',
+            'categories.name as category',
+            'parent_categories.name as parent_category'
+        ])
+            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
+            ->orderBy('products.id', 'desc')
+            ->cursorPaginate(15);
 
         return Inertia::render('Product/Products', [
             'products' => $products,

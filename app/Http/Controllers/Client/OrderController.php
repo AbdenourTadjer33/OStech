@@ -3,13 +3,20 @@
 namespace App\Http\Controllers\Client;
 
 use Inertia\Inertia;
+use App\Models\Order;
+use App\Models\Coupon;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Order\StoreRequest;
-use App\Models\ShippingCompany;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
+use App\Services\OrderService;
+use App\Models\ShippingPricing;
+use App\Services\CouponService;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Order\StoreRequest;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
@@ -18,59 +25,98 @@ class OrderController extends Controller
         $this->middleware('precognitive')->only('store');
     }
 
-    public function index()
+    public function index(Request $request)
     {
     }
 
-    public function store(StoreRequest $request)
+    public function create(Request $request)
     {
-        dd($request->all(), session('cart'), session('coupon'), $request->cookie());
+        if (empty($request->cart)) {
+            session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'Votre panier est vide',
+            ]);
+            return to_route('welcome');
+        }
+        return Inertia::render('Order/Create');
     }
 
-    public function validateCustomer(Request $request)
+
+    public function store(StoreRequest $request, CouponService $couponService, OrderService $orderService)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'min:2'],
-            'phone' => ['required', 'regex:/^(05|06|07)[0-9]{8}$/'],
-            'email' => ['required', 'email'],
-            'address' => ['required', 'string', 'min:4'],
-            'city' => ['required', 'min:2'],
-            'wilaya' => ['required'],
+        if (!$request->cart) {
+            return to_route('welcome')->with('alert', [
+                'status' => 'danger',
+                'message' => 'Votre panier est vide',
+            ]);
+        }
+
+        $order = DB::transaction(function () use ($request, $couponService, $orderService) {
+
+            $subTotal = $orderService->calculateSubTotal($request->cart);
+            $shippingCost = $orderService->shippingPricing((int) $request->wilaya, $request->shippingType);
+            $discount = isset($request?->coupon['code']) ? $couponService->useCoupon($request?->coupon['code'], $subTotal) : null;
+
+
+            /**
+             * @var \App\Models\Order
+             */
+            $order = Order::create([
+                'ref' => Order::generateRef(),
+                'user_id' => $request->user()?->id,
+                'client' => $request->only('name', 'phone', 'email', 'address', 'city', 'wilaya'),
+                'shipping_company_id' => $request->shippingCompany,
+                'shipping_type' => $request->shippingType,
+                'shipping_cost' => $shippingCost,
+                'payment_method' => $request->paymentMethod,
+                'coupon_id' => isset($request?->coupon['id']) ? $request?->coupon['id'] : null,
+                'coupon_code' => isset($request?->coupon['code']) ? $request?->coupon['code'] : null,
+                'discount' => $discount,
+                'sub_total' => $subTotal,
+                'total' => $orderService->calculateTotal($subTotal, $shippingCost, $discount),
+            ]);
+
+            $orderProducts = $orderService->prepareOrderProducts($request->cart);
+            $order->products()->attach($orderProducts);
+
+            return $order;
+        });
+
+        session()->forget(['coupon', 'cart']);
+
+        return redirect(route('order.show', ['ref' => $order->ref]))
+            ->with('alert', [
+                'status' => 'success',
+                'message' => 'Commande effectuer avec succés',
+            ]);
+    }
+
+    // public function newOrder(Request $request)
+    // {
+    //     /**
+    //      * @var \App\Models\Order
+    //      */
+    //     $order = Order::where('ref', $request->ref)->first();
+    //     if (auth()->check() && $request->user()->id === $order->user_id) {
+    //         dump($order);
+    //     }
+    // }
+
+    public function show(Request $request)
+    {
+        /**
+         * @var \App\Models\Order
+         */
+        $order = Order::where('ref', $request->ref)->first();
+
+        if ($order->user_id && !auth()->check()) {
+            return abort(401);
+        }
+
+        $pivotData = $order->products()->withPivot('qte')->get()->pluck('pivot');
+
+        return Inertia::render('Order/Show', [
+            'order' => $order,
         ]);
-
-        return redirect()->back();
-    }
-
-    public function validatePaymentMethod(Request $request)
-    {
-        $request->validate([
-            'paymentMethod' => ['required', Rule::in(['bank-transfer', 'cash-on-delivery'])]
-        ]);
-
-        return redirect()->back();
-    }
-
-    public function validateShippingMethod(Request $request) {
-        $request->validate([
-            // 'shippingCompany' => ['required'],
-            'shippingType' => ['required'],
-        ]);
-    }
-
-    public function validateData(Request $request)
-    {
-        $request->validate([
-            'name' => [Rule::requiredIf($request->has('name')), 'string', 'min:2'],
-            'email' => [Rule::requiredIf($request->has('email')), 'email'],
-            'phone' => [Rule::requiredIf($request->has('phone')), 'regex:/^(05|06|07)[0-9]{8}$/'],
-            'address' => [Rule::requiredIf($request->has('address')), 'string', 'min:4'],
-            'city' => [Rule::requiredIf($request->has('city')), 'min:2'],
-            'wilaya' => [Rule::requiredIf($request->has(''))],
-        ]);
-    }
-
-    public function shippingPrice(Request $request)
-    {
-        return ShippingCompany::where('name', $request->name)->with('shippingPricings')->first();
     }
 }

@@ -19,7 +19,7 @@ export default function NavBar() {
                             className="flex ms-2 md:me-24"
                         >
                             <ApplicationLogo
-                                type="indigo"
+                                type="white"
                                 className="h-8 w-auto me-3"
                             />
                         </Link>

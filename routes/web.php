@@ -1,11 +1,6 @@
 <?php
 
-use Inertia\Inertia;
-use App\Models\Brand;
-use App\Models\Product;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\OrderController;
@@ -13,7 +8,11 @@ use App\Http\Controllers\Client\CouponController;
 use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\Client\ShippingController;
 use App\Http\Controllers\Client\WelcomeController;
-use App\Models\ShippingCompany;
+use App\Models\Order;
+use App\Models\OrderProduct;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -34,20 +33,20 @@ Route::prefix('cart')->controller(CartController::class)->group(function () {
     Route::get('/temp-destroy-cart', 'destroy')->name('cart.destroy');
 });
 
-Route::prefix('order')->controller(OrderController::class)->group(function () {
-    Route::get('/', 'index')->name('order.index');
-    Route::get('/create', 'create')->name('order.create');
-    Route::post('/create', 'store')->name('order.store');
+Route::prefix('order')->controller(OrderController::class)->as('order.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/create', 'store')->name('store');
+    Route::get('/show/{ref}', 'show')->name('show');
+    Route::get('/new/{ref}', 'newOrder')->name('new.show');
 
-    Route::post('/validate-customer-data', 'validateCustomer')->name('order.validate.customer');
-    Route::post('/validate-payement-method', 'validatePaymentMethod')->name('order.validate.paymentMethod');
-    Route::post('/validate-shipping-method', 'validateShippingMethod')->name('order.validate.shippingMethod');
+
+
 });
 
 Route::prefix('coupon')->controller(CouponController::class)->group(function () {
     Route::post('/add', 'add')->name('coupon.add');
 });
-
 
 Route::get('/catalogue', [WelcomeController::class, 'index'])->name('catalogue');
 Route::get('/contact', [WelcomeController::class, 'index'])->name('contact');
@@ -57,10 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-
-
-Route::get('/test', [ShippingController::class, 'index']);
 
 
 require __DIR__ . '/auth.php';

@@ -14,20 +14,25 @@ class ShippingController extends Controller
 {
     public function get(Request $request)
     {
-        return ShippingCompany::where('name', $request->name)
-            ->with('shippingPricings')
-            ->first();
+        return ShippingCompany::where('name', $request->name)->first();
     }
 
     public function getPricings(Request $request)
     {
-        $wilaya = $request->input('code');
-        $shippingCompany = $request->input('company');
+        $code = (int) $request->input('wilaya');
+        $shipping = ShippingPricing::where('wilaya_id', $code)->first();
+        if (!$shipping) {
+            return;
+        }
+        return [
+            ['price' => $shipping->cost_home, 'label' => 'tarif à domicile', 'name' => 'cost_home'],
+            ['price' => $shipping->cost_stop_desk, 'label' => 'tarif stop desk', 'name' => 'cost_stop_desk'],
+        ];
 
-        // $cache = Cache::get(
-            // 'shipping',
-            // ShippingCompany::status()->where('name', $shippingCompany)->get()
-        // );
+        // return ShippingCompany::status()
+        //     ->whereHas('shippingPricings', fn ($query) => $query->where('wilaya_id', $code))
+        //     ->with(['shippingPricings' => fn ($query) => $query->where('wilaya_id', $code)])
+        //     ->get();
     }
 
     public function index()

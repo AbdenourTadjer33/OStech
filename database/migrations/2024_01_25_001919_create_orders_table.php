@@ -14,17 +14,23 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('ref', 22)->unique();
-            $table->foreignId('coupon_id')->nullable()->constrained('coupons')->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users', 'id')->nullOnDelete();
-            $table->foreignId('shipping_company_id')->nullable()->constrained('shipping_companies', 'id')->nullOnDelete();
-            $table->string('address')->nullable();
             $table->json('client')->nullable();
+
+            $table->foreignId('shipping_company_id')->nullable()->constrained('shipping_companies', 'id')->nullOnDelete();
+            $table->string('shipping_type');
+            $table->decimal('shipping_cost', 10, 2)->nullable();
+            $table->string('payment_method')->nullable();
+
+            $table->foreignId('coupon_id')->nullable()->constrained('coupons')->nullOnDelete();
             $table->string('coupon_code')->nullable();
-            $table->float('discount')->nullable();
-            $table->string('shipping_company_name')->nullable();
-            $table->float('shipping_cost')->default('0.00');
-            $table->float('total');
-            $table->enum('status', ['New order', 'Paid', 'Under process','Finished', 'Canceled', 'Refund requested', 'Returned order', 'Refunded order'])->default('New order');
+            $table->decimal('discount', 10, 2)->nullable();
+
+            $table->decimal('sub_total', 10, 2);
+            $table->decimal('total', 10, 2);
+
+            $table->enum('status', ['Nouvel commande', 'Payé', 'En cours de traitement', 'Fini', 'Annulé', 'Remboursement demandé', 'Commande retournée', 'Commande remboursée'])->default('Nouvel commande');
+
             $table->boolean('is_online')->default(true);
             $table->timestamps();
         });

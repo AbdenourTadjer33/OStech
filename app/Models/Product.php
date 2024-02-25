@@ -26,11 +26,11 @@ class Product extends Model
         'price',
         'promo',
         'features',
+        'images',
         'status',
         'catalogue',
         'category_id',
         'brand_id',
-        'images',
     ];
 
     protected $casts = [
@@ -43,8 +43,24 @@ class Product extends Model
         'updated_at' => 'datetime:d-m-Y H:i'
     ];
 
-    public function scopeStatus(Builder $query) {
+    public function scopeActive(Builder $query)
+    {
         $query->where('status', true);
+    }
+
+    public function scopeStatus(Builder $query)
+    {
+        $query->where('status', true);
+    }
+
+    public function scopeClient(Builder $query)
+    {
+        $query->select(['id', 'ref', 'name', 'description', 'slug', 'price', 'promo', 'images', 'features', 'category_id', 'brand_id']);
+    }
+
+    public function scopeShoppingCart(Builder $query)
+    {
+        $query->select(['id', 'ref', 'name', 'slug', 'price', 'promo', 'images']);
     }
 
     public function brand(): BelongsTo
@@ -59,6 +75,22 @@ class Product extends Model
 
     public function orders(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class, 'order_products');
+        return $this->belongsToMany(Order::class)->withPivot(['qte', 'prices']);
+    }
+
+    /**
+     * this method check if a product has a promo
+     * and calculate the final price of the product
+     * else return the price
+     * 
+     * @return float
+     */
+    public function calculateFinalPrice(): float
+    {
+        if (!$this->promo) {
+            return $this->price;
+        }
+
+        return $this->price - ($this->price * $this->promo / 100);
     }
 }

@@ -28,7 +28,7 @@ const AppLayout = ({ children }) => {
 
             <DynamicNavBar />
 
-            <main className="my-5">{children}</main>
+            <main className="my-2.5 sm:my-5">{children}</main>
 
             <Footer />
 

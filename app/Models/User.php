@@ -40,6 +40,7 @@ class User extends Authenticatable
         'password',
         'status',
         'recive_email',
+        'data',
         'type',
         'role_id',
     ];
