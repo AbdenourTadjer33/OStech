@@ -83,4 +83,5 @@ class ProductController extends Controller
 
         dump($products);
     }
+
 }

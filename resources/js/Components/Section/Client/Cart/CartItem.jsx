@@ -8,8 +8,9 @@ import {
 } from "@/Logic/helper";
 import Minus from "@/Components/Icons/Minus";
 import Plus from "@/Components/Icons/Plus";
-import { Tooltip } from "flowbite-react";
 import { FaRegTrashCan } from "react-icons/fa6";
+
+
 const CartItem = ({ item }) => {
 	const { post, processing, data, setData } = useForm({
 		qte: item.qte,

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Client\CouponController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Client\ShippingController;
 use App\Services\ApiService;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('/coupon/verify', [CouponController::class, 'verify'])->name('coupon.verify');
 Route::get('/shipping-pricing', [ShippingController::class, 'getPricings'])->name('shipping.pricings');
 
-// Route::get('/shipping-prices', [])
+// Route::get('/product/{slug}', [ClientProductController::class, 'getByCategory'])->name('category.products');
 
 Route::post('test-api', function (Request $request) {
     return session()->get('cart');

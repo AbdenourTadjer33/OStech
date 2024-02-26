@@ -6,13 +6,8 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\CouponController;
 use App\Http\Controllers\Client\ProductController;
-use App\Http\Controllers\Client\ShippingController;
 use App\Http\Controllers\Client\WelcomeController;
-use App\Models\Order;
-use App\Models\OrderProduct;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Client\CategoryController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -21,9 +16,24 @@ Route::prefix('products')->controller(ProductController::class)->group(function 
     Route::get('/slug', 'show')->name('products.show');
 });
 
-Route::get('/products', [ProductController::class, 'index'])->name('products');
-Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
-Route::get('/{subCategory}/products', [ProductController::class, 'subCategory'])->name('subCategory.products');
+
+
+
+Route::prefix('products')->controller(ProductController::class)->as('products.')->group(function () {
+    Route::get('/', [ProductController::class, 'index'])->name('index');
+    Route::get('/{slug}', [ProductController::class, 'show'])->name('show');
+    // Route::get('/{subCategory}/products', [ProductController::class, 'subCategory'])->name('subCategory');
+});
+
+Route::prefix('category')->controller(CategoryController::class)->as('category.')->group(function () {
+    Route::get('/{category_slug}/{subCategory_slug}', 'show')->name('show');
+
+
+
+
+    Route::get('/', 'getByCategory')->name('get');
+}); 
+
 
 Route::prefix('cart')->controller(CartController::class)->group(function () {
     Route::get('/', 'index')->name('cart');
@@ -40,7 +50,7 @@ Route::prefix('order')->controller(OrderController::class)->as('order.')->group(
     Route::get('/show/{ref}', 'show')->name('show');
     Route::get('/new/{ref}', 'newOrder')->name('new.show');
 
-
+    Route::get('/download/pdf/{ref}', 'pdf')->name('pdf');
 
 });
 

@@ -53,7 +53,7 @@ class Order extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class)->withPivot(['qte', 'prices']);
+        return $this->belongsToMany(Product::class)->withPivot(['qte', 'prices', 'product']);
     }
 
     public function coupon(): BelongsTo

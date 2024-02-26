@@ -26,7 +26,7 @@ const isStr = (str) => {
 
 export const isNumber = (value) => {
 	return !isNaN(value);
-}
+};
 
 export const media = (str) => {
 	return "/media/" + str;
@@ -49,7 +49,7 @@ export const debounce = (func, delay) => {
 	};
 
 	return debouncedFunction;
-}
+};
 
 export const comboFilterData = (query, data, ...key) => {
 	if (typeof key === "string") {
@@ -87,4 +87,14 @@ export const parseDatetime = (strDatetime) => {
 	}
 
 	return jsDate;
-}
+};
+
+export const shorter = (str, nbWord = 4) => {
+	if (!isStr(str)) return null;
+
+	const arr = str.split(" ");
+
+	if (arr.length <= nbWord) return str;
+
+	return arr.slice(0, nbWord).join(" ");
+};

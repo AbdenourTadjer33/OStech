@@ -21,17 +21,20 @@ class LoadData
     public function handle(Request $request, Closure $next)
     {
         if (!$request->routeIs('admin*')) {
-            // $categories = Cache::remember('categories', now()->addDay(), fn () => Category::get());
             $categories = Category::get();
+
+            $request->merge(['categories' => $categories]);
 
             $hierarchicalCategories = $categories->filter(function ($category) {
                 return $category->isMainCategory();
             })->map(function (Category $mainCategory) use ($categories) {
-                $mainCategory->subCategories = $categories->where('parent_id', $mainCategory->id)->all();
-                return $mainCategory;
+                $subCategories = $categories->where('parent_id', $mainCategory->id)->values()->all();
+                $clonedCategory = clone $mainCategory;
+                $clonedCategory->subCategories = $subCategories;
+                return $clonedCategory;
             })->values();
-            Inertia::share('categories', $hierarchicalCategories);
 
+            Inertia::share('categories', $hierarchicalCategories);
 
             $cart = [];
             if (session()->has('cart') && count(session('cart')) > 0) {
@@ -61,7 +64,7 @@ class LoadData
 
             if (session()->has('coupon')) {
                 Inertia::share('coupon', session()->get('coupon'));
-                $request->merge(['coupon' =>     session()->get('coupon')]);
+                $request->merge(['coupon' => session()->get('coupon')]);
             }
         }
         return $next($request);

@@ -24,7 +24,7 @@ const NavBar = () => {
         },
         {
             label: "Products",
-            link: "products",
+            link: "products.index",
         },
         {
             label: "Catalogue",

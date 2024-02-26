@@ -6,10 +6,12 @@ use Inertia\Inertia;
 use App\Models\Order;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Models\OrderProduct;
 use Illuminate\Http\Request;
 use App\Services\OrderService;
 use App\Models\ShippingPricing;
 use App\Services\CouponService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -109,14 +111,29 @@ class OrderController extends Controller
          */
         $order = Order::where('ref', $request->ref)->first();
 
+        if (!$order) {
+            abort(404);
+        }
+
         if ($order->user_id && !auth()->check()) {
             return abort(401);
         }
 
-        $pivotData = $order->products()->withPivot('qte')->get()->pluck('pivot');
+        $order->orderProducts = OrderProduct::where('order_id', $order->id)->get();
 
         return Inertia::render('Order/Show', [
             'order' => $order,
         ]);
+    }
+
+    public function pdf(Request $request)
+    {
+        $order = Order::where('ref', $request->ref)->first();
+        $order->orderProducts = OrderProduct::where('order_id', $order->id)->get();
+
+        $pdf = Pdf::setOption(['dpi' => 150, 'defaultFont' => 'sans-serif'])->loadView('pdf.order', [
+            'order' => $order,
+        ]);
+        return $pdf->download("commande-{$order->ref}.pdf");
     }
 }

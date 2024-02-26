@@ -18,6 +18,21 @@ class StoreRequest extends FormRequest
         return true;
     }
 
+    public function attributes()
+    {
+        return [
+            'name' => 'nom prénom',
+            'phone' => 'n° téléphone',
+            'email' => 'adresse email',
+            'address' => 'adresse',
+            'city' => 'ville',
+            'wilaya' => 'wilaya',
+            'paymentMethod' => 'mode de payment',
+            'shippingType' => 'méthode de livraison'
+
+        ];
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

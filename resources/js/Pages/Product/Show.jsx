@@ -2,15 +2,15 @@ import React from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import ProductCard from "@/Components/Section/Client/ProductCard";
 import AppLayout from "@/Layouts/AppLayout";
-import { calculatePrice, currencyFormat, media } from "@/Logic/helper";
+import { calculatePrice, currencyFormat, media, shorter } from "@/Logic/helper";
 import Button from "@/Components/Button";
 import { TbShoppingCartPlus } from "react-icons/tb";
 import Container from "@/Components/Container";
 import { useRef } from "react";
+import Badge from "@/Components/Badge";
 
 const Show = ({ product }) => {
 	const { post, processing } = useForm();
-
 	const addToCart = (id) => {
 		post(route("cart.add", { id }), {
 			preserveScroll: true,
@@ -22,10 +22,60 @@ const Show = ({ product }) => {
 
 			<ProductDetails product={product} addToCart={addToCart} />
 
-			<div className="bg-info-50 p-4 mb-10">
-				<Container>
-					<div className="flex items-center justify-between">
-						<h4 className="text-lg font-medium">Modèles pareils</h4>
+			<div className="bg-gray-100 ">
+				<Container className="flex items-center gap-10  overflow-hidden">
+					<div className="">
+						<h4 className="text-base sm:text-lg text-gray-800 font-medium">
+							<span>Modèles pareils</span> /{" "}
+							<span>Autres Couleurs</span>
+						</h4>
+					</div>
+
+					<div className="flex gap-4">
+						<MinProductCard
+							slug={product.slug}
+							name={product.name}
+							img={product.images[0]}
+							price={product.price}
+							promo={product?.promo}
+						/>
+						{/* <Link
+							as="div"
+							href={route("products.show", {
+								slug: product.slug,
+							})}
+							className="flex flex-col items-center md:flex-row max-w-[20rem] transition duration-75 group hover:bg-white -my-4 cursor-pointer"
+						>
+							<div className="relative h-20 w-20">
+								<img
+									className="object-contain object-center h-full w-full"
+									src={media(product.images[0])}
+									alt={product.name}
+								/>
+								{product.promo && (
+									<div className="absolute bottom-0 -right-3">
+										<Badge type="indigo">
+											-{product.promo} %
+										</Badge>
+									</div>
+								)}
+							</div>
+							<div className="flex flex-col justify-between p-4 leading-normal tracking-tight">
+								<h5 className="mb-2 text-base text-gray-600 ">
+									{shorter(product.name)}
+								</h5>
+								<h5 className="text-lg font-medium group-hover:text-info-500">
+									{product.promo
+										? currencyFormat(
+												product.price -
+													(product.promo *
+														product.price) /
+														100
+										  )
+										: currencyFormat(product.price)}
+								</h5>
+							</div>
+						</Link> */}
 					</div>
 				</Container>
 			</div>
@@ -119,7 +169,6 @@ const ProductDetails = ({ product, addToCart }) => {
 						<img
 							ref={mainImgRef}
 							src={media(images?.[0])}
-							// className="h-[30vh] w-auto"
 							className="h-full w-full object-contain object-center"
 						/>
 						{promo && (
@@ -185,74 +234,36 @@ const ProductDetails = ({ product, addToCart }) => {
 	);
 };
 
+export const MinProductCard = ({ slug, name, img, price, promo }) => {
+	return (
+		<Link
+			href={route("products.show", { slug })}
+			className="flex flex-col items-center md:flex-row max-w-[20rem] transition duration-75 group hover:bg-white -my-4 cursor-pointer bg-gray-50"
+		>
+			<div className="relative h-20 w-20">
+				<img
+					className="object-contain object-center h-full w-full"
+					src={media(img)}
+					alt={name}
+				/>
+				{promo && (
+					<div className="absolute bottom-0 -right-3">
+						<Badge type="indigo">-{promo} %</Badge>
+					</div>
+				)}
+			</div>
+			<div className="flex flex-col justify-between p-4 leading-normal tracking-tight">
+				<h5 className="mb-2 text-base text-gray-600 ">
+					{shorter(name)}
+				</h5>
+				<h5 className="text-lg font-medium group-hover:text-info-500">
+					{promo
+						? currencyFormat(price - (promo * price) / 100)
+						: currencyFormat(price)}
+				</h5>
+			</div>
+		</Link>
+	);
+};
+
 export default Show;
-
-// {/* <Container>
-// 	<section className="flex flex-col md:flex-row gap-4">
-// 		<div className="flex flex-row w-full md:w-1/2 gap-2 justify-center">
-// 			<div className="flex flex-col items-center justify-start gap-4 overflow-y-auto">
-// 				{product.images.map((img, idx) => (
-// 					<img
-// 						key={idx}
-// 						src={media(img)}
-// 						className="h-16 cursor-pointer"
-// 					/>
-// 				))}
-// 			</div>
-
-// 			<img src={media(product.images?.[0])} className="h-[30vh] w-auto" />
-// 		</div>
-
-// 		<div className="space-y-3 md:mt-4 md:ms-2">
-// 			<h6 className="text-sm text-gray-500">
-// 				{product.parent_category} {">"} {product.category}
-// 			</h6>
-// 			<h2 className="text-xl font-medium text-info-950">
-// 				{product.name}
-// 			</h2>
-// 			{/* {product.promo ? (
-// 							<>
-// 								<div className="absolute w-full text-center translate-y-4">
-// 									<span className="text-xs line-through">
-// 										{currencyFormat(price)}
-// 									</span>
-// 								</div>
-// 								<h4 className="text-lg font-medium text-gray-800">
-// 									{currencyFormat(
-// 										price - (price * promo) / 100
-// 									)}
-// 								</h4>
-// 							</>
-// 						) : (
-// 							<h4 className="text-lg font-medium text-gray-800">
-// 								{currencyFormat(product.price)}
-// 							</h4>
-// 						)} */}
-// 			<div className="flex gap-2 items-center justify-start">
-// 				<Button btn="info" className="capitalize">
-// 					Commander maintenant
-// 				</Button>
-// 				<button
-// 					className="text-info-800 hover:text-info-500"
-// 					onClick={() => addToCart(product.id)}
-// 				>
-// 					<TbShoppingCartPlus className="w-6 h-6" />
-// 				</button>
-// 			</div>
-// 			{/* <div>
-// 							Lorem ipsum dolor sit amet, consectetur adipiscing
-// 							elit. Mauris vel magna id velit dictum consequat.
-// 							Pellentesque eget ipsum ac turpis accumsan faucibus.
-// 							Ut non hendrerit odio. Proin vitae semper lacus.
-// 							Integer commodo odio nec velit euismod condimentum
-// 						</div> */}
-// 			{/* {product.description && (
-//                             <div
-//                                 dangerouslySetInnerHTML={{
-//                                     __html: product.description,
-//                                 }}
-//                             />
-//                         )} */}
-// 		</div>
-// 	</section>
-// </Container>; */}

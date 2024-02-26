@@ -13,7 +13,7 @@ const Button = ({ btn = "primary", className="", children, disabled, ...props })
         warning: `bg-warning-700 hover:bg-warning-800 dark:bg-warning-600 dark:hover:bg-warning-700 ${basedStyle} `,
     };
     return (
-        <button className={btnsStyles[btn] + className} disabled={disabled} {...props}>
+        <button className={`${btnsStyles[btn]} ${className}`} disabled={disabled} {...props}>
             {children}
         </button>
     );

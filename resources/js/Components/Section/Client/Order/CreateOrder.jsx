@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect, Fragment } from "react";
+import React, {
+	useContext,
+	useState,
+	useEffect,
+	Fragment,
+	useRef,
+} from "react";
 import { usePage, useForm } from "@inertiajs/react";
 import { Combobox, Transition, RadioGroup } from "@headlessui/react";
 import Label from "@/Components/Label";
@@ -40,7 +46,7 @@ const CreateOrder = () => {
 		},
 	];
 
-	const { post, data, setData, processing, errors } = useForm({
+	const { post, data, setData, processing, errors, hasErrors } = useForm({
 		name: user?.name || "",
 		phone: user?.phone || "",
 		email: user?.email || "",
@@ -101,9 +107,20 @@ const CreateOrder = () => {
 		});
 	};
 
+	const formRef = useRef();
+
+	useEffect(() => {
+		if (hasErrors && formRef.current) {
+			formRef.current.scrollIntoView({
+				behavior: "smooth",
+				block: "start",
+			});
+		}
+	}, [hasErrors]);
+
 	return (
 		<div className="shadow-lg rounded-xl py-6 px-4 space-y-6 bg-white border border-gray-200">
-			<form onSubmit={submitHandler}>
+			<form ref={formRef} onSubmit={submitHandler}>
 				<div className="grid gap-4 sm:grid-cols-2 mb-5">
 					<div className="sm:col-span-2">
 						<h3 className="text-xl font-medium text-gray-800">
@@ -454,9 +471,7 @@ const CreateOrder = () => {
 					</div>
 				</div>
 
-				<button
-					className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-				>
+				<button className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
 					{capitalize("Commander")}
 				</button>
 			</form>

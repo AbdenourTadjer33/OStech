@@ -40,7 +40,7 @@ const Trigger = ({ children }) => {
 const Content = ({
     align = "right",
     width = "w-48",
-    contentClasses = "bg-white dark:bg-gray-700",
+    contentClasses = "z-50 bg-white dark:bg-gray-700",
     children,
 }) => {
     const { open, setOpen, dismissOnClick } = useContext(DropDownContext);

@@ -39,6 +39,7 @@ class OrderService
             $product = $cartItem['product'];
             $orderProducts[$cartItem['product']?->id] = [
                 'qte' => $cartItem['qte'],
+                'product' => collect($product->only('id', 'ref', 'slug', 'name', 'images', 'price', 'promo'))->toJson(),
                 'prices' => collect([
                     'price' => $product?->price,
                     'promo' => $product?->promo
