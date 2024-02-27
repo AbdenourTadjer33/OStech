@@ -23,7 +23,7 @@ const ProductCard = ({
 	};
 
 	return (
-		<div className="group w-full max-w-sm p-4 bg-white shadow rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
+		<div className="group w-full max-w-sm border p-4 bg-white shadow rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
 			<Link
 				href={route("products.show", { slug })}
 				className="relative overflow-hidden block"
@@ -46,7 +46,7 @@ const ProductCard = ({
 					{parentCategory} {">"} {category}
 				</h6>
 				<Link href={route("products.show", { slug })}>
-					<h5 className="text-lg font-medium leading-tight text-info-950 h-11 my-1">
+					<h5 className="text-lg font-medium leading-tight text-info-950 h-11 my-1 overflow-hidden">
 						{name}
 					</h5>
 				</Link>

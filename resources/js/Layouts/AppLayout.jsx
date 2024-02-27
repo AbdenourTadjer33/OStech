@@ -32,7 +32,7 @@ const AppLayout = ({ children, mainClass = true }) => {
 
 			<Footer />
 
-			<div className="fixed top-[4.125rem] right-0 px-4 z-50 w-full sm:max-w-sm sm:min-w-[22rem] ">
+			{/* <div className="fixed top-[4.125rem] right-0 px-4 z-50 w-full sm:max-w-sm sm:min-w-[22rem] ">
 				<Transition
 					show={isShown}
 					enter="transition-opacity transition-transform duration-200 ease-out"
@@ -46,7 +46,7 @@ const AppLayout = ({ children, mainClass = true }) => {
 						<Alert alert={flash.alert} setIsShown={setIsShown} />
 					)}
 				</Transition>
-			</div>
+			</div> */}
 		</AppLayoutContext.Provider>
 	);
 };

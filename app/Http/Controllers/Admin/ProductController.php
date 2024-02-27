@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use Inertia\Inertia;
-use App\Models\Brand;
 use App\Models\Media;
 use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Services\MediaService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -17,7 +14,6 @@ use App\Http\Requests\Product\UpdateRequest;
 use App\Http\Requests\Product\StoreRequest;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager as Image;
 
 class ProductController extends Controller
@@ -55,7 +51,6 @@ class ProductController extends Controller
     {
         DB::transaction(function () use ($request) {
 
-            $parentCategory = $request->parentCategory;
             $subCategory = $request->category; // this represent the sub-category
 
             $images = $request->images;
@@ -69,8 +64,6 @@ class ProductController extends Controller
 
             Product::create([
                 'name' => $request->input('name'),
-                'ref' => Product::generateRef(),
-                'slug' => Str::slug($parentCategory['name'] . ' ' . $subCategory['name'] . ' ' . $request->input('name')),
                 'description' => $request->input('description'),
                 'sku' => $request->input('sku'),
                 'qte' => $request->input('qte'),

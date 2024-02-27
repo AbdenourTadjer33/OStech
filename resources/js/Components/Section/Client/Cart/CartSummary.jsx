@@ -33,7 +33,7 @@ const CartSummary = () => {
 					<div className="flex items-center gap-2">
 						<p className="text-gray-600">Coupon</p>
 						<span className=" inline-flex items-center justify-center font-medium bg-indigo-100 text-indigo-800 text-base px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
-							{coupon?.type == "percentage"
+							{coupon?.type == "pourcentage"
 								? coupon.value + " %"
 								: currencyFormat(coupon.value)}
 						</span>

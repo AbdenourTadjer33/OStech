@@ -18,13 +18,17 @@ class CategoryController extends Controller
         $parentCategory = $request->categories->firstWhere('slug', $request->slug);
         $ids = $request->categories->where('parent_id', $parentCategory->id)->pluck('id');
 
-        return Product::whereIn('category_id', $ids)->select('ref', 'slug', 'name', 'images', 'price', 'promo')->limit(5)->get();
+        return Product::whereIn('category_id', $ids)
+            ->sample()
+            ->latest()
+            ->limit(10)
+            ->get();
 
     }
 
     public function getSubcategoryIdsByParentSlug($categories, $parentSlug)
     {
-        $subcategoryIds = [];
+        $subcategoryIds = [];   
 
         foreach ($categories as $category) {
             if ($category->parent_id === null && $category->slug === $parentSlug) {

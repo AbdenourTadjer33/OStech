@@ -75,6 +75,7 @@ class RoleController extends Controller
         return session()->flash('');
     }
 
+
     public function destroy(Request $request)
     {
         $role = Role::where('id', $request->id)->withCount('users')->firstOrFail();

@@ -46,7 +46,6 @@ const Index = ({ products }) => {
         const filtered = data.filter(
             (record) =>
                 record.name.toLowerCase().includes(query) ||
-                record.ref.toLowerCase().includes(query) ||
                 record?.sku?.toLowerCase().includes(query) ||
                 record.category?.name.toLowerCase().includes(query)
         );
@@ -322,9 +321,6 @@ const Index = ({ products }) => {
 												/>
 											</Table.Column>
 											<Table.Column className="px-2 py-3">
-												ref: {record.ref}
-												<br />
-												nom:{" "}
 												<ReadMore
 													content={record.name}
 												/>

@@ -79,8 +79,8 @@ const Index = () => {
 					<h1 className="text-4xl font-medium text-gray-800 my-4">
 						Finaliser ma commande
 					</h1>
-					<div className="flex justify-between items-start gap-4 flex-row-reverse">
-						<div className="sticky top-28 w-full sm:max-w-xl border border-gray-200 shadow-lg rounded">
+					<div className="flex flex-col-reverse md:flex-row-reverse items-start gap-4">
+						<div className="md:sticky md:top-28 w-full md:max-w-xl border border-gray-200 shadow-lg rounded">
 							<div className="divide-y">
 								{cart.map((item, index) => (
 									<CartItem key={index} item={item} />

@@ -130,16 +130,5 @@ class DatabaseSeeder extends Seeder
         }
 
 
-        Coupon::create([
-            'code' => '123123',
-            'type' => 'pourcentage',
-            'value' => '5',
-            'start_at' => now(),
-            'expire_at' => now()->addWeek(),
-            'max_use' => 10,
-            'max_amount' => 750,
-            'status' => true,
-        ]);
-
     }
 }

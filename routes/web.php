@@ -11,29 +11,27 @@ use App\Http\Controllers\Client\CategoryController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
+Route::controller(WelcomeController::class)->group(function () {
+    Route::get('/', 'index')->name('welcome');
+    Route::get('/contact-us', 'contact')->name('contact');
+    Route::get('/our-catalogue', 'catalogue')->name('catalogue');
+});
+
+
 Route::prefix('products')->controller(ProductController::class)->group(function () {
     Route::get('/', 'index')->name('products');
     Route::get('/slug', 'show')->name('products.show');
 });
 
-
-
-
 Route::prefix('products')->controller(ProductController::class)->as('products.')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('index');
     Route::get('/{slug}', [ProductController::class, 'show'])->name('show');
-    // Route::get('/{subCategory}/products', [ProductController::class, 'subCategory'])->name('subCategory');
 });
 
 Route::prefix('category')->controller(CategoryController::class)->as('category.')->group(function () {
     Route::get('/{category_slug}/{subCategory_slug}', 'show')->name('show');
-
-
-
-
     Route::get('/', 'getByCategory')->name('get');
 }); 
-
 
 Route::prefix('cart')->controller(CartController::class)->group(function () {
     Route::get('/', 'index')->name('cart');
@@ -58,14 +56,10 @@ Route::prefix('coupon')->controller(CouponController::class)->group(function () 
     Route::post('/add', 'add')->name('coupon.add');
 });
 
-Route::get('/catalogue', [WelcomeController::class, 'index'])->name('catalogue');
-Route::get('/contact', [WelcomeController::class, 'index'])->name('contact');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 
 require __DIR__ . '/auth.php';

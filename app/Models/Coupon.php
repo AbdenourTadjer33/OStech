@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\CodeGenerator;
+use App\Traits\UniqueGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Coupon extends Model
 {
-    use HasFactory, CodeGenerator;
+    use HasFactory, UniqueGenerator;
 
     protected $fillable = [
         'type',
@@ -46,7 +46,7 @@ class Coupon extends Model
     {
         parent::boot();
 
-        static::creating(fn (Coupon $coupon) => $coupon->code = $coupon->generate(6, 'code'));
+        static::creating(fn (Coupon $coupon) => $coupon->code = $coupon->generateCode('code', 6));
     }
 
 

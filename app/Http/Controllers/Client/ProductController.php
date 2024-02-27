@@ -40,11 +40,12 @@ class ProductController extends Controller
     public function show(Request $request)
     {
         $product = Product::where('products.slug', $request->slug)
-            ->status()
+            ->active()
             ->select([
                 'products.id', 'products.slug', 'products.name', 'products.price', 'products.promo', 'products.images', 'products.description', 'products.features',
                 'brands.name as brand',
                 'categories.name as category',
+                'categories.id as category_id',
                 'parent_categories.name as parent_category'
             ])
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
@@ -52,9 +53,17 @@ class ProductController extends Controller
             ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
             ->firstOrFail();
 
+        $similairProducts = Product::sample()
+            ->where('category_id', $product->category_id)
+            ->whereNot('id', $product->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+
 
         return Inertia::render('Product/Show', [
             'product' => $product,
+            'similairProducts' => $similairProducts
         ]);
     }
 

@@ -2,22 +2,20 @@
 
 namespace App\Models;
 
-use App\Traits\ReferanceGenerator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\UniqueGenerator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
-    use HasFactory, ReferanceGenerator, SoftDeletes;
+    use HasFactory, UniqueGenerator, SoftDeletes;
 
     protected $fillable = [
-        'ref',
         'name',
         'slug',
         'description',
@@ -43,6 +41,15 @@ class Product extends Model
         'updated_at' => 'datetime:d-m-Y H:i'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Product $product) {
+            $product->slug = $product->generateSlug('slug', $product->name);
+        });
+    }
+
     public function scopeActive(Builder $query)
     {
         $query->where('status', true);
@@ -55,12 +62,17 @@ class Product extends Model
 
     public function scopeClient(Builder $query)
     {
-        $query->select(['id', 'ref', 'name', 'description', 'slug', 'price', 'promo', 'images', 'features', 'category_id', 'brand_id']);
+        $query->select(['id', 'slug', 'name', 'description', 'price', 'promo', 'images', 'features', 'category_id', 'brand_id']);
     }
 
     public function scopeShoppingCart(Builder $query)
     {
-        $query->select(['id', 'ref', 'name', 'slug', 'price', 'promo', 'images']);
+        $query->select(['id', 'slug', 'name', 'price', 'promo', 'images']);
+    }
+
+    public function scopeSample(Builder $query)
+    {
+        $query->select(['id', 'slug', 'name', DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"), 'price', 'promo']);
     }
 
     public function brand(): BelongsTo

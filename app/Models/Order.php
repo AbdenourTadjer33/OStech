@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
-use App\Traits\ReferanceGenerator;
+use App\Traits\UniqueGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Order extends Model
 {
-    use HasFactory, ReferanceGenerator;
+    use HasFactory, UniqueGenerator;
 
     protected $fillable = [
         'user_id',
