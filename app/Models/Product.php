@@ -55,14 +55,19 @@ class Product extends Model
         $query->where('status', true);
     }
 
-    public function scopeStatus(Builder $query)
+    public function scopeNotActive(Builder $query)
     {
-        $query->where('status', true);
+        $query->where('status', false);
     }
 
-    public function scopeClient(Builder $query)
+    public function scopeCatalog(Builder $query)
     {
-        $query->select(['id', 'slug', 'name', 'description', 'price', 'promo', 'images', 'features', 'category_id', 'brand_id']);
+        $query->where('catalog', true);
+    }
+
+    public function scopeNotCatalog(Builder $query)
+    {
+        $query->where('catalog', false);
     }
 
     public function scopeShoppingCart(Builder $query)
@@ -74,6 +79,27 @@ class Product extends Model
     {
         $query->select(['id', 'slug', 'name', DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"), 'price', 'promo']);
     }
+
+    public function scopeClient(Builder $query)
+    {
+        $query->select([
+            'products.id',
+            'products.slug',
+            'products.name',
+            'products.price',
+            'products.promo',
+            DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"),
+            'brands.name as brand_name',
+            'categories.name as category',
+            'parent_categories.name as parent_category'
+        ])
+            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
+            ->orderBy('products.id', 'desc');
+    }
+
+
 
     public function brand(): BelongsTo
     {

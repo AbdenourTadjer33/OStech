@@ -103,8 +103,8 @@ class User extends Authenticatable
         $query->where('type', 'admin');
     }
 
-    public function scopeStatus(Builder $query)
+    public function scopeActive(Builder $query)
     {
-        return $query->where('status', true);
+        $query->where('status', true);
     }
 }

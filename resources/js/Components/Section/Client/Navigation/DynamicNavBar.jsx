@@ -89,7 +89,7 @@ const DynamicNavBar = () => {
 													<div className="ml-3 flex h-7 items-center">
 														<button
 															type="button"
-															className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
+															className="relative -m-2 p-2 text-gray-400 hover:text-gray-500 outline-none"
 															onClick={closeBar}
 														>
 															<span className="absolute -inset-0.5" />
@@ -101,7 +101,7 @@ const DynamicNavBar = () => {
 													</div>
 												</div>
 
-												<Container className="flex flex-col gap-10">
+												<Container className="flex flex-col gap-5 sm:gap-10">
 													<div className="flex flex-col gap-3">
 														{category?.subCategories.map(
 															(subCategory) => (
@@ -109,16 +109,16 @@ const DynamicNavBar = () => {
 																	href={route(
 																		"category.show",
 																		{
-																			category_slug:
+																			category:
 																				category.slug,
-																			subCategory_slug:
+																			subCategory:
 																				subCategory.slug,
 																		}
 																	)}
 																	key={
 																		subCategory.id
 																	}
-																	className="text-sm whitespace-nowrap font-medium text-blue-600 underline"
+																	className="text-base whitespace-nowrap font-medium text-blue-600 underline underline-offset-2"
 																>
 																	{
 																		subCategory.name

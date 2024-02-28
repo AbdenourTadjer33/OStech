@@ -11,6 +11,8 @@ import ProductCard from "@/Components/Section/Client/ProductCard";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Button from "@/Components/Button";
+import TextInput from "@/Components/TextInput";
 
 const WelcomePageContext = createContext();
 
@@ -20,21 +22,7 @@ const Welcome = ({ featuredProducts }) => {
 			<AppLayout mainClass={false}>
 				<Head title="Accueil" />
 
-				{/* <div className="flex w-full h-[40vh]">
-				<div className="w-1/2">
-					<img
-						className="w-full h-full"
-						src="/assets/images/slides/slide1.jpg"
-					/>
-				</div>
-
-				<div className="w-1/2 flex flex-col h-full">
-					<img
-						className="w-full h-full object-cover"
-						src="/assets/images/slides/slide2.jpg"
-					/>
-				</div>
-			</div> */}
+				<HeroBanner />
 
 				<FeaturesSection />
 
@@ -46,7 +34,23 @@ const Welcome = ({ featuredProducts }) => {
 	);
 };
 
-const HeroBanner = () => {};
+const HeroBanner = () => (
+	<div
+		className="h-[40rem] bg-center bg-no-repeat bg-cover bg-fixed relative"
+		style={{
+			backgroundImage:
+				"linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/assets/images/slides/slide1.jpg)",
+		}}
+	>
+		{/* <div className="text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
+			<h1>I am John Doe</h1>
+			<p>And I'm a Photographer</p>
+			<button className="outline-none inline-block py-2.5 px-6 text-black bg-primary-50 text-center cursor-pointer hover:bg-gray-500 hover:text-white">
+				Hire me
+			</button>
+		</div> */}
+	</div>
+);
 
 const FeaturesSection = () => {
 	const features = [
@@ -69,16 +73,16 @@ const FeaturesSection = () => {
 	];
 
 	return (
-		<div className="w-full bg-gray-50">
-			<Container>
-				<ul className="flex items-center justify-around">
+		<div className="bg-gray-50 w-full">
+			<Container className="overflow-hidden">
+				<ul className="flex items-center gap-2 justify-around">
 					{features.map(({ label, icon: Icon }, idx) => (
 						<li
 							key={idx}
 							className="flex flex-col items-center text-gray-600 text-sm sm:text-xl font-medium gap-2"
 						>
 							<Icon className="w-5 h-5 sm:w-7 sm:h-7 text-info-500" />
-							<span className="text-xs sm:text-sm font-medium text-gray-500 whitespace-nowrap">
+							<span className="text-xs sm:text-sm  font-medium text-gray-500 whitespace-nowrap">
 								{capitalize(label)}
 							</span>
 						</li>
@@ -117,43 +121,43 @@ const FeaturedProductSection = () => {
 	);
 };
 
-const MostSelledProductSection = () => {};
-
-const SecondBannerSection = () => {};
-
-const NewsLetter = () => {
+export const NewsLetter = () => {
 	return (
 		<div
-			className="my-10 p-10 bg-no-repeat bg-info-900"
+			className="my-10 bg-no-repeat bg-info-900"
 			style={{
 				backgroundImage: "url(/assets/images/banner/b14.png)",
 				backgroundPosition: "20% 30%",
 			}}
 		>
-			<Container className="flex items-center justify-between">
-				<div>
-					<h3 className="text-3xl font-bold text-gray-100">
+			<Container className="py-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 md:gap-10">
+				<div className="space-y-2">
+					<h3 className="text-4xl font-bold sm:whitespace-nowrap text-gray-100">
 						Abonnez-vous à la newsletter
 					</h3>
-					<p>
+					<p className="text-base font-semibold text-white">
 						Recevez des mises à jour par e-mail sur notre dernière
-						boutique et <span clas>nos offres spéciales</span>.
+						boutique et{" "}
+						<span className=" text-info-200">
+							nos offres spéciales
+						</span>
+						.
 					</p>
 				</div>
-				<div className="w-full inline-flex">
-					<input
-						placeholder="Coupon"
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-[2rem] focus:ring-2 focus:ring-info-400 block w-full p-2.5 "
-					/>
-					<button className="inline-flex items-center text-white border border-gray-700 focus:ring-2 focus:ring-gray-400 font-medium rounded-e-[2rem] text-sm px-5 py-2.5 focus:outline-none  disabled:opacity-25 transition ease-in-out duration-150 bg-gray-700 hover:bg-gray-800">
-						Ajouter
-					</button>
+				<div className="bg-white/15 border border-gray-50/25 p-4 sm:p-8 shadow-xl rounded-xl w-full overflow-hidden">
+					<form>
+						<div className="flex items-center gap-4">
+							<TextInput
+								placeholder="Votre adresse email"
+								autoComplete="username"
+							/>
+							<Button btn="info">Rejoindre</Button>
+						</div>
+					</form>
 				</div>
 			</Container>
 		</div>
 	);
 };
-
-const brands = () => {};
 
 export default Welcome;

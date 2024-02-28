@@ -125,7 +125,7 @@ const NavBar = () => {
                             </>
                         ) : (
                             <Link
-                                className="text-base text-blue-600 hover:underline"
+                                className="text-base text-blue-600 hover:underline hidden sm:block"
                                 href={route("login")}
                             >
                                 <Button btn="info">Connexion</Button>

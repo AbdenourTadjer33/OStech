@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
         /**
          * @var \App\Models\User
          */
-        $user = User::status()
+        $user = User::active()
             ->where('email', $request->username)
             ->orWhere('phone', $request->username)
             ->first();

@@ -31,11 +31,6 @@ class Category extends Model
         $query->where('parent_id', '<>', 'null');
     }
 
-    public function banner(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediable');
-    }
-
     public function subCategories(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->float('price')->nullable();
             $table->float('promo')->nullable();
             $table->boolean('status')->default(false);
-            $table->boolean('catalogue')->default(false);
+            $table->boolean('catalog')->default(false);
             $table->json('features')->nullable();
             $table->foreignId('category_id')->nullable()->constrained('categories', 'id');
             $table->foreignId('brand_id')->nullable()->constrained('brands', 'id')->nullOnDelete();

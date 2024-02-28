@@ -17,7 +17,6 @@ Route::controller(WelcomeController::class)->group(function () {
     Route::get('/our-catalogue', 'catalogue')->name('catalogue');
 });
 
-
 Route::prefix('products')->controller(ProductController::class)->group(function () {
     Route::get('/', 'index')->name('products');
     Route::get('/slug', 'show')->name('products.show');
@@ -29,7 +28,9 @@ Route::prefix('products')->controller(ProductController::class)->as('products.')
 });
 
 Route::prefix('category')->controller(CategoryController::class)->as('category.')->group(function () {
-    Route::get('/{category_slug}/{subCategory_slug}', 'show')->name('show');
+    Route::get('/{category:slug}/{subCategory:slug}', 'show')->name('show');
+
+
     Route::get('/', 'getByCategory')->name('get');
 }); 
 
