@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\UniqueGenerator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
 {
-    use HasFactory;
+    use HasFactory, UniqueGenerator;
 
     protected $fillable = [
         'name',
@@ -26,10 +28,39 @@ class Category extends Model
         'updated_at' => 'datetime:d-m-Y H:i',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function (Category $category) {
+            dd('here on the model');
+            $category->slug = $category->generateSlug('slug', $category->name);
+        });
+
+        static::creating(function (Category $category) {
+            $category->slug = $category->generateSlug('slug', $category->name);
+        });
+
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucfirst($value),
+        );
+    }
+
     public function scopeSubCategory(Builder $query)
     {
         $query->where('parent_id', '<>', 'null');
     }
+
+    public function scopeMainCategory(Builder $query)
+    {
+        $query->whereNull('parent_id');
+    }
+
+
 
     public function subCategories(): HasMany
     {
