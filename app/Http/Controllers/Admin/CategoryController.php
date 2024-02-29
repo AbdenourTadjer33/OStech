@@ -3,189 +3,167 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Services\MediaService;
-use App\Services\CategoryService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\StoreSubCategoryRequest;
-
-use App\Http\Requests\Category\UpdateRequest;
-use App\Models\Media;
+use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Http\Requests\Category\UpdateSubCategoryRequest;
+use App\Services\CategoryService;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->middleware('precognitive')->only('storeCategory', 'storeSubCategory');
-    }
-
-    public function index()
+    // FINISHED
+    public function index(CategoryService $categoryService)
     {
         /**
-         * @var \Illuminate\Support\Collection
+         * @var \Illuminate\Database\Eloquent\Collection
          */
-        $categories = Category::get();
-        // Cache::remember(
-            // 'categories',
-            // now()->addDay(),
-            // fn () =>
-            // Category::get()
-        // );
+        $categories = Cache::rememberForever('categories', function () {
+            return Category::get();
+        });
 
-        $hierarchicalCategories = $categories->filter(function ($category) {
-            return $category->isMainCategory();
-        })->map(function (Category $mainCategory) use ($categories) {
-            $mainCategory->subCategories = $categories->where('parent_id', $mainCategory->id)->all();
-            return $mainCategory;
-        })->values();
-
+        $categories->loadCount('products');
 
         return Inertia::render('Admin/Category/Index', [
-            'hierarchicalCategories' => $hierarchicalCategories->toArray(),
-            'parentCategories' => $categories->whereNull('parent_id')->all(),
-            'subCategories' => $categories->whereNotNull('parent_id')->all(),
+            'hierarchicalCategories' => $categoryService->hierarchicalCategories($categories)->toArray(),
+            'mainCategoriesCount' => $categoryService->countMainCategories($categories),
+            'subCategoriesCount' => $categoryService->countSubCategories($categories),
         ]);
     }
 
+    // FINISHED
     public function storeCategory(StoreCategoryRequest $request)
     {
         DB::transaction(function () use ($request) {
             Category::create([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'description' => $request->description,
             ]);
         });
 
-        return session()->flash('alert', [
+        $this->clearCacheCategories();
+
+        return redirect(route('admin.category.index'))->with('alert', [
             'status' => 'success',
             'message' => 'Catégorie créer avec succés'
         ]);
     }
 
+    // FINISHED
     public function storeSubCategory(StoreSubCategoryRequest $request)
     {
-        DB::transaction(function () use ($request) {
-            $subCategory = Category::create([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'description' => $request->description,
-                'parent_id' => $request->category_id,
-            ]);
+        DB::transaction(fn () => Category::create([
+            'name' => $request->input('name'),
+            'parent_id' => $request->mainCategory,
+        ]));
 
-            if ($banner = $request->file('banner')) {
-                (new MediaService)->storeCategoryBanner($banner, $subCategory);
-            }
-        });
-        return session()->flash('alert', [
+        $this->clearCacheCategories();
+
+        return redirect(route('admin.category.index'))->with('alert', [
             'status' => 'success',
-            'message' => 'Sous-catégorie créer avec succés'
+            'message' => 'Sous catégorie créer avec succés',
         ]);
     }
 
-    public function updateCategory(UpdateRequest $request)
+    // FINISHED
+    public function updateCategory(UpdateCategoryRequest $request)
     {
-        /**
-         * @var \App\Models\Category 
-         */
-        $category = Category::where('id', $request->id)->firstOrFail();
+        DB::transaction(
+            fn () =>
+            Category::mainCategory()
+                ->where('id', $request->mainCategory)
+                ->update([
+                    'name' => $request->name,
+                    'slug' => Category::generateSlug('slug', $request->name)
+                ])
+        );
 
-        if (!$category->isMainCategory()) {
-            // throw an error here.
-        }
-        DB::transaction(function () use ($category, $request) {
-            return $category->update([
-                'name' => $request->name,
-                'description' => $request->description,
-            ]);
-        });
-        return session()->flash('');
+        $this->clearCacheCategories();
+
+        return redirect(route('admin.category.index'))->with('alert', [
+            'status' => 'success',
+            'message' => 'Catégorie editer avec succés'
+        ]);
     }
 
-    public function updateSubCategory(UpdateRequest $request)
+    // FINISHED
+    public function updateSubCategory(UpdateSubCategoryRequest $request)
     {
-        /**
-         * @var \App\Models\Category
-         */
-        $subCategory = Category::where('id', $request->id)->with()->firstOrFail();
+        DB::transaction(
+            fn () => Category::subCategory()
+                ->where('parent_id', $request->mainCategory)
+                ->where('id', $request->subCategory)
+                ->update([
+                    'name' => $request->name,
+                    'slug' => Category::generateSlug('slug', $request->name),
+                ])
+        );
 
-        if ($subCategory->isMainCategory()) {
-            // return throw an error here.
-        }
-        DB::transaction(function () use ($subCategory, $request) {
-            $subCategory->update([
-                'name' => $request->name,
-                'description' => $request->description,
-            ]);
+        $this->clearCacheCategories();
 
-            $banner = $request->file('banner');
-            if ($banner && (new MediaService)->unLinkImage($subCategory->banner)) {
-                (new MediaService)->storeCategoryBanner($banner, $subCategory);
-            }
-        });
-        return session()->flash('');
+        return redirect(route('admin.category.index'))->with('alert', [
+            'status' => 'success',
+            'message' => 'Sous catégorie editer avec succés',
+        ]);
     }
 
+    // FINISHED
     public function destroyCategory(Request $request)
     {
-        $category = Category::where('id', $request->id)->withCount('subCategories')->firstOrFail();
+        $isDeleted = DB::transaction(
+            fn () =>
+            Category::mainCategory()
+                ->where('id', $request->mainCategory)
+                ->delete()
+        );
 
-        if ($category->sub_categories_count) {
-            return session()->flash('alert', [
+        if (!$isDeleted) {
+            return redirect()->back()->with('alert', [
                 'status' => 'danger',
-                'message' => 'La catégorie ' . $category->name  . ' ne peut pas étre supprimé.'
+                'message' => 'Something wen wrong',
             ]);
         }
 
-        if (!DB::transaction(fn () => $category->delete())) {
-            return session()->flash('alert', [
-                'status' => 'danger',
-                'message' => 'Quel que chose est mal passé, Please retry later.',
-            ]);
-        }
+        $this->clearCacheCategories();
 
-        return session()->flash('alert', [
+        return redirect()->back()->with('alert', [
             'status' => 'success',
-            'message' => 'La catégorie ' . $category->name . ' est supprimé avec succés.'
+            'message' => 'Catégorie supprimé avec succés',
         ]);
     }
 
+    // FINISHED
     public function destroySubCategory(Request $request)
     {
-        /**
-         * @var \App\Models\Category
-         */
-        $subCategory = Category::where('id', $request->id)->withCount('products')->firstOrFail();
-        if ($subCategory->products_count) {
-            return session()->flash('alert', [
+        $isDeleted = DB::transaction(
+            fn () =>
+            Category::subCategory()
+                ->where('parent_id', $request->mainCategory)
+                ->where('id', $request->subCategory)
+                ->delete()
+        );
+
+        if (!$isDeleted) {
+            return redirect()->back()->with('alert', [
                 'status' => 'danger',
-                'message' => 'La sous-catégorie ' . $subCategory?->name  . ' ne peut pas étre supprimé.'
+                'message' => 'Something went wrong',
             ]);
         }
 
-        if (!DB::transaction(fn () => $subCategory->delete())) {
-            return
-                session()->flash('alert', [
-                    'status' => 'danger',
-                    'message' => 'Quel que chose est mal passé, Please retry later.',
-                ]);
-        }
+        $this->clearCacheCategories();
 
-        return session()->flash('alert', [
+        return redirect()->back()->with('alert', [
             'status' => 'success',
-            'message' => 'La sous-catégorie ' . $subCategory?->name . ' est supprimé avec succés.'
+            'message' => 'Sous catégorie supprimé avec succés',
         ]);
+    }
 
-        // DB::transaction(function () use ($subCategory) {
-        // (new MediaService)->unLinkImage($subCategory->banner);
-        // $subCategory->banner->delete();
-        // $subCategory->delete();
-        // });
+    // FINISHED
+    private function clearCacheCategories()
+    {
+        Cache::forget('categories');
     }
 }
