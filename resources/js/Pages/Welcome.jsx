@@ -7,7 +7,7 @@ import OnlineShipping from "@/Components/Icons/OnlineShipping";
 import Promotion from "@/Components/Icons/Promotion";
 import { capitalize } from "@/Logic/helper";
 import Container from "@/Components/Container";
-import ProductCard from "@/Components/Section/Client/ProductCard";
+import ProductCard from "@/Components/Section/Client/Product/ProductCard";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";

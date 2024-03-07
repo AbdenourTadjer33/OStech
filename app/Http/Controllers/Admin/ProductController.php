@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\UpdateRequest;
 use App\Http\Requests\Product\StoreRequest;
+use App\Services\BrandService;
+use App\Services\CategoryService;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager as Image;
@@ -22,7 +24,7 @@ class ProductController extends Controller
 
     public function __construct()
     {
-        $this->middleware('precognitive')->only('store');
+        $this->middleware('precognitive',)->only(['store', 'update']);
     }
 
     public function index(Request $request)
@@ -30,11 +32,23 @@ class ProductController extends Controller
         /**
          * @var \App\Models\Product
          */
-        $productQuery = Product::withTrashed()->with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name']);
+        $productQuery = Product::with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name']);
+        $productQuery->withTrashed();
 
-        if ($request->input('count_orders')) {
-            $productQuery->loadCount('orders');
-        }
+        // if ($request->has('status')) {
+        //     $request->status ? $productQuery->active() : $productQuery->notActive();
+        // } 
+
+        // if ($request->input('count_orders')) {
+        //     $productQuery->loadCount('orders');
+        // }
+
+        // if ($request->input('only_trash')) {
+        //     $productQuery->onlyTrashed();
+        // }
+
+        // if (!$request->input('no_trash')) {
+        // }
 
         $products = $productQuery->paginate($request->pagination ?? 10)->appends(request()->query());
         return Inertia::render('Admin/Product/Index', [
@@ -42,16 +56,24 @@ class ProductController extends Controller
         ]);
     }
 
-    public function create()
+    // FINISHED
+    public function create(CategoryService $categoryService, BrandService $brandService)
     {
-        return Inertia::render('Admin/Product/Create');
+        $categories = $categoryService->getCategories();
+
+        return Inertia::render('Admin/Product/Create', [
+            'mainCategories' => $categoryService->mainCategories($categories),
+            'subCategories' => $categoryService->subCategories($categories),
+            'brands' => $brandService->getBrands(),
+        ]);
     }
 
+    // FINISHED
     public function store(StoreRequest $request)
     {
         DB::transaction(function () use ($request) {
 
-            $subCategory = $request->category; // this represent the sub-category
+            $subCategory = $request->subCategory; // this represent the sub-category
 
             $images = $request->images;
 
@@ -70,10 +92,12 @@ class ProductController extends Controller
                 'price' => $request->input('price'),
                 'promo' => $request->input('promo'),
                 'status' => $request->input('status'),
-                'catalogue' => $request->input('catalogue'),
+                'catalog' => $request->input('catalog'),
                 'features' => $request->input('features'),
+                // 'colors' => $request->input('colors'),
+                // 'options' => $request->input('options'),
                 'category_id' => $subCategory['id'],
-                'brand_id' => $request?->brand ? $request->brand['id'] : null,
+                'brand_id' => $request->has('brand') ? $request->brand['id'] : null,
                 'images' => $paths,
             ]);
         });
@@ -84,57 +108,57 @@ class ProductController extends Controller
         ]);
     }
 
-    public function edit(Request $request)
+    // FINISHED
+    public function edit(Request $request, CategoryService $categoryService, BrandService $brandService)
     {
-        /**
-         * @var \App\Models\Product
-         */
-        $product = Product::where('id', $request->id)->with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name'])->first();
+        $product = Product::withTrashed()->where('id', $request->id)->firstOrFail();
+        $categories = $categoryService->getCategories();
 
         return Inertia::render('Admin/Product/Edit', [
             'product' => $product,
+            'mainCategories' => $categoryService->mainCategories($categories),
+            'subCategories' => $categoryService->subCategories($categories),
+            'brands' => $brandService->getBrands(),
         ]);
     }
 
+    // handle images change
     public function update(UpdateRequest $request)
     {
-        $product = Product::where('id', $request->id)->firstOrFail();
 
-        DB::transaction(function () use ($request, $product) {
-            dd($request->all(), $product);
+        DB::transaction(function () use ($request) {
 
-            $parentCategory = $request->parentCategory;
             $subCategory = $request->subCategory;
 
             $images = $request->images;
 
-            $paths = [];
-            foreach ($images as $image) {
-            }
+            // $paths = [];
+            // foreach ($images as $image) {
+            // }
 
-            $product->update([
-                'name' => $request->name,
-                'slug' => Str::slug($parentCategory['name'] . ' ' . $subCategory['name'] . ' ' . $request->input('name')),
-                'description' => $request->description,
+            Product::where('id', $request->id)->update([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
                 'sku' => $request->input('sku'),
                 'qte' => $request->input('qte'),
                 'price' => $request->input('price'),
                 'promo' => $request->input('promo'),
                 'status' => $request->input('status'),
-                'catalogue' => $request->input('catalogue'),
+                'catalog' => $request->input('catalog'),
                 'features' => $request->input('features'),
                 'category_id' => $subCategory['id'],
-                'brand_id' => $request?->brand ? $request->brand['id'] : null,
+                'brand_id' => $request->has('brand') ? $request->brand['id'] : null,
                 'images' => $request->images,
             ]);
         });
 
-        session()->flash('alert', [
+        return redirect(route('admin.product.index'))->with('alert', [
             'status' => 'success',
-            'message'
+            'massage' => 'Produit créer avec succés',
         ]);
     }
 
+    // FINISHED
     public function restore(Request $request)
     {
         $product = Product::withTrashed()->where('id', $request->id)->restore();
@@ -151,9 +175,10 @@ class ProductController extends Controller
             'message' => 'Produit restoré avec succés',
         ]);
 
-        return redirect(route('admin.products.index'));
+        return redirect(route('admin.product.index'));
     }
 
+    // FINISHED
     public function destroy(Request $request)
     {
         $product = Product::where('id', $request->id)->first();
@@ -172,9 +197,10 @@ class ProductController extends Controller
             'message' => 'Produit archivé avec succés',
         ]);
 
-        return redirect(route('admin.products.index'));
+        return redirect(route('admin.product.index'));
     }
 
+    // FINISHED
     public function forceDestroy(Request $request)
     {
         $product = Product::where('id', $request->id)->first();
@@ -199,8 +225,62 @@ class ProductController extends Controller
             'message' => 'produit supprimé avec succés',
         ]);
 
-        return redirect(route('admin.products.index'));
+        return redirect(route('admin.product.index'));
     }
+
+    // FINISHED
+    public function activeStatus(Request $request)
+    {
+        Product::where('id', $request->id)->update(['status' => true]);
+        return redirect(route('admin.product.index'));
+    }
+
+    // FINISHED
+    public function disableStatus(Request $request)
+    {
+        Product::where('id', $request->id)->update(['status' => false]);
+        return redirect(route('admin.product.index'));
+    }
+
+    // FINISHED
+    public function activeCatalog(Request $request)
+    {
+        Product::where('id', $request->id)->update(['catalog' => true]);
+        return redirect(route('admin.product.index'));
+    }
+
+    // FINISHED
+    public function disableCatalog(Request $request)
+    {
+        Product::where('id', $request->id)->update(['catalog' => false]);
+        return redirect(route('admin.product.index'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public function saveTempImages(Request $request)
@@ -262,94 +342,5 @@ class ProductController extends Controller
         }
 
         return $this->success(null, 'image supprimé avec succés', 200);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public function updateInformations(Request $request)
-    {
-        DB::transaction(function () use ($request) {
-            Product::where('id', $request->id)->update([
-                'name' => $request->name,
-                'ref' => $request->description,
-                'details' => $request->details,
-                'choices' => $request->choices,
-                'qte' => $request->qte,
-                'promo' => $request->promo,
-                'price' => $request->price,
-                'status' => $request->status,
-                'catalogue' => $request->catalogue,
-                'category_id' => $request->category_id,
-                'brand_id' => $request->brand_id,
-            ]);
-        });
-    }
-
-    public function updateDetails(Request $request)
-    {
-        $request->validate([
-            'details' => ['required', 'array'],
-        ]);
-        DB::transaction(function () use ($request) {
-            Product::where('id', $request->id)->update([
-                'details' => $request->details,
-            ]);
-        });
-    }
-
-    public function updateChoices()
-    {
-    }
-
-    public function updateCategory(Request $request)
-    {
-        DB::transaction(function () use ($request) {
-            Product::where('id', $request->id)->update([
-                'category_id' => $request->category_id,
-            ]);
-        });
-    }
-
-    public function updateBrand(Request $request)
-    {
-        DB::transaction(function () use ($request) {
-            Product::where('id', $request->id)->update([
-                'brand_id' => $request->brand_id,
-            ]);
-        });
-    }
-
-    public function updateImages(Request $request)
-    {
-        DB::transaction(function () use ($request) {
-        });
-    }
-
-    public function destroyImage(Request $request)
-    {
-        if (DB::transaction(fn () => Media::where('file_path', $request->file_path)->delete())) {
-            // return success
-        }
-        // return faillure
     }
 }

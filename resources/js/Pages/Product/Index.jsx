@@ -3,10 +3,9 @@ import { Head } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import Container from "@/Components/Container";
 import SelectInput from "@/Components/SelectInput";
-import ProductCard from "@/Components/Section/Client/ProductCard";
+import ProductCard from "@/Components/Section/Client/Product/ProductCard";
 
 const Index = ({ products, categoryName }) => {
-	console.log(products);
 
 	const { data } = products;
 

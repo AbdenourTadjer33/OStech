@@ -22,8 +22,11 @@ return new class extends Migration
             $table->float('promo')->nullable();
             $table->boolean('status')->default(false);
             $table->boolean('catalog')->default(false);
+            $table->json('colors')->nullable();
+            $table->json('choices')->nullable();
+            $table->integer('ordered_times')->default(0);
             $table->json('features')->nullable();
-            $table->foreignId('category_id')->nullable()->constrained('categories', 'id');
+            $table->foreignId('category_id')->nullable()->constrained('categories', 'id')->cascadeOnDelete();
             $table->foreignId('brand_id')->nullable()->constrained('brands', 'id')->nullOnDelete();
             $table->json('images')->nullable();
             $table->timestamps();

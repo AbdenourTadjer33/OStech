@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Enums\PaymentMethod;
+use App\Enums\ShippingType;
 use App\Models\User;
+use App\Rules\PhoneNumber;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
@@ -18,21 +22,6 @@ class StoreRequest extends FormRequest
         return true;
     }
 
-    public function attributes()
-    {
-        return [
-            'name' => 'nom prénom',
-            'phone' => 'n° téléphone',
-            'email' => 'adresse email',
-            'address' => 'adresse',
-            'city' => 'ville',
-            'wilaya' => 'wilaya',
-            'paymentMethod' => 'mode de payment',
-            'shippingType' => 'méthode de livraison'
-
-        ];
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -42,14 +31,13 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:2'],
-            'phone' => ['required', 'regex:/^(05|06|07)[0-9]{8}$/'],
-            'email' => ['required', 'email'],
+            'phone' => ['required', new PhoneNumber],
+            'email' => ['sometimes', $this->email ? 'email' : ''],
             'address' => ['required', 'string', 'min:4'],
             'city' => ['required', 'min:2'],
             'wilaya' => ['required'],
-            'paymentMethod' => ['required', Rule::in(['cash_on_delivery', 'bank_transfer'])],
-            'shippingCompany' => ['required'],
-            'shippingType' => ['required', Rule::in(['cost_home', 'cost_stop_desk'])],
+            'paymentMethod' => ['required', Rule::enum(PaymentMethod::class)],
+            'shipping' => ['required'],
         ];
     }
 
@@ -63,17 +51,19 @@ class StoreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
 
-            if (!Auth::check()) {
-                $user = User::where('email', $this->input('email'))->select('uuid')->first();
-                if ($user) {
-                    $validator->errors()->add('email', 'Cet email existe déjà, Si cet email vous appartient, connectez-vous avec lui et réessayez.');
+            if (!Auth::check() && $this->email) {
+                if (User::where('email', $this->input('email'))->select('uuid')->first()) {
+                    $validator->errors()->add('email', 'Cet email existe déjà, Si cet addresse e-mail vous appartient, connectez-vous avec et réessayez.');
                 }
             }
 
             if (Auth::check() && $this->user()->email !== $this->input('email')) {
-                $validator->errors()->add('email', 'Utiliser votre email, pour continuer votre achat');
+                $validator->errors()->add('email', 'Utiliser votre addresse e-mail, pour continuer votre achat');
             }
 
+            if ($this->shipping) {
+
+            }
         });
     }
 }

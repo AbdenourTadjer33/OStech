@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('shipping_pricings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shipping_company_id')->constrained();
             $table->foreignId('wilaya_id')->constrained('wilayas');
-            $table->float('delay')->nullable();
+            $table->string('delay')->nullable();
             $table->float('cost_home')->nullable();
             $table->float('cost_stop_desk')->nullable();
         });

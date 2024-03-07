@@ -16,7 +16,6 @@ class OrderProduct extends Model
         'order_id',
         'product_id',
         'qte',
-        'prices',
         'product',
         'total',
     ];

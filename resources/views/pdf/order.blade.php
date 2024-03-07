@@ -6,11 +6,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Commande n° {{ $order->ref }}</title>
-
-    <style>
-        * {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- <style>
+        body,
+        body *:not(html):not(style):not(br):not(tr):not(code) {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+                'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            position: relative;
         }
+
+        body {
+            -webkit-text-size-adjust: none;
+            background-color: #ffffff;
+            color: rgb(31, 41, 55);
+            height: 100%;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+        }
+
+        p,
+        ul,
+        ol,
+        blockquote {
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        a {
+            color: #3869d4;
+        }
+
+        a img {
+            border: none;
+        }
+
+        /* Typography */
+
+        h1 {
+            color: #3d4852;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            text-align: left;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 0;
+            text-align: left;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 0;
+            text-align: left;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.5em;
+            margin-top: 0;
+            text-align: left;
+        }
+
+        p.sub {
+            font-size: 12px;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -21,6 +92,28 @@
             padding: 8px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+        }
+
+        table {
+            -premailer-cellpadding: 0;
+            -premailer-cellspacing: 0;
+            -premailer-width: 100%;
+            margin: 30px auto;
+            width: 100%;
+        }
+
+        table th {
+            border-bottom: 1px solid #edeff2;
+            margin: 0;
+            padding-bottom: 8px;
+        }
+
+        table td {
+            color: #74787e;
+            font-size: 15px;
+            line-height: 18px;
+            margin: 0;
+            padding: 10px 0;
         }
 
         .header {
@@ -39,7 +132,9 @@
         .section-1 .info {
             margin: 0 20px 0 0;
         }
-    </style>
+    </style> --}}
+
+    @vite(['resources/css/app.css'])
 
 </head>
 
@@ -47,43 +142,48 @@
     @php
         $logoPath = public_path('assets/logo/indigo.png');
         $logoBs64 = base64_encode(file_get_contents($logoPath));
+        $wilaya = Storage::json('data/wilaya.json');
     @endphp
-    <header class="header">
+
+    <header style="padding-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
         <div>
             <img src="data:image/png;base64,{{ $logoBs64 }}" width="150">
         </div>
-        <h2 class="header-title">Proforma invoce</h2>
+
+        <div class="text-blue-500">
+            N° tél: 0780115527</span>
+        </div>
     </header>
 
-    <section class="section-1">
-        <div style="padding: 5px 0;">
-            <span class="info">Commande n°: {{ $order->ref }}</span>
-            <span>Commande date: {{ $order->created_at }}</span>
-        </div>
-    </section>
+    <div style="font-size: 18px; padding-bottom: 10px">
+        <span style="font-weight: 600;">Commande n°:</span> {{ $order->ref }}<br />
+        <span style="font-weight: 600;">Commande date:</span> {{ $order->created_at }}
+    </div>
 
-    <section>
-        <h1>Information de client</h1>
-        <p>{{ $order->client['name'] }}</p>
-        <p>{{ $order->client['address'] . ', ' . $order->client['city'] . ', ' . $order->client['wilaya'] }}</p>
-        <p>{{ $order->client['email'] }}</p>
-        <p>{{ $order->client['phone'] }}</p>
-    </section>
+    <h2>Information de client</h2>
 
-    <section style="margin-bottom: 40px;">
-        <table>
+    <p>{{ $order->client['name'] }}</p>
+    <p>{{ $order->client['address'] . ' ' . $order->client['city'] . ', ' . collect($wilaya)->firstWhere('code', $order->client['wilaya'])['name'] }}
+    </p>
+    <p>{{ $order->client['email'] }}</p>
+    <p>{{ $order->client['phone'] }}</p>
+
+    <table>
+        <thead>
             <tr>
-                <th>Ref</th>
-                <th>Mode de payement</th>
-                <th>Mode le livraison</th>
+                <th style="text-align: start; padding: 4px 8px;">Ref</th>
+                <th style="text-align: start; padding: 4px 8px;">Ref</th>
+                <th style="text-align: start; padding: 4px 8px;">Ref</th>
             </tr>
+        </thead>
+        <tbody>
             <tr>
                 <td>{{ $order->ref }}</td>
                 <td>{{ $order->payment_method }}</td>
                 <td>{{ $order->shipping_type }}</td>
             </tr>
-        </table>
-    </section>
+        </tbody>
+    </table>
 
     <section>
         <table>

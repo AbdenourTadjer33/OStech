@@ -1,7 +1,7 @@
 import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
-import ProductCard from "@/Components/Section/Client/ProductCard";
+import ProductCard from "@/Components/Section/Client/Product/ProductCard";
 import Container from "@/Components/Container";
 import SelectInput from "@/Components/SelectInput";
 
@@ -51,8 +51,9 @@ const Products = ({ products }) => {
 								price={product.price}
 								promo={product.promo}
 								image={product.image}
-								category={product.category}
-								parentCategory={product.parent_category}
+								subCategory={product.category}
+								mainCategory={product.parent_category}
+								colors={product.colors}
 							/>
 						);
 					})}

@@ -22,12 +22,12 @@ export default [
 	},
 	{
 		name: "Categorie",
-		route: "admin.categories.index",
+		route: "admin.category.index",
 		icon: MdCategory,
 	},
 	{
 		name: "Produit",
-		route: "admin.products.index",
+		route: "admin.product.index",
 		icon: MdOutlineProductionQuantityLimits,
 	},
 	{

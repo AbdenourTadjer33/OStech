@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ request()->routeIs('admin.*') ? 'dark' : '' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ request()->routeIs('admin.*') ? '' : '' }}">
 
 <head>
     <meta charset="utf-8">

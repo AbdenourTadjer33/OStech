@@ -34,16 +34,17 @@ const RichEditor = ({...props}) => {
     ];
 
     return (
-        <>
-            <ReactQuill
-               {...props}
-                modules={modules}
-                formats={formats}
-                theme="snow"
-                className="bg-gray-100 text-gray-900 w-full"
-            />
-        </>
-    );
+		<>
+			<ReactQuill
+				{...props}
+				spellCheck={false}
+				modules={modules}
+				formats={formats}
+				theme="snow"
+				className="bg-gray-100 text-gray-900 w-full"
+			/>
+		</>
+	);
 };
 
 export default RichEditor;

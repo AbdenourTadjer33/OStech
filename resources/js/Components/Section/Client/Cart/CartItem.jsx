@@ -21,7 +21,7 @@ const CartItem = ({ item }) => {
 		if (!isFirstRender.current) {
 			const debouncedApiCall = debounce(() => {
 				post(route("cart.handle.qte", { id: item?.product?.id }));
-			}, 1000);
+			}, 250);
 
 			debouncedApiCall();
 
@@ -41,7 +41,9 @@ const CartItem = ({ item }) => {
 	};
 
 	const destroyItem = () => {
-		post(route("cart.remove", { id: item?.product?.id }));
+		post(route("cart.remove", { id: item?.product?.id }), {
+			preserveScroll: true
+		});
 	};
 
 	return (

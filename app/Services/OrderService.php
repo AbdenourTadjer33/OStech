@@ -6,11 +6,6 @@ use App\Models\ShippingPricing;
 
 class OrderService
 {
-    public function calculatePromo($price, $percentage)
-    {
-        return $price - (($price * $percentage) / 100);
-    }
-
     /**
      * this service method calculate and return sub total 
      * @var array the cart array
@@ -39,12 +34,8 @@ class OrderService
             $product = $cartItem['product'];
             $orderProducts[$cartItem['product']?->id] = [
                 'qte' => $cartItem['qte'],
-                'product' => collect($product->only('id', 'ref', 'slug', 'name', 'images', 'price', 'promo'))->toJson(),
-                'prices' => collect([
-                    'price' => $product?->price,
-                    'promo' => $product?->promo
-                ])->toJson(),
-                'total' => $product?->calculateFinalPrice()
+                'product' => collect($product->only('id', 'name', 'price', 'promo'))->toJson(),
+                'total' => $product?->calculateFinalPrice() * $cartItem['qte'],
             ];
         }
         return $orderProducts;
@@ -58,6 +49,7 @@ class OrderService
     public function shippingPricing($wilayaCode, $shippingType): null|float
     {
         $shippingPricing = ShippingPricing::where('wilaya_id', (int) $wilayaCode)->first();
+
         if (!$shippingPricing) return null;
 
         switch ($shippingType) {

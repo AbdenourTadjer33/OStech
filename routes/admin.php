@@ -26,28 +26,34 @@ Route::prefix('brand')->controller(BrandController::class)->group(function () {
     Route::delete('destroy/{id}', 'destroy')->name('brands.destroy');
 });
 
-Route::prefix('category')->controller(CategoryController::class)->group(function () {
-    Route::get('/', 'index')->name('categories.index');
+Route::prefix('category')->controller(CategoryController::class)->as('category.')->group(function () {
+    Route::get('/', 'index')->name('index');
 
-    Route::post('/create-category', 'storeCategory')->name('categories.storeCategory');
-    Route::post('/create-subcategory', 'storeSubCategory')->name('categories.storeSubCategory');
+    Route::post('/create', 'storeCategory')->name('storeCategory');
+    Route::post('/create/{mainCategory}', 'storeSubCategory')->name('storeSubCategory');
 
-    Route::post('/edit-category/{id}', 'updateCategory')->name('categories.updateCategory');
-    Route::post('/edit-subcategory/{id}', 'updateSubCategory')->name('categories.updateSubCategory');
+    Route::post('/edit/{mainCategory}', 'updateCategory')->name('updateCategory');
+    Route::post('/edit/{mainCategory}/{subCategory}', 'updateSubCategory')->name('updateSubCategory');
 
-    Route::delete('/delete-category/{id}', 'destroyCategory')->name('categories.destroyCategory');
-    Route::delete('/delete-subcategory/{id}', 'destroySubCategory')->name('categories.destroySubCategory');
+    Route::delete('/destroy/{mainCategory}', 'destroyCategory')->name('destroyCategory');
+    Route::delete('/destroy/{mainCategory}/{subCategory}', 'destroySubCategory')->name('destroySubCategory');
 });
 
-Route::prefix('product')->controller(ProductController::class)->group(function () {
-    Route::get('/', 'index')->name('products.index');
-    Route::get('/create', 'create')->name('products.create');
-    Route::post('/create', 'store')->name('products.store');
-    Route::get('/edit/{id}', 'edit')->name('products.edit');
-    Route::post('/edit/{id}', 'update')->name('products.update');
-    Route::post('/restore/{id}', 'restore')->name('products.restore');
-    Route::delete('/destroy/{id}', 'destroy')->name('products.destroy');
-    Route::delete('/force-destroy/{id}', 'forceDestroy')->name('products.forceDestroy');
+Route::prefix('product')->controller(ProductController::class)->as('product.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/create', 'store')->name('store');
+    Route::get('/edit/{id}', 'edit')->name('edit');
+    Route::post('/edit/{id}', 'update')->name('update');
+    Route::post('/restore/{id}', 'restore')->name('restore');
+    Route::delete('/destroy/{id}', 'destroy')->name('destroy');
+    Route::delete('/force-destroy/{id}', 'forceDestroy')->name('forceDestroy');
+
+    Route::post('/active/status/{id}', 'activeStatus')->name('activeStatus');
+    Route::post('/disable/status/{id}', 'disableStatus')->name('disableStatus');
+
+    Route::post('active/catalog/{id}', 'activeCatalog')->name('activeCatalog');
+    Route::post('/disable/catalog/{id}', 'disableCatalog')->name('disableCatalog');
 });
 
 Route::prefix('coupon')->controller(CouponController::class)->as('coupon.')->group(function() {

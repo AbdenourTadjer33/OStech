@@ -21,7 +21,8 @@ class LoadData
     public function handle(Request $request, Closure $next)
     {
         if (!$request->routeIs('admin*')) {
-            $categories = Category::get();
+
+            $categories = Cache::get('categories', fn () => Category::get());
 
             $request->merge(['categories' => $categories]);
 

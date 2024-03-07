@@ -1,3 +1,4 @@
+import { capitalize } from "@/Logic/helper";
 import React from "react";
 
 const Badge = ({ type = "primary", children, className = "" }) => {
@@ -13,13 +14,16 @@ const Badge = ({ type = "primary", children, className = "" }) => {
 		pink: "bg-pink-100 text-pink-800 text-sm capitalize font-medium px-2.5 py-1 rounded dark:bg-pink-900 dark:text-pink-300",
 	};
 
-	return (
-		<span
-			className={`${styles[type]} ${className}`}
-		>
-			{children}
-		</span>
-	);
+	return <span className={`${styles[type]} ${className}`}>{children}</span>;
 };
 
+export const BadgeStatus = ({
+	isActive,
+	active = "active",
+	inactive = "inactive",
+}) => (
+	<Badge type={isActive ? "green" : "red"}>
+		{capitalize(isActive ? active : inactive)}
+	</Badge>
+);
 export default Badge;

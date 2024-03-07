@@ -15,7 +15,13 @@ trait UniqueGenerator
         return $ref;
     }
 
-    protected function generateSlug(string $col = 'slug', $name)
+    /**
+     * this method take a column name & string and generate a unique slug
+     * @param string $col column name
+     * @param string $name
+     * @return string
+     */
+    protected static function generateSlug(string $col = 'slug', string $name): string
     {
         $slug = Str::slug($name);
         if (!static::where($col, $slug)->select($col)->first()) {

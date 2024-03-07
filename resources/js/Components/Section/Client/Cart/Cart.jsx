@@ -24,7 +24,7 @@ const Cart = () => {
 	return (
 		<>
 			<button
-				className="text-primary-950 hover:text-indigo-400"
+				className="text-primary-950 hover:text-indigo-400 "
 				onClick={() => setOpen(true)}
 			>
 				<div className="relative">

@@ -46,57 +46,6 @@ class DatabaseSeeder extends Seeder
             ]
         ]);
 
-        DB::table('categories')->insert([
-            [
-                'id' => 1,
-                'name' => 'Accessoire',
-                'slug' => Str::slug('Accessoire'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 2,
-                'name' => 'Télephone mobile',
-                'slug' => Str::slug('Télephone mobile'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 3,
-                'name' => 'Autre',
-                'slug' => Str::slug("autre"),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        ]);
-
-        DB::table('categories')->insert([
-            [
-                'id' => 4,
-                'name' => 'Casque',
-                'slug' => Str::slug('casque'),
-                'parent_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 5,
-                'name' => 'Coques de protection',
-                'slug' => Str::slug('coques de protection'),
-                'parent_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 6,
-                'name' => 'Montres intelligentes',
-                'slug' => Str::slug('Montres intelligentes'),
-                'parent_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        ]);
-
         $wilayas = Storage::json('data/wilaya.json');
         DB::table('wilayas')->insert($wilayas);
 
@@ -124,10 +73,10 @@ class DatabaseSeeder extends Seeder
             Brand::create($brand);
         }
 
-        foreach(Storage::json('data/products.json') as $product)
-        {
-            Product::create($product);
-        }
+        // foreach(Storage::json('data/products.json') as $product)
+        // {
+        //     Product::create($product);
+        // }
 
 
     }

@@ -9,6 +9,7 @@ use App\Http\Requests\Shipping\StoreRequest;
 use App\Http\Requests\Shipping\UpdateRequest;
 use App\Models\ShippingCompany;
 use App\Models\ShippingPricing;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -23,13 +24,13 @@ class ShippingController extends Controller
 
     public function index()
     {
-        $shippingCompany = ShippingCompany::with('shippingPricings')->paginate(10);
+        $shippingCompany = Cache::rememberForever('shippingCompanies', fn () => ShippingCompany::get());
 
-        $pricings = ShippingPricing::paginate(10);
+        $shippingPricings = Cache::rememberForever('shippingPricings', fn () => ShippingPricing::get());
 
         return Inertia::render('Admin/Shipping/Index', [
             'shippings' => $shippingCompany,
-            'pricings' => $pricings
+            'pricings' => $shippingPricings,
         ]);
     }
 
@@ -72,12 +73,12 @@ class ShippingController extends Controller
             ]);
         }
 
-        session()->flash('alert', [
-            'status' => 'success',
-            'message' => 'Company created successfully'
-        ]);
+        $this->clearCacheShipping();
 
-        // return redirect(route('admin.shippings.index'));
+        return redirect(route('admin.shippings.index'))->with('alert', [
+            'statys' => 'success',
+            'message' => 'Entreprise de livraison créer avec succés'
+        ]);
     }
 
     public function edit()
@@ -90,5 +91,11 @@ class ShippingController extends Controller
 
     public function destroy()
     {
+    }
+
+    private function clearCacheShipping()
+    {
+        Cache::forget('shippingCompanies');
+        Cache::forget('shippingPricings');
     }
 }

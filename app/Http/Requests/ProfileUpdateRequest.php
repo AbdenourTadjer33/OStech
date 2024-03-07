@@ -18,6 +18,10 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+            'phone' => ['nullable', 'regex:/^(05|06|07)[0-9]{8}$/', Rule::unique(User::class)->ignore($this->user()->id)],
+            'address' => ['nullable', 'string', 'min:4'],
+            'city' => ['nullable', 'min:2'],
+            'wilaya' => ['nullable'],
         ];
     }
 }

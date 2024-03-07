@@ -1,13 +1,17 @@
 <?php
 
+use App\Models\Order;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\CouponController;
 use App\Http\Controllers\Client\ProductController;
+use App\Http\Controllers\Client\SettingController;
 use App\Http\Controllers\Client\WelcomeController;
 use App\Http\Controllers\Client\CategoryController;
+use App\Http\Controllers\Client\ShippingController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -15,6 +19,9 @@ Route::controller(WelcomeController::class)->group(function () {
     Route::get('/', 'index')->name('welcome');
     Route::get('/contact-us', 'contact')->name('contact');
     Route::get('/our-catalogue', 'catalogue')->name('catalogue');
+
+
+    Route::get('/terms-and-conditions', 'termAndCondition');
 });
 
 Route::prefix('products')->controller(ProductController::class)->group(function () {
@@ -46,21 +53,39 @@ Route::prefix('order')->controller(OrderController::class)->as('order.')->group(
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
     Route::post('/create', 'store')->name('store');
+
+    Route::get('new/{ref}', 'newOrder')->name('new');
     Route::get('/show/{ref}', 'show')->name('show');
-    Route::get('/new/{ref}', 'newOrder')->name('new.show');
+
+    Route::get('/find', 'find')->name('find');
 
     Route::get('/download/pdf/{ref}', 'pdf')->name('pdf');
 
 });
 
+Route::get('/shipping-pricing', [ShippingController::class, 'getPricings'])->name('shipping.pricings');
+
 Route::prefix('coupon')->controller(CouponController::class)->group(function () {
     Route::post('/add', 'add')->name('coupon.add');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::prefix('setting')->controller(SettingController::class)->as('setting.')->group(function () {
+    Route::get('/', 'index')->name('index');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
+
+Route::get('preview-mail', function () {
+    $order = Order::where('id', 15)->first();
+
+    return view('mail.new_order', [
+        'order' => $order,
+        'orderProducts' => $order->orderProducts,
+        'orderLink' => URL::signedRoute('order.show', ['ref' => $order->ref])
+    ]);
+}); 
 
 require __DIR__ . '/auth.php';

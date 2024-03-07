@@ -46,6 +46,7 @@ class CategoryController extends Controller
         $ids = $request->categories->where('parent_id', $parentCategory->id)->pluck('id');
 
         return Product::whereIn('category_id', $ids)
+            ->active()
             ->sample()
             ->latest()
             ->limit(10)

@@ -24,7 +24,10 @@ return new class extends Migration
             $table->boolean('recive_email')->default(true);
             $table->json('data')->nullable();
             $table->enum('type', ['admin', 'client'])->default('client');
-            $table->foreignId('role_id')->nullable()->constrained('roles');
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
+            $table->string('picture')->nullable();
+            $table->string('social_id')->nullable();
+            $table->string('social-type')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

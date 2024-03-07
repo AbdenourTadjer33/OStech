@@ -10,84 +10,120 @@ import Table from "@/Components/Table";
 import ReadMore from "@/Components/ReadMore";
 import CurrencyFormat from "@/Components/CurrencyFormat";
 import { Dropdown } from "flowbite-react";
+import { BadgeStatus } from "@/Components/Badge";
 import Accordion from "@/Components/Accordion";
 import { media } from "@/Logic/helper";
 import Modal from "@/Components/Modal";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { FaSpinner } from "react-icons/fa";
-import TrueIcon from "@/Components/Icons/TrueIcon";
-import FalseIcon from "@/Components/Icons/FalseIcon";
 import { Search } from "@/Components/InputSearch";
+import { StatusCercle } from "@/Components/Status";
 
 const Index = ({ products }) => {
-    const {
-        data,
-        current_page,
-        next_page_url,
-        prev_page_url,
-        links,
-        per_page,
-        total,
-        last_page,
-    } = products;
+	const {
+		data,
+		current_page,
+		next_page_url,
+		prev_page_url,
+		links,
+		per_page,
+		total,
+		last_page,
+	} = products;
 
-    const { delete: destroy, post, processing } = useForm();
+	const { delete: destroy, post, processing } = useForm();
 
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filteredData, setFilteredData] = useState(data);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [filteredData, setFilteredData] = useState(data);
 
-    const [archiveModal, setArchiveModal] = useState({ status: false });
-    const [deleteModal, setDeleteModal] = useState({ status: false });
+	const [archiveModal, setArchiveModal] = useState({ status: false });
+	const [deleteModal, setDeleteModal] = useState({ status: false });
 
-    const handleSearch = (e) => {
-        const query = e.target.value.toLowerCase();
-        setSearchQuery(query);
+	const handleSearch = (e) => {
+		const query = e.target.value.toLowerCase();
+		setSearchQuery(query);
 
-        const filtered = data.filter(
-            (record) =>
-                record.name.toLowerCase().includes(query) ||
-                record?.sku?.toLowerCase().includes(query) ||
-                record.category?.name.toLowerCase().includes(query)
-        );
+		const filtered = data.filter(
+			(record) =>
+				record.name.toLowerCase().includes(query) ||
+				record?.sku?.toLowerCase().includes(query) ||
+				record.category?.name.toLowerCase().includes(query)
+		);
 
-        setFilteredData(filtered);
-    };
+		setFilteredData(filtered);
+	};
 
-    const archive = () => {
-        destroy(
-            route("admin.products.destroy", { id: archiveModal.product.id }),
-            {
-                onSuccess: () => setArchiveModal({ status: false }),
-            }
-        );
-    };
+	const statusProduct = (product) => {
+		if (!product.status) {
+			post(route("admin.product.activeStatus", { id: product.id }), {
+				preserveScroll: true,
+			});
+			return;
+		} else {
+			post(route("admin.product.disableStatus", { id: product.id }), {
+				preserveScroll: true,
+			});
+			return;
+		}
+	};
 
-    const forceDelete = () => {
-        destroy(
-            route("admin.products.forceDestroy", {
-                id: deleteModal.product.id,
-            }),
-            {
-                onSuccess: () => setDeleteModal({ status: false }),
-            }
-        );
-    };
+	const catalogProduct = (product) => {
+		if (!product.catalog) {
+			post(route("admin.product.activeCatalog", { id: product.id }), {
+				preserveScroll: true,
+			});
+			return;
+		} else {
+			post(route("admin.product.disableCatalog", { id: product.id }), {
+				preserveScroll: true,
+			});
+			return;
+		}
+	};
 
-    const restore = (productId) => {
-        post(route("admin.products.restore", { id: productId }));
-    };
+	const archive = () => {
+		destroy(
+			route("admin.product.destroy", { id: archiveModal.product.id }),
+			{
+				onSuccess: () => setArchiveModal({ status: false }),
+			}
+		);
+	};
 
-    useEffect(() => {
-        setFilteredData(data);
-    }, [data]);
+	const forceDelete = () => {
+		destroy(
+			route("admin.product.forceDestroy", {
+				id: deleteModal.product.id,
+			}),
+			{
+				onSuccess: () => setDeleteModal({ status: false }),
+			}
+		);
+	};
 
-    return (
+	const restore = (productId) => {
+		post(route("admin.product.restore", { id: productId }));
+	};
+
+	useEffect(() => {
+		setFilteredData(data);
+	}, [data]);
+
+	return (
 		<AdminLayout>
 			<Head title="Gestion De Produit" />
 			<h1 className="text-4xl font-bold mb-3">Produits</h1>
 
 			<div className="w-full">
 				<div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-visible">
+					<div className="p-4">
+						<h4 className="text-xl">
+							Total produits : <span>{total}</span>
+						</h4>
+					</div>
+
+					<hr className="h-px mb-2 bg-gray-200 border-0 dark:bg-gray-700 mx-4" />
+
 					<div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
 						<div className="w-full md:w-1/2">
 							<form className="flex items-center">
@@ -258,7 +294,7 @@ const Index = ({ products }) => {
 								</Dropdown>
 							</div>
 
-							<Link href={route("admin.products.create")}>
+							<Link href={route("admin.product.create")}>
 								<Button btn="primary" type="button">
 									Créer un produit
 								</Button>
@@ -266,9 +302,81 @@ const Index = ({ products }) => {
 						</div>
 					</div>
 
+					<hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700 mx-4" />
+
+					<div className="p-4 space-x-5">
+						some actions
+						
+						{/* <Link className="p-2 rounded-lg"
+							href={route('admin.product.index', {status: true})}
+						>
+							Status activé
+						</Link>
+
+						<Link className="p-2 rounded-lg"
+							href={route('admin.product.index', {status: false})}
+						>
+							Status désactiver
+						</Link>
+
+						<Link
+							className={`p-2 rounded-lg ${
+								route().current("admin.product.index", {
+									only_trash: true,
+								})
+									? "bg-green-500"
+									: "bg-red-500"
+							}`}
+							href={route("admin.product.index", {
+								only_trash: !route().current(
+									"admin.product.index",
+									{ only_trash: true }
+								),
+							})}
+						>
+							Produit archivé
+						</Link>
+
+						<Link
+							className={`p-2 rounded-lg ${
+								route().current("admin.product.index", {
+									no_trash: true,
+								})
+									? "bg-green-500"
+									: "bg-red-500"
+							}`}
+							href={route("admin.product.index", {
+								no_trash: !route().current(
+									"admin.product.index",
+									{ no_trash: true }
+								),
+							})}
+						>
+							Produit non archivé
+						</Link> */}
+
+						{/* <Link
+							className={`p-2 rounded-lg ${
+								route().current("admin.product.index", {
+									with_trash: true,
+								})
+									? "bg-green-500"
+									: "bg-red-500"
+							}`}
+							href={route("admin.product.index", {
+								with_trash: !route().current(
+									"admin.product.index",
+									{ with_trash: false }
+								),
+							})}
+						>
+							Produit non archivé
+						</Link> */}
+					</div>
+
 					<div className="overflow-x-auto">
-						<Table className="table-auto">
-							<Table.Head>
+						<Table className="table-auto relative">
+							<Table.Head className=" sticky">
 								<Table.Row>
 									<Table.Title className="px-2 py-3"></Table.Title>
 									<Table.Title className="px-2 py-3">
@@ -307,7 +415,7 @@ const Index = ({ products }) => {
 										>
 											<Table.Column className="px-2 py-3 w-16 md:w-32">
 												<img
-													className="max-w-fill max-h-full"
+													className="w-fill h-full"
 													src={
 														record?.images?.[0]
 															? media(
@@ -321,9 +429,10 @@ const Index = ({ products }) => {
 												/>
 											</Table.Column>
 											<Table.Column className="px-2 py-3">
-												<ReadMore
+												{/* <ReadMore
 													content={record.name}
-												/>
+												/> */}
+												{record.name}
 												{record.sku && (
 													<>
 														<br />
@@ -343,18 +452,14 @@ const Index = ({ products }) => {
 												/>
 											</Table.Column>
 											<Table.Column className="px-2 py-4">
-												{record.status ? (
-													<TrueIcon className="m-auto" />
-												) : (
-													<FalseIcon className="m-auto" />
-												)}
+												<BadgeStatus
+													isActive={record.status}
+												/>
 											</Table.Column>
 											<Table.Column className="px-2 py-4">
-												{record.catalogue ? (
-													<TrueIcon className="m-auto" />
-												) : (
-													<FalseIcon className="m-auto" />
-												)}
+												<BadgeStatus
+													isActive={record.catalog}
+												/>
 											</Table.Column>
 											<Table.Column className="px-2 py-4">
 												{record.category.name}
@@ -366,11 +471,9 @@ const Index = ({ products }) => {
 												{record.created_at}
 											</Table.Column>
 											<Table.Column className="px-2 py-4 ">
-												{record.deleted_at ? (
-													<TrueIcon className="m-auto" />
-												) : (
-													<FalseIcon className="m-auto" />
-												)}
+												<StatusCercle
+													status={record.deleted_at}
+												/>
 											</Table.Column>
 											<Table.Column className="px-2 py-4">
 												<Dropdown
@@ -391,14 +494,9 @@ const Index = ({ products }) => {
 															aria-labelledby="apple-imac-27-dropdown-button"
 														>
 															<li>
-																<button className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-																	Afficher
-																</button>
-															</li>
-															<li>
 																<Link
 																	href={route(
-																		"admin.products.edit",
+																		"admin.product.edit",
 																		{
 																			id: record.id,
 																		}
@@ -407,6 +505,54 @@ const Index = ({ products }) => {
 																>
 																	Éditer
 																</Link>
+															</li>
+															<li>
+																<button
+																	className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+																	onClick={() =>
+																		statusProduct(
+																			record
+																		)
+																	}
+																>
+																	{record.status ? (
+																		<>
+																			Désactiver
+																			le
+																			status
+																		</>
+																	) : (
+																		<>
+																			Activé
+																			le
+																			status
+																		</>
+																	)}
+																</button>
+															</li>
+															<li>
+																<button
+																	className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+																	onClick={() =>
+																		catalogProduct(
+																			record
+																		)
+																	}
+																>
+																	{record.catalog ? (
+																		<>
+																			Désactiver
+																			dans
+																			catalogue
+																		</>
+																	) : (
+																		<>
+																			Activé
+																			dans
+																			catalogue
+																		</>
+																	)}
+																</button>
 															</li>
 														</ul>
 														<div className="py-1">

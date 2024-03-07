@@ -158,6 +158,8 @@ return [
     'ulid' => 'Le champ :attribute doit être un ULID valide.',
     'uuid' => 'Le champ :attribute doit être un UUID valide.',
 
+    'phone' => 'Le champ :attribute doit être valid.',
+
     /*
     |--------------------------------------------------------------------------
     | Messages de validation personnalisés
@@ -186,6 +188,15 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'email' => 'addresse e-mail',
+        'phone' => 'n° téléphone',
+        'name' => 'nom prénom',
+        'address' => 'addresse',
+        'city' => 'ville',
+        'wilaya' => 'wilaya',
+        'paymentMethod' => 'mode de payment',
+        'shippingType' => 'méthode de livraison'
+    ],
 
 ];

@@ -14,6 +14,7 @@ export const CreateOrderContext = createContext();
 const Index = () => {
 	const { cart, coupon } = usePage().props;
 	const [shippingPrice, setShippingPrice] = useState(null);
+	const [isCoupon, setIsCoupon] = useState(!!coupon);
 
 	const subTotal = () => {
 		let sum = 0;
@@ -88,8 +89,17 @@ const Index = () => {
 							</div>
 
 							<div className="px-4 py-6 sm:px-6 border-t">
-								<div className="mb-4">
-									<Coupon coupon={coupon} />
+								<div className="mb-4 select-none">
+									{isCoupon ? (
+											<Coupon coupon={coupon} />
+									) : (
+										<p
+											className="text-indigo-600 font-medium cursor-pointer"
+											onClick={() => setIsCoupon(!isCoupon)}
+										>
+											Ajouter un coupon.
+										</p>
+									)}
 								</div>
 
 								<div className="space-y-2">

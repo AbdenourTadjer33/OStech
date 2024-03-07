@@ -17,7 +17,7 @@
 }
 
 .slick-prev::before, .slick-next::before {
-    color: red !important;
+    color: #4338ca !important;
 }
 
 .progress-bar {

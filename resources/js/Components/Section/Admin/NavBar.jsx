@@ -254,7 +254,7 @@ export default function NavBar() {
                                     <ul>
                                         <li>
                                             <Dropdown.Link
-                                                href={route("profile.edit")}
+                                                href={route("profile.index")}
                                             >
                                                 Profile
                                             </Dropdown.Link>

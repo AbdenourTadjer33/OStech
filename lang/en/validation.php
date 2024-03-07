@@ -158,6 +158,8 @@ return [
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
 
+    'phone' => 'The :attribute field must be valid.',
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines
@@ -185,7 +187,15 @@ return [
     | of "email". This simply helps us make our message more expressive.
     |
     */
-
-    'attributes' => [],
+    'attributes' => [
+        'email' => 'e-maim',
+        'phone' => 'phone number',
+        'name' => 'full name',
+        'address' => 'address',
+        'city' => 'city',
+        'wilaya' => 'state',
+        'paymentMethod' => 'payment method',
+        'shippingType' => 'shipping method'
+    ],
 
 ];

@@ -57,4 +57,9 @@ class WelcomeController extends Controller
     public function catalogue(Request $request)
     {
     }
+
+    public function termAndCondition()
+    {
+        return Inertia::render('TermsAndConditions');
+    }
 }

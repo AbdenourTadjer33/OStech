@@ -5,10 +5,10 @@ import React, {
 	Fragment,
 	useRef,
 } from "react";
-import { usePage, useForm } from "@inertiajs/react";
+import { usePage, useForm, router } from "@inertiajs/react";
 import { Combobox, Transition, RadioGroup } from "@headlessui/react";
 import Label from "@/Components/Label";
-import TextInput from "@/Components/TextInput";
+import TextInput, { PopoverInput } from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import axios from "axios";
 import { capitalize, currencyFormat } from "@/Logic/helper";
@@ -16,33 +16,26 @@ import { HiMiniChevronUpDown } from "react-icons/hi2";
 import { FaCheck } from "react-icons/fa";
 import wilaya from "@/data/wilaya.json";
 import { CreateOrderContext } from "@/Pages/Order/Create";
+import { IndigoButton } from "@/Components/Button";
 
 const CreateOrder = () => {
 	const { setShippingPrice } = useContext(CreateOrderContext);
 
 	const { user } = usePage().props;
 	const [query, setQuery] = useState("");
-	const [shippingType, setShippingType] = useState([
-		{
-			name: "cost_home",
-			label: "Tarif à domicile",
-			price: null,
-		},
-		{
-			name: "cost_stop_desk",
-			label: "Tarif stop desk",
-			price: null,
-		},
-	]);
+
+	const [shippings, setShippings] = useState([]);
 
 	const paymentMehods = [
 		{
-			name: "cash_on_delivery",
+			name: "Paiement à la livraison",
 			label: "paiement à la livraison",
+			description: null,
 		},
 		{
-			name: "bank_transfer",
-			label: "virement bancaire",
+			name: "Virement",
+			label: "virement CCP/Baridimob",
+			description: null,
 		},
 	];
 
@@ -54,20 +47,22 @@ const CreateOrder = () => {
 		city: user?.data?.city || "",
 		wilaya: user?.data?.wilaya || "",
 		paymentMethod: "",
-		shippingCompany: 1,
-		shippingType: "",
+		shipping: {},
 	});
 
 	const getShippingPricing = async () => {
 		try {
 			const response = await axios.get(
-				route("api.shipping.pricings", {
+				route("shipping.pricings", {
 					_query: {
 						wilaya: data.wilaya,
 					},
 				})
 			);
-			setShippingType(response.data);
+
+			if (response.data) {
+				setShippings(response.data);
+			}
 		} catch (e) {
 			console.error("Error fetching shipping pricings", e);
 		}
@@ -76,19 +71,15 @@ const CreateOrder = () => {
 	useEffect(() => {
 		if (data.wilaya) {
 			getShippingPricing();
+			setData("shipping", {});
 		}
 	}, [data.wilaya]);
 
 	useEffect(() => {
-		if (data.shippingType) {
-			const result = shippingType.find(
-				(type) => type.name === data.shippingType
-			);
-			if (result.price) {
-				setShippingPrice(result.price);
-			}
+		if (data.shipping && data.shipping?.price) {
+			setShippingPrice(data.shipping?.price);
 		}
-	}, [data.shippingType]);
+	}, [data.shipping]);
 
 	const filteredWilaya =
 		query === ""
@@ -129,41 +120,6 @@ const CreateOrder = () => {
 					</div>
 
 					<div className="sm:col-span-2">
-						<Label required htmlFor="email" className="mb-2">
-							Email
-						</Label>
-						<TextInput
-							id="email"
-							name="email"
-							type="email"
-							value={data.email}
-							onChange={(e) => setData("email", e.target.value)}
-						/>
-						<InputError className="mt-2" message={errors.email} />
-					</div>
-
-					<div className="sm:col-span-2">
-						<Label required htmlFor="phone" className="mb-2">
-							N° tél
-						</Label>
-						<TextInput
-							id="phone"
-							name="phone"
-							value={data.phone}
-							onChange={(e) => setData("phone", e.target.value)}
-						/>
-						<InputError className="mt-2" message={errors.phone} />
-					</div>
-
-					<hr className="sm:col-span-2" />
-
-					<div className="sm:col-span-2">
-						<h3 className="text-xl font-medium text-gray-800">
-							Informations sur la livraison
-						</h3>
-					</div>
-
-					<div className="sm:col-span-2">
 						<Label htmlFor="name" required className="mb-2">
 							Nom prénom
 						</Label>
@@ -174,6 +130,67 @@ const CreateOrder = () => {
 							onChange={(e) => setData("name", e.target.value)}
 						/>
 						<InputError message={errors.name} className="mt-2" />
+					</div>
+
+					<div className="sm:col-span-2">
+						<Label required htmlFor="phone" className="mb-2">
+							N° tél
+						</Label>
+						<div className="relative">
+							<TextInput
+								id="phone"
+								name="phone"
+								value={data.phone}
+								onChange={(e) =>
+									setData("phone", e.target.value)
+								}
+							/>
+							<div className="absolute right-2 top-1/2 -translate-y-1/2 z-[51]">
+								<PopoverInput>
+									Le champ n° téléphone est requis. Ce champ
+									doit commencé avec 05, 06 ou 07. et ne
+									dépasse pas les 10 caractères. le numero de
+									fix n'est pas accéptée
+								</PopoverInput>
+							</div>
+						</div>
+						<InputError className="mt-2" message={errors.phone} />
+					</div>
+
+					<div className="sm:col-span-2">
+						<Label htmlFor="email" className="mb-2">
+							Email
+						</Label>
+						<div className="relative">
+							<TextInput
+								id="email"
+								name="email"
+								type="email"
+								value={data.email}
+								onChange={(e) =>
+									setData("email", e.target.value)
+								}
+							/>
+							<div className="absolute right-2 top-1/2 -translate-y-1/2 z-50">
+								<PopoverInput>
+									Le champ d'addresse e-mail n'est pas requis
+									mais en le fournissant, nous pouvons vous
+									envoyer des mises à jour et des
+									notifications importantes concernant vos
+									commandes, telles que des confirmations de
+									commande et des mises à jour d'expédition.
+								</PopoverInput>
+							</div>
+						</div>
+						<InputError className="mt-2" message={errors.email} />
+					</div>
+
+					<hr className="sm:col-span-2" />
+
+					<div className="sm:col-span-2">
+						<h3 className="text-xl font-medium text-gray-800">
+							Informations sur la livraison
+						</h3>
 					</div>
 
 					<div className="sm:col-span-2">
@@ -309,81 +326,102 @@ const CreateOrder = () => {
 					</div>
 
 					<div className="sm:col-span-2">
-						<RadioGroup
-							value={data.shippingType}
-							onChange={(e) => setData("shippingType", e)}
-						>
-							<RadioGroup.Label className="sr-only">
-								Shipping type
-							</RadioGroup.Label>
-							<div className="grid gap-4 sm:grid-cols-2">
-								{shippingType.map((type, idx) => (
-									<RadioGroup.Option
-										key={idx}
-										value={type.name}
-										className={({
-											checked,
-											active,
-										}) => `border relative flex cursor-pointer rounded-lg px-5 py-4 focus:outline-none bg-gray-50
+						{!data.wilaya && shippings.length === 0 ? (
+							<>Veuillez séléctionnez une wilaya</>
+						) : (
+							<>
+								<RadioGroup
+									value={data.shipping}
+									onChange={(e) => {
+										setData("shipping", e);
+									}}
+								>
+									<RadioGroup.Label className="sr-only">
+										Shipping type
+									</RadioGroup.Label>
+									<div className="grid gap-4 sm:grid-cols-2">
+										{shippings.map((type, idx) => (
+											<RadioGroup.Option
+												key={idx}
+												value={type}
+												className={({
+													checked,
+													active,
+												}) => `border relative flex cursor-pointer rounded-lg px-5 py-4 focus:outline-none bg-gray-50
                         ${active ? " ring-2 ring-info-400 " : ""}
                             ${
 								checked
 									? "border-2 border-info-500"
 									: "border-gray-300"
 							}`}
-									>
-										{({ checked }) => (
-											<>
-												<div className="flex w-full items-center justify-between">
-													<div className="flex items-center">
-														<div className="text-sm">
-															<RadioGroup.Label
-																as="p"
-																className={`font-medium
+											>
+												{({ checked }) => (
+													<>
+														<div className="flex w-full items-center justify-between">
+															<div className="flex items-center">
+																<div className="text-sm">
+																	<RadioGroup.Label
+																		as="p"
+																		className={`font-medium
 
                                                     `}
-															>
-																{capitalize(
-																	type.label
-																)}
-															</RadioGroup.Label>
-															<RadioGroup.Description
-																as="span"
-																className={`inline text-gray-500`}
-															>
-																<span>
-																	{type.price ? (
-																		currencyFormat(
-																			type.price
-																		)
-																	) : (
-																		<></>
-																	)}
-																</span>
-															</RadioGroup.Description>
-														</div>
-													</div>
-													<input
-														type="radio"
-														className="w-4 h-4 text-info-600 bg-gray-100 border-gray-300 focus:ring-info-500 dark:focus:ring-info-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-														checked={checked}
-														onChange={(e) =>
-															(e.target.checked =
-																checked)
-														}
-													/>
-												</div>
-											</>
-										)}
-									</RadioGroup.Option>
-								))}
-							</div>
-						</RadioGroup>
+																	>
+																		{capitalize(
+																			type.name
+																		)}
+																	</RadioGroup.Label>
+																	<RadioGroup.Description
+																		as="span"
+																		className={`inline text-gray-500`}
+																	>
+																		<span className="block">
+																			{type.price
+																				? currencyFormat(
+																						type.price
+																				  )
+																				: ""}
+																		</span>
 
-						<InputError
-							message={errors.shippingType}
-							className="mt-2"
-						/>
+																		<span className="block">
+																			{type.delay
+																				? `Durré: ${
+																						type.delay
+																				  } jour${
+																						type.delay >
+																						1
+																							? "s"
+																							: ""
+																				  }`
+																				: ""}
+																		</span>
+																	</RadioGroup.Description>
+																</div>
+															</div>
+															<input
+																type="radio"
+																className="w-4 h-4 text-info-600 bg-gray-100 border-gray-300 outline-none focus:ring-0 focus:ring-transparent"
+																checked={
+																	checked
+																}
+																onChange={(e) =>
+																	(e.target.checked =
+																		checked)
+																}
+															/>
+														</div>
+													</>
+												)}
+											</RadioGroup.Option>
+										))}
+									</div>
+								</RadioGroup>
+
+								<InputError
+									message={errors.shipping}
+									className="mt-2"
+								/>
+							</>
+						)}
 					</div>
 
 					<div className="sm:col-span-2">
@@ -449,7 +487,7 @@ const CreateOrder = () => {
 													</div>
 													<input
 														type="radio"
-														className="w-4 h-4 text-info-600 bg-gray-100 border-gray-300 focus:ring-info-500 dark:focus:ring-info-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+														className="w-4 h-4 text-info-600 bg-gray-100 border-gray-300 outline-none focus:ring-0 focus:ring-transparent"
 														checked={checked}
 														onChange={(e) =>
 															(e.target.checked =
@@ -471,145 +509,12 @@ const CreateOrder = () => {
 					</div>
 				</div>
 
-				<button className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
+				<IndigoButton className="w-full" disabled={processing}>
 					{capitalize("Commander")}
-				</button>
+				</IndigoButton>
 			</form>
 		</div>
 	);
 };
 
 export default CreateOrder;
-
-const V0 = () => {
-	const { user } = usePage().props;
-	const [currentStep, setCurrentStep] = useState(0);
-	const { post, data, setData, processing, errors } = useForm({
-		name: user?.name || "",
-		phone: user?.phone || "",
-		email: user?.email || "",
-		address: user?.data?.address || "",
-		city: user?.data?.city || "",
-		wilaya: user?.data?.wilaya || "",
-		paymentMethod: "cash on delivery",
-		shippingCompany: 1,
-		shippingType: "",
-	});
-
-	const formSteps = [
-		{
-			title: "information génerale",
-			description: "adresse de livraison et facturation",
-			component: <CustomerDetails />,
-			validationRoute: "order.validate.customer",
-		},
-		{
-			title: "mode de paiement",
-			description: "méthode de paiement",
-			component: <PaymentMethod />,
-			validationRoute: "order.validate.paymentMethod",
-		},
-		{
-			title: "mode de livraison",
-			description: "méthode d'expédition",
-			component: <ShippingOption />,
-			validationRoute: "order.validate.shippingMethod",
-		},
-		{
-			title: "confirmation",
-			component: <ConfirmOrder />,
-		},
-	];
-
-	const handleNext = () => {
-		const { validationRoute } = formSteps[currentStep];
-		if (!validationRoute) {
-			console.log("no validation route here");
-		}
-		post(route(validationRoute), {
-			preserveScroll: true,
-			preserveState: true,
-			onSuccess: () => setCurrentStep(currentStep + 1),
-		});
-	};
-
-	const handlePrevious = () => {
-		setCurrentStep(currentStep - 1);
-	};
-
-	const submitHandler = (e) => {
-		e.preventDefault();
-		post(route("order.store"), {
-			preserveScroll: true,
-		});
-	};
-
-	return (
-		<CreateOrderContext.Provider value={{ data, setData, errors }}>
-			<div className="shadow-lg rounded-xl py-6 px-4 space-y-6 bg-gray-100">
-				<Stepper
-					steps={formSteps.map((step) => {
-						return {
-							title: step.title,
-							description: step?.description,
-						};
-					})}
-					currentStep={currentStep}
-				/>
-
-				<form onSubmit={(e) => e.preventDefault()}>
-					{formSteps.map((step, idx) => (
-						<div
-							key={idx}
-							className={`transition-opacity duration-300 ${
-								currentStep === idx
-									? "opacity-100"
-									: "opacity-0 sr-only"
-							}`}
-						>
-							{step.component}
-						</div>
-					))}
-				</form>
-
-				<div className="flex items-center gap-4">
-					{/* {currentStep === 0 && (
-                        <button
-                            onClick={() => setOrder(false)}
-                            className="w-full flex items-center justify-center rounded-md border border-transparent bg-red-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700"
-                        >
-                            {capitalize("annuler")}
-                        </button>
-                    )} */}
-
-					{currentStep > 0 && (
-						<button
-							onClick={handlePrevious}
-							className="w-full flex items-center justify-center rounded-md border border-transparent bg-gray-700 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800"
-						>
-							{capitalize("Retour")}
-						</button>
-					)}
-
-					{currentStep !== formSteps.length - 1 && (
-						<button
-							onClick={handleNext}
-							className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-						>
-							{capitalize("suivant")}
-						</button>
-					)}
-
-					{currentStep === formSteps.length - 1 && (
-						<button
-							onClick={submitHandler}
-							className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-						>
-							{capitalize("Commander")}
-						</button>
-					)}
-				</div>
-			</div>
-		</CreateOrderContext.Provider>
-	);
-};

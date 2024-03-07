@@ -81,6 +81,7 @@ const Informations = () => {
 					name="description"
 					value={data.description}
 					onChange={(e) => setData("description", e)}
+					onBlur={() => validate('description')}
 				/>
 				<InputError message={errors.description} className="mt-2" />
 			</div>

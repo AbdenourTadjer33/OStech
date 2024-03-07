@@ -245,7 +245,7 @@ const Index = ({ orders }) => {
 								</Dropdown>
 							</div>
 
-							<Link href={route("admin.products.create")}>
+							<Link href={route("admin.product.create")}>
 								<Button btn="primary" type="button">
 									Créer un produit
 								</Button>
@@ -357,7 +357,7 @@ const Index = ({ orders }) => {
 															<li>
 																<Link
 																	href={route(
-																		"admin.products.edit",
+																		"admin.product.edit",
 																		{
 																			id: record.id,
 																		}

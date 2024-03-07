@@ -42,14 +42,14 @@ const Show = ({ order }) => {
 					</p>
 				</div>
 
-				<div className="flex justify-start items-end gap-4">
+				<div className="flex sm:flex-row flex-col justify-start items-end sm:gap-4 gap-2">
 					<div className="divide-y w-full sm:max-w-2xl border border-gray-200 shadow-lg rounded">
 						{order.orderProducts.map((item, idx) => (
 							<OrderedItem key={idx} item={item} />
 						))}
 					</div>
 
-					<div className="w-full max-w-sm bg-white border p-4 shadow-lg rounded">
+					<div className="w-screen max-w-sm bg-white border sm:p-4 shadow-lg rounded">
 						<OrderSummary order={order} />
 					</div>
 				</div>

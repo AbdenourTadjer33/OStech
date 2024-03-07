@@ -16,6 +16,16 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
+    public function attributes()
+    {
+        return [
+            'name' => 'nom prénom',
+            'phone' => 'n° téléphone',
+            'email' => 'email',
+            'password' => 'mot de passe',
+        ];
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,10 +34,10 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
             'phone' => ['required', 'regex:/^(05|06|07)[0-9]{8}$/', 'unique:' . User::class],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'email' => ['required', 'string', 'email', 'max:100', 'unique:' . User::class],
+            'password' => ['required', Password::defaults()],
         ];
     }
 }
