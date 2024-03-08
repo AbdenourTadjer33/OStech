@@ -97,7 +97,7 @@ class ProductController extends Controller
                 // 'colors' => $request->input('colors'),
                 // 'options' => $request->input('options'),
                 'category_id' => $subCategory['id'],
-                'brand_id' => $request->has('brand') ? $request->brand['id'] : null,
+                'brand_id' => $request->input('brand') ? $request->brand['id'] : null,
                 'images' => $paths,
             ]);
         });
@@ -132,9 +132,12 @@ class ProductController extends Controller
 
             $images = $request->images;
 
-            // $paths = [];
-            // foreach ($images as $image) {
-            // }
+            $paths = [];
+            foreach ($images as $image) {
+                $newPath = "product/" . substr($image, strpos($image, '/') + 1);
+                Storage::disk('media')->move($image, $newPath);
+                $paths[] = $newPath;
+            }
 
             Product::where('id', $request->id)->update([
                 'name' => $request->input('name'),
@@ -147,8 +150,8 @@ class ProductController extends Controller
                 'catalog' => $request->input('catalog'),
                 'features' => $request->input('features'),
                 'category_id' => $subCategory['id'],
-                'brand_id' => $request->has('brand') ? $request->brand['id'] : null,
-                'images' => $request->images,
+                'brand_id' => $request->input('brand') ? $request->brand['id'] : null,
+                'images' => $paths,
             ]);
         });
 
@@ -254,93 +257,5 @@ class ProductController extends Controller
     {
         Product::where('id', $request->id)->update(['catalog' => false]);
         return redirect(route('admin.product.index'));
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public function saveTempImages(Request $request)
-    {
-        $request->validate([
-            'images' => ['required', 'array'],
-            'images.*' => ['required', 'image'],
-        ]);
-
-        $paths = [];
-        /**
-         * @var UploadedFile $image
-         */
-        foreach ($request->images as $image) {
-            $paths[] = $image->store('temp', 'media');
-        }
-
-        return $paths;
-    }
-
-    public function editTempImage(Request $request)
-    {
-        $request->validate([
-            'path' => ['required'],
-            'cropInfo' => ['required', 'array'],
-        ]);
-
-        if (!Storage::disk('media')->exists($request->path)) {
-            return $this->error(null, 'image non trouvé', 404);
-        }
-
-        $cropInfo = $request->cropInfo;
-
-        $img = Image::gd()->read(Storage::disk('media')->get($request->path));
-
-        $img->crop($cropInfo['width'], $cropInfo['height'], $cropInfo['x'], $cropInfo['y']);
-
-        $img->toPng();
-
-        $filename = 'media/temp/cropped_' . time() . '_' . uniqid() . '.png';
-
-        $img->save($filename);
-
-        Storage::disk('media')->delete($request->path);
-
-        return $this->success([
-            'path' => substr($filename, strpos($filename, '/') + 1),
-        ], 'image modifier avec succés');
-    }
-
-    public function destroyTempImage(Request $request)
-    {
-        if (!Storage::disk('media')->exists($request->path)) {
-            return $this->error(null, 'image non trouvé', 404);
-        }
-
-        if (!Storage::disk('media')->delete($request->path)) {
-            return $this->error(null, 'something went wrong.', 500);
-        }
-
-        return $this->success(null, 'image supprimé avec succés', 200);
     }
 }

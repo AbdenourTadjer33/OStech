@@ -83,7 +83,7 @@ const ImageUpload = () => {
 		importedFiles.map(({ file }) => formData.append("images[]", file));
 		try {
 			const response = await axios.post(
-				route("api.save.temp.imgs"),
+				route("admin.upload.save.temp"),
 				formData,
 				{
 					headers: {
@@ -92,7 +92,7 @@ const ImageUpload = () => {
 				}
 			);
 
-			setData("images", [...data.images, ...response.data]);
+			setData("images", [...data.images, ...response.data?.data?.path]);
 			setImportedFiles([]);
 			setIsLoading(false);
 			setImportModal(false);
@@ -142,7 +142,7 @@ const ImageUpload = () => {
 		const idx = deleteModal.imageId;
 
 		try {
-			const response = await axios.post(route("api.destroy.temp.img"), {
+			const response = await axios.post(route("admin.upload.destroy"), {
 				path: data.images[idx],
 			});
 			if (response.status === 200) {
@@ -169,7 +169,7 @@ const ImageUpload = () => {
 		const idx = editModal.imageId;
 
 		try {
-			const response = await axios.post(route("api.edit.temp.img"), {
+			const response = await axios.post(route("admin.upload.edit"), {
 				path: data.images[idx],
 				cropInfo,
 			});

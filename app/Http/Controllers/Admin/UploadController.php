@@ -55,7 +55,7 @@ class UploadController extends Controller
         ], 'image modifier avec succés');
     }
 
-    public function destroyTemp(Request $request)
+    public function destroy(Request $request)
     {
         if (!Storage::disk('media')->exists($request->path)) {
             return $this->error(null, 'image non trouvé', 404);

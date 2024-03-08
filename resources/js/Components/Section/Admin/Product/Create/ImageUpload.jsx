@@ -139,7 +139,7 @@ const ImageUpload = () => {
         const idx = deleteModal.imageId;
 
         try {
-            const response = await axios.post(route("admin.upload.destroy.temp"), {
+            const response = await axios.post(route("admin.upload.destroy"), {
                 path: data.images[idx],
             });
             if (response.status === 200) {
@@ -166,11 +166,10 @@ const ImageUpload = () => {
         const idx = editModal.imageId;
 
         try {
-            const response = await axios.post(route("admin.upload.edit.temp"), {
+            const response = await axios.post(route("admin.upload.edit"), {
                 path: data.images[idx],
                 cropInfo,
             });
-            console.log(response);
             if (response.status === 200) {
                 const status = response.data.status;
                 const message = response.data.message;
