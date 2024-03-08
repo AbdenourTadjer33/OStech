@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\WilayaController;
 use App\Http\Controllers\Admin\ShippingController;
+use App\Http\Controllers\Admin\UploadController;
 
 Route::get('/', fn () => to_route('admin.dashboard'));
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -79,17 +80,16 @@ Route::prefix('orders')->controller(OrderController::class)->as('order.')->group
     Route::get('/{ref}', 'show')->name('show');
 });
 
-Route::prefix('shipping-companies')->controller(ShippingController::class)->group(function () {
-    Route::get('/', 'index')->name('shippings.index');
-    Route::get('/create', 'create')->name('shippings.create');
-    Route::post('/create', 'store')->name('shippings.store');
-
-    Route::get('/edit/{id}', 'edit')->name('shippings.edit');
-    Route::post('/edit/{id}', 'update')->name('shippings.update');
+Route::prefix('shipping')->controller(ShippingController::class)->group(function () {
+    Route::get('/', 'index')->name('shipping.index');
+    Route::post('/edit/{wilayaId}', 'update')->name('shipping.update');
 });
 
-
-
+Route::prefix('upload')->controller(UploadController::class)->as('upload.')->group(function () {
+    Route::post('/save-temp', 'saveTemp')->name('save.temp');
+    Route::post('/edit-temp', 'editTemp')->name('edit');
+    Route::post('/destroy-temp', 'destroy')->name('destroy');
+});
 
 Route::prefix('settings')->group(function () {
     Route::get('/', [DashboardController::class, 'settings'])->name('settings');

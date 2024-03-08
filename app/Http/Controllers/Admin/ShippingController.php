@@ -9,6 +9,7 @@ use App\Http\Requests\Shipping\StoreRequest;
 use App\Http\Requests\Shipping\UpdateRequest;
 use App\Models\ShippingCompany;
 use App\Models\ShippingPricing;
+use App\Services\WilayaService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -22,80 +23,53 @@ class ShippingController extends Controller
         $this->middleware('precognitive')->only(['store', 'update']);
     }
 
-    public function index()
+    public function index(WilayaService $wilayaService)
     {
-        $shippingCompany = Cache::rememberForever('shippingCompanies', fn () => ShippingCompany::get());
+        /**
+         *@var \Illuminate\Database\Eloquent\Collection
+         */
+        $shippings = Cache::remember('shipping_pricings', now()->addWeek(), fn () => ShippingPricing::get());
+        $wilayas = $wilayaService->getWilayas();
 
-        $shippingPricings = Cache::rememberForever('shippingPricings', fn () => ShippingPricing::get());
+        $shippings->map(
+            fn ($shipping) =>
+            $shipping->wilaya_name = $wilayas->firstWhere('code', $shipping->wilaya_id)->name
+        );
 
         return Inertia::render('Admin/Shipping/Index', [
-            'shippings' => $shippingCompany,
-            'pricings' => $shippingPricings,
+            'shippings' => $shippings,
         ]);
     }
 
-    public function create()
+    public function update(Request $request, WilayaService $wilayaService)
     {
-        return Inertia::render('Admin/Shipping/Create', [
-            'wilayas' => Storage::json('data/wilaya.json'),
+        $request->validate([
+            'delay' => ['nullable', 'string'],
+            'cost_home' => ['nullable', 'numeric'], 
+            'cost_stop_desk' => ['nullable', 'numeric'],
+        ]);
+
+        DB::transaction(
+            fn () =>
+            ShippingPricing::where('wilaya_id', $request->wilayaId)->update([
+                'cost_home' => $request->input('cost_home'),
+                'cost_stop_desk' => $request->input('cost_stop_desk'),
+                'delay' => $request->input('delay'),
+            ])
+        );
+
+        $this->clearCacheShippings();
+
+        $wilaya = $wilayaService->getWilayaByCode($request->wilayaId);
+
+        return redirect(route('admin.shipping.index'))->with('alert', [
+            'status' => 'success',
+            'message' => "tarification de $wilaya sont editer avec succés",
         ]);
     }
 
-    public function store(StoreRequest $request)
+    private function clearCacheShippings()
     {
-        $pricings = collect($request->pricings)->map(function ($pricing) {
-            return [
-                'wilaya_id' => $pricing['code'],
-                'delay' => $pricing['delay'],
-                'cost_home' => $pricing['cost_home'],
-                'cost_stop_desk' => $pricing['cost_stop_desk']
-            ];
-        });
-
-        $status = DB::transaction(function () use ($request, $pricings) {
-            /**
-             * @var \App\Models\ShippingCompany
-             */
-            $shippingCompany = ShippingCompany::create([
-                'name' => $request->input('name'),
-                'status' => $request->input('status'),
-            ]);
-
-            $shippingCompany->shippingPricings()->createMany($pricings);
-
-            return true;
-        });
-
-        if (!$status) {
-            return session()->flash('alert', [
-                'status' => 'danger',
-                'message' => 'something went wrong',
-            ]);
-        }
-
-        $this->clearCacheShipping();
-
-        return redirect(route('admin.shippings.index'))->with('alert', [
-            'statys' => 'success',
-            'message' => 'Entreprise de livraison créer avec succés'
-        ]);
-    }
-
-    public function edit()
-    {
-    }
-
-    public function update(UpdateRequest $request)
-    {
-    }
-
-    public function destroy()
-    {
-    }
-
-    private function clearCacheShipping()
-    {
-        Cache::forget('shippingCompanies');
-        Cache::forget('shippingPricings');
+        Cache::forget('shipping_pricings');
     }
 }
