@@ -9,7 +9,10 @@ import Visibility from "./Edit/Visibility";
 import Features from "./Edit/Features";
 import ImageUpload from "./Edit/ImageUpload";
 import { PreviewProductCard } from "../../Client/Product/ProductCard";
-import {PreviewProductDetails, ProductFeatures} from "@/Components/Section/Client/Product/DetailsProduct"
+import {
+	PreviewProductDetails,
+	ProductFeatures,
+} from "@/Components/Section/Client/Product/DetailsProduct";
 
 export const EditProductFormContext = createContext();
 
@@ -174,7 +177,7 @@ const EditForm = ({ product, mainCategories, subCategories, brands }) => {
 						)}
 					</div>
 				))}
-				<div className="flex items-center gap-5 mt-10">
+				<div className="flex items-center gap-4 mt-10">
 					<Button
 						type="button"
 						btn="danger"
@@ -229,17 +232,17 @@ const EditForm = ({ product, mainCategories, subCategories, brands }) => {
 						{/* The actual dialog panel  */}
 						<Dialog.Panel className="mx-auto max-w-screen-xl p-4 rounded bg-white">
 							<div>
-									<PreviewProductDetails
-										name={data.name}
-										description={data.description}
-										price={data.price}
-										promo={data.promo}
-										images={data.images}
-										brand={data.brand?.name}
-										mainCategory={data.mainCategory?.name}
-										subCategory={data.subCategory?.name}
-									/>
-									<ProductFeatures features={data.features} />
+								<PreviewProductDetails
+									name={data.name}
+									description={data.description}
+									price={data.price}
+									promo={data.promo}
+									images={data.images}
+									brand={data.brand?.name}
+									mainCategory={data.mainCategory?.name}
+									subCategory={data.subCategory?.name}
+								/>
+								<ProductFeatures features={data.features} />
 							</div>
 						</Dialog.Panel>
 					</div>

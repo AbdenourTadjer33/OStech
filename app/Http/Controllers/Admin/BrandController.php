@@ -6,8 +6,6 @@ use Inertia\Inertia;
 use App\Models\Brand;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Services\MediaService;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -19,11 +17,7 @@ class BrandController extends Controller
 {
     use HttpResponses;
 
-    public function __construct()
-    {
-        $this->middleware('precognitive')->only(['store', 'update']);
-    }
-
+    // FINISHED
     public function index(Request $request)
     {
         $brandQuery = Brand::withCount('products')->orderBy('id', 'asc');
@@ -35,11 +29,13 @@ class BrandController extends Controller
         ]);
     }
 
+    // FINISHED
     public function create()
     {
         return Inertia::render('Admin/Brand/Create');
     }
 
+    // FINISHED
     public function store(StoreRequest $request)
     {
         DB::transaction(function () use ($request) {
@@ -55,63 +51,70 @@ class BrandController extends Controller
             ]);
         });
 
-        session()->flash('alert', [
+        return redirect(route('admin.brand.index'))->with('alert', [
             'status' => 'success',
-            'message' => 'Brand créer avec succés.'
+            'message' => 'Brand créer avec succés',
         ]);
-
-        return redirect(route('admin.brands.index'));
     }
 
+    // FINISHED
     public function edit(Request $request)
     {
-        $brand = Brand::where('id', $request->id)->firstOrFail();
+        $brand = Brand::where('id', $request->id)->first();
+
+        if (!$brand) {
+            return redirect()->back()->with('alert', [
+                'stauts' => 'danger',
+                'message' => 'Brand non trouvé',
+            ]);
+        }
 
         return Inertia::render('Admin/Brand/Edit', [
             'brand' => $brand,
         ]);
     }
 
+    // FINISHED
     public function update(UpdateRequest $request)
     {
-        $brand = Brand::where('id', $request->id)->firstOrFail();
+        DB::transaction(function () use ($request) {
+            $img = $request->image;
 
-        DB::transaction(function () use ($request, $brand) {
-            $path = $request->image;
-            if ($brand->logo != $request->image) {
-                $image = $request->image;
+            $path = "brand/" . substr($img, strpos($img, '/'));
+            Storage::disk('media')->move($img, $path);
 
-                $path = 'brand/' . substr($image, strpos($image, '/'));
-                Storage::disk('media')->move($image, $path);
-            }
-            $brand->update([
+            Brand::where('id', $request->id)->update([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name),
+                'slug' => Brand::generateSlug('slug', $request->name),
                 'logo' => $path,
             ]);
         });
 
-        session()->flash('alert', [
+        return redirect(route('admin.brand.index'))->with('alert', [
             'status' => 'success',
             'message' => 'Brand editer avec succés'
         ]);
-
-        return redirect(route('admin.brand.index'));
     }
 
+    // FINISHED
     public function destroy(Request $request)
     {
         $brand = Brand::where('id', $request->id)->first();
 
-        Storage::disk('media')->delete($brand->logo); 
+        if (!$brand) {
+            return redirect()->back()->with('alert', [
+                'status' => 'danger',
+                'message' => 'Brand non trouvé',
+            ]);
+        }
+
+        Storage::disk('media')->delete($brand->logo);
 
         $brand->delete();
 
-        session()->flash('alert', [
+        return redirect(route('admin.brand.index'))->with('alert', [
             'status' => 'success',
             'message' => 'brand supprimé avec succés',
-        ]);
-
-        return redirect(route('admin.brands.index'));
+        ]);;
     }
 }

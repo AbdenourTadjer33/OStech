@@ -119,6 +119,11 @@ class User extends Authenticatable
         $query->where('status', true);
     }
 
+    public function scopeSample(Builder $query)
+    {
+        $query->select('id', 'uuid', 'name', 'email', 'phone', 'status', 'role_id');
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);

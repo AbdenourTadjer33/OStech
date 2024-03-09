@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users', 'id')->nullOnDelete();
             $table->json('client')->nullable();
 
-            $table->foreignId('shipping_company_id')->nullable()->constrained('shipping_companies', 'id')->nullOnDelete();
             $table->string('shipping_type');
             $table->decimal('shipping_cost', 10, 2)->nullable();
+            
             $table->string('payment_method')->nullable();
 
             $table->foreignId('coupon_id')->nullable()->constrained('coupons')->nullOnDelete();

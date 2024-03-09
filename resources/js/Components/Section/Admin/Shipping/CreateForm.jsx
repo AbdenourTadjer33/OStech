@@ -334,6 +334,7 @@ const CreateForm = ({ wilayas }) => {
                                 })}
                             </Table.Body>
                         </Table>
+
                         {data.pricings.length === 0 && (
                             <div className="animate-pulse p-4">
                                 <div className="h-10 bg-gray-200 rounded-lg dark:bg-gray-700 mb-2.5"></div>

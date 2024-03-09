@@ -93,7 +93,6 @@ const CreateForm = ({ mainCategories, subCategories, brands }) => {
 
 	const submitHandler = (e) => {
 		e.preventDefault();
-		console.log(data);
 		post(route("admin.product.store"), {
 			onSuccess: () => reset(),
 		});

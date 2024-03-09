@@ -307,15 +307,6 @@ const CategoryBrand = () => {
 										<div className="relative cursor-default text-sm select-none px-2.5 py-2 text-gray-700 dark:text-gray-50">
 											Brand non trouvé
 										</div>
-										<Combobox.Option
-											value={""}
-											className="relative cursor-default select-none py-2 px-4 hover:bg-gray-200 dark:hover:bg-gray-500"
-										>
-											Créer Brand{" "}
-											<span className="text-sm">
-												"{query}"
-											</span>
-										</Combobox.Option>
 									</>
 								) : filteredBrands.length === 0 &&
 								  query == "" ? (

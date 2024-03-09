@@ -17,7 +17,7 @@ const Button = ({
 		danger: `bg-danger-700 hover:bg-danger-800 dark:bg-danger-600 dark:hover:bg-danger-700 ${basedStyle} `,
 		info: `bg-info-700 hover:bg-info-800 dark:bg-info-600 dark:hover:bg-info-700 ${basedStyle} `,
 		success: `bg-green-700 hover:bg-green-800 dark:bg-green-600 dark:hover:bg-green-700 ${basedStyle} `,
-		warning: `bg-warning-700 hover:bg-warning-800 dark:bg-warning-600 dark:hover:bg-warning-700 ${basedStyle} `,
+		warning: `bg-yellow-700 hover:bg-yellow-800 dark:bg-yellow-500 dark:hover:bg-yellow-700 ${basedStyle} `,
 	};
 	return (
 		<button

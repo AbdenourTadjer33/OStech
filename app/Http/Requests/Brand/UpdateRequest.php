@@ -15,6 +15,13 @@ class UpdateRequest extends FormRequest
         return true;
     }
 
+    public function attributes()
+    {
+        return [
+            'name' => 'brand'
+        ];
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

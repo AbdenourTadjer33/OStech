@@ -13,7 +13,14 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
+    }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'role',
+        ];
     }
 
     /**
@@ -24,7 +31,11 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'name' => ['required', 'string', Rule::unique('roles', 'name')->ignore($this->)]
+            'name' => ['required', 'string', Rule::unique('roles', 'name')->ignore($this->id, 'id')],
+            'description' => ['nullable', 'string'],
+            'permission' => ['required', Rule::in(Role::PERMIISSION)],
+            'permissions' => [$this->permission == 'custom' ? 'required' : 'nullable', $this->permission == 'custom' ? 'array' : ''],
+            'permissions.*' => [$this->permission == 'custom' ? 'required' : 'nullable', 'string'],
         ];
     }
 }

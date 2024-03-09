@@ -19,12 +19,7 @@ class CategoryController extends Controller
     // FINISHED
     public function index(CategoryService $categoryService)
     {
-        /**
-         * @var \Illuminate\Database\Eloquent\Collection
-         */
-        $categories = Cache::rememberForever('categories', function () {
-            return Category::get();
-        });
+        $categories = $categoryService->getCategories();
 
         $categories->loadCount('products');
 

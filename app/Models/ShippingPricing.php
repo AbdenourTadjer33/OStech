@@ -11,17 +11,12 @@ class ShippingPricing extends Model
     use HasFactory;
 
     protected $fillable = [
-        'shipping_company_id',
         'wilaya_id',
         'delay',
         'cost_home',
         'cost_stop_desk',
     ];
 
-    public function shippingCompany(): BelongsTo
-    {
-        return $this->belongsTo(ShippingCompany::class, 'shipping_company_id', 'id');
-    }
 
     public $timestamps = false;
 }

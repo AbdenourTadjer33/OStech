@@ -39,7 +39,7 @@ Route::prefix('category')->controller(CategoryController::class)->as('category.'
 
 
     Route::get('/', 'getByCategory')->name('get');
-}); 
+});
 
 Route::prefix('cart')->controller(CartController::class)->group(function () {
     Route::get('/', 'index')->name('cart');
@@ -60,7 +60,6 @@ Route::prefix('order')->controller(OrderController::class)->as('order.')->group(
     Route::get('/find', 'find')->name('find');
 
     Route::get('/download/pdf/{ref}', 'pdf')->name('pdf');
-
 });
 
 Route::get('/shipping-pricing', [ShippingController::class, 'getPricings'])->name('shipping.pricings');
@@ -78,14 +77,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::get('preview-mail', function () {
-    $order = Order::where('id', 15)->first();
-
-    return view('mail.new_order', [
-        'order' => $order,
-        'orderProducts' => $order->orderProducts,
-        'orderLink' => URL::signedRoute('order.show', ['ref' => $order->ref])
-    ]);
-}); 
 
 require __DIR__ . '/auth.php';

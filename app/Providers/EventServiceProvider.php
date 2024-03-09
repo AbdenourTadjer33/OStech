@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\Admin\NewAdmin;
 use App\Events\Order\NewOrder;
+use App\Listeners\SendAdminCredentials;
 use App\Listeners\SendNewOrderNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -23,6 +25,10 @@ class EventServiceProvider extends ServiceProvider
 
         NewOrder::class => [
             SendNewOrderNotification::class
+        ],
+
+        NewAdmin::class => [
+            SendAdminCredentials::class,
         ]
     ];
 

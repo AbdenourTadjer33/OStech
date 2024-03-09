@@ -12,6 +12,10 @@ export const AppLayoutContext = createContext();
 const AppLayout = ({ children, mainClass = true }) => {
 	const { user, categories, cart, coupon, flash } = usePage().props;
 
+	useEffect(() => {
+		document.querySelector('html').classList.remove('dark');
+	}, []);
+
 	const [isShown, setIsShown] = useState(false);
 	useEffect(() => {
 		if (flash.alert && flash.alert?.show != false) {

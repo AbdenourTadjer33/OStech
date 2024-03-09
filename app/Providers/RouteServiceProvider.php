@@ -41,7 +41,8 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware([
                 'web',
                 'auth',
-                'admin'
+                'admin',
+                'loadAdminSpace'
             ])
                 ->prefix('admin')
                 ->as('admin.')

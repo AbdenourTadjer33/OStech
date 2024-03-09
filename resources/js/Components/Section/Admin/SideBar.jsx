@@ -6,7 +6,6 @@ import { Transition } from "@headlessui/react";
 
 export default function SideBar() {
 	const { isOpen, toggleSideBar } = useContext(AdminLayoutContext);
-
 	return (
 		<Aside>
 			<ul className="space-y-2 font-medium">
@@ -17,7 +16,6 @@ export default function SideBar() {
 							name={name}
 							link={route}
 							Icon={icon}
-							sub={sub}
 						/>
 					);
 				})}
@@ -36,26 +34,20 @@ const Aside = ({ children }) => {
 			} h-screen pt-20 transition-all duration-100 ease-in bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700`}
 			aria-label="Sidebar"
 		>
-			<div className="relative h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+			<div className="relative h-full px-3 pb-4 bg-white dark:bg-gray-800">
 				{children}
 			</div>
 		</aside>
 	);
 };
 
-const SideBarLink = ({ name, link, Icon, sub }) => {
+const SideBarLink = ({ name, link, Icon }) => {
 	const { isOpen } = useContext(AdminLayoutContext);
-	const activeLink = route().current(link);
-	const [subMenu, setSubMenu] = useState(false);
-
-	const toggle = (e) => {
-		e.preventDefault();
-		setSubMenu(!subMenu);
-	};
+	const activeLink = link === usePage().url
 	return (
 		<li>
 			<Link
-				href={route(link)}
+				href={link}
 				className={`flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group p-2 ${
 					isOpen ? "justify-start" : "justify-center"
 				} ${activeLink && "bg-gray-200 dark:bg-gray-600"}`}
@@ -81,59 +73,7 @@ const SideBarLink = ({ name, link, Icon, sub }) => {
 						{name}
 					</span>
 				</Transition>
-
-				<Transition
-					as={Fragment}
-					show={isOpen && !!sub}
-					enter="transition-opacity duration-200"
-					enterFrom="opacity-0"
-					enterTo="opacity-100"
-					leave="transition-opacity duration-75"
-					leaveFrom="opacity-100"
-					leaveTo="opacity-0"
-				>
-					<div
-						onClick={toggle}
-						className={`ml-auto p-2 rounded-full dark:hover:bg-gray-600 hover:bg-gray-50`}
-					>
-						<svg
-							className={`w-4 h-4 text-gray-800 dark:text-white ${
-								subMenu ? "rotate-180" : ""
-							}`}
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="m19 9-7 7-7-7"
-							/>
-						</svg>
-					</div>
-				</Transition>
 			</Link>
-			{sub && (
-				<Transition
-					show={subMenu && isOpen}
-					as="ul"
-					className="py-2 space-y-2"
-				>
-					{sub.map((subLink, idx) => (
-						<li
-							key={idx}
-							className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-						>
-							<Link href={route(subLink.route)}>
-								{subLink.name}
-							</Link>
-						</li>
-					))}
-				</Transition>
-			)}
 		</li>
 	);
 };

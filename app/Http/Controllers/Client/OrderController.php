@@ -9,7 +9,6 @@ use App\Models\OrderProduct;
 use Illuminate\Http\Request;
 use App\Services\OrderService;
 use App\Services\CouponService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
@@ -135,10 +134,10 @@ class OrderController extends Controller
         $order = Order::where('ref', $request->ref)->first();
         $order->orderProducts = OrderProduct::where('order_id', $order->id)->get();
 
-        $pdf = Pdf::setOption(['dpi' => 150, 'defaultFont' => 'sans-serif'])->loadView('pdf.order', [
-            'order' => $order,
-        ]);
+        // $pdf = Pdf::setOption(['dpi' => 150, 'defaultFont' => 'sans-serif'])->loadView('pdf.order', [
+            // 'order' => $order,
+        // ]);
         // return $pdf->download("commande-{$order->ref}.pdf");
-        return $pdf->stream('doc.pdf');
+        // return $pdf->stream('doc.pdf');
     }
 }

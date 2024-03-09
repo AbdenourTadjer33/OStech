@@ -16,6 +16,13 @@ class StoreRequest extends FormRequest
         return true;
     }
 
+    public function attributes()
+    {
+        return [
+            'name' => 'role',
+        ];
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,10 +31,10 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'unique:'.Role::class],
+            'name' => ['required', 'string', 'unique:' . Role::class],
             'description' => ['nullable', 'string'],
             'permission' => ['required', Rule::in(Role::PERMIISSION)],
-            'permissions' => [$this->permission == 'custom' ? 'required' : 'nullable', $this->permission == 'custom' ? 'array' : '' ],
+            'permissions' => [$this->permission == 'custom' ? 'required' : 'nullable', $this->permission == 'custom' ? 'array' : ''],
             'permissions.*' => [$this->permission == 'custom' ? 'required' : 'nullable', 'string'],
         ];
     }

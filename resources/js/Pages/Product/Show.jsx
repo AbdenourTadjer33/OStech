@@ -13,30 +13,6 @@ import "slick-carousel/slick/slick-theme.css";
 const Show = ({ product, similairProducts }) => {
 	const { data, setData, post, processing } = useForm({});
 
-	// useEffect(() => {
-	// 	if (product.colors) {
-	// 		setData((prev) => {
-	// 			return {
-	// 				...prev,
-	// 				color: product.colors.find((color) => color.amount == 0),
-	// 			};
-	// 		});
-	// 	}
-
-	// 	if (product.options) {
-	// 		product.options.forEach((option) => {
-	// 			setData((prev) => {
-	// 				return {
-	// 					...prev,
-	// 					[option.title]: option.options.find(
-	// 						(opt) => opt.amount == 0
-	// 					),
-	// 				};
-	// 			});
-	// 		});
-	// 	}
-	// }, []);
-
 	const addToCart = (id) => {
 		post(route("cart.add", { id }), {
 			preserveScroll: true,
@@ -85,9 +61,7 @@ const Show = ({ product, similairProducts }) => {
 					setData={setData}
 				/>
 
-				{product.features.length > 0 && (
-					<ProductFeatures features={product.features} />
-				)}
+				<ProductFeatures features={product.features} />
 
 				{similairProducts.length > 0 && (
 					<div className="mt-10 space-y-4">

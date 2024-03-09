@@ -14,7 +14,7 @@ class CategoryService
      */
     public function getCategories(): \Illuminate\Database\Eloquent\Collection
     {
-        return Cache::get('categories', fn () => Category::get());
+        return Cache::remember('categories', now()->addWeek() ,fn () => Category::get());
     }
 
     public function hierarchicalCategories(Collection $categories)

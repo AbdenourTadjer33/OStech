@@ -15,6 +15,14 @@ class StoreRequest extends FormRequest
         return true;
     }
 
+    public function attributes()
+    {
+        return [
+            'name' => 'brand',
+            'image' => 'brand logo',
+        ];
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,6 +32,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:40', Rule::unique('brands', 'name')],
+            'image' => ['required'],
         ];
     }
 }

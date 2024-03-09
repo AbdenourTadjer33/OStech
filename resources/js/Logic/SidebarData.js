@@ -1,57 +1,65 @@
 import Dashboard from "@/Components/Icons/Dashboard";
 import Setting from "@/Components/Icons/Setting";
-import {
-	MdBrandingWatermark,
-	MdCategory,
-	MdOutlineProductionQuantityLimits,
-	MdOutlineLocalShipping,
-} from "react-icons/md";
+import Product from "@/Components/Icons/Product";
+import { MdOutlineLocalShipping } from "react-icons/md";
 import { TbChecklist } from "react-icons/tb";
 import { RiCoupon3Line } from "react-icons/ri";
+import { FaFolderPlus } from "react-icons/fa6";
+import { AiOutlineAppstoreAdd } from "react-icons/ai";
+import { FaUsers } from "react-icons/fa";
+import Inbox from "@/Components/Icons/Inbox";
+import Sales from "@/Components/Icons/Sales";
 
 export default [
 	{
 		name: "dashboard",
-		route: "admin.dashboard",
+		route: "/admin/dashboard",
 		icon: Dashboard,
 	},
 	{
 		name: "Brand",
-		route: "admin.brands.index",
-		icon: MdBrandingWatermark,
+		route: "/admin/brand",
+		icon: AiOutlineAppstoreAdd,
 	},
 	{
 		name: "Categorie",
-		route: "admin.category.index",
-		icon: MdCategory,
+		route: "/admin/category",
+		icon: FaFolderPlus,
 	},
 	{
 		name: "Produit",
-		route: "admin.product.index",
-		icon: MdOutlineProductionQuantityLimits,
+		route: "/admin/product",
+		icon: Product,
 	},
 	{
 		name: "Coupon",
-		route: "admin.coupon.index",
+		route: "/admin/coupon",
 		icon: RiCoupon3Line,
 	},
 	{
-		name: "Pack & Group",
-		route: "admin.group.index",
-	},
-	{
 		name: "ventes",
-		route: "admin.order.index",
+		route: "/admin/orders",
 		icon: TbChecklist,
 	},
 	{
-		name: "Livraison Company",
-		route: "admin.shippings.index",
+		name: "Livraison",
+		route: "/admin/shipping",
 		icon: MdOutlineLocalShipping,
 	},
 	{
+		name: "Utilisateur",
+		route: "/admin/users",
+		icon: FaUsers,
+	},
+	{
+		name: "Inbox",
+		route: "/admin/inbox",
+		icon: Inbox,
+	},
+	{
 		name: "configuration",
-		route: "admin.settings",
+		route: "/admin/settings",
 		icon: Setting,
 	},
 ];
+

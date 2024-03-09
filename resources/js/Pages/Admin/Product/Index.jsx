@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import Button from "@/Components/Button";
-import { FaFilter, FaSearch } from "react-icons/fa";
+import { FaFilter, FaSearch, FaSpinner } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Pagination from "@/Components/Pagination";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
@@ -15,7 +15,6 @@ import Accordion from "@/Components/Accordion";
 import { media } from "@/Logic/helper";
 import Modal from "@/Components/Modal";
 import { IoMdInformationCircleOutline } from "react-icons/io";
-import { FaSpinner } from "react-icons/fa";
 import { Search } from "@/Components/InputSearch";
 import { StatusCercle } from "@/Components/Status";
 
@@ -375,7 +374,7 @@ const Index = ({ products }) => {
 					</div>
 
 					<div className="overflow-x-auto">
-						<Table className="table-auto relative">
+						<Table className="">
 							<Table.Head className=" sticky">
 								<Table.Row>
 									<Table.Title className="px-2 py-3"></Table.Title>

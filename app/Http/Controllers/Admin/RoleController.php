@@ -8,31 +8,30 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\StoreRequest;
 use App\Http\Requests\Role\UpdateRequest;
+use App\Services\RoleService;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class RoleController extends Controller
 {
-    public function __construct()
+    // FINISHED
+    public function index(RoleService $roleService)
     {
-        $this->middleware('precognitive')->only(['store', 'update']);
-    }
-
-    public function index()
-    {
-        $roles = Role::latest()->paginate(10)->toArray();
         return Inertia::render('Admin/Role/Index', [
-            'roles' => $roles,
+            'roles' => $roleService->getRoles(),
         ]);
     }
 
+    // FINISHED
     public function create()
     {
         return Inertia::render('Admin/Role/Create');
     }
 
+    // FINISHED
     public function store(StoreRequest $request)
     {
-        $role = DB::transaction(
+        DB::transaction(
             fn () =>
             Role::create([
                 'name' => $request->name,
@@ -41,25 +40,33 @@ class RoleController extends Controller
                 'permissions' => $request->permissions,
             ])
         );
-        if (!$role) return session()->flash('alert', [
-            'status' => 'danger',
-            'message' => 'quelque chose s\'est mal passé, veuillez signaler ce bug',
-        ]);
 
-        session()->flash('alert', [
+        $this->clearCacheRoles();
+
+        return redirect(route('admin.role.index'))->with('alert', [
             'status' => 'success',
             'message' => 'role créer avec succés',
         ]);
-
-        if ($request->input('redirect')) {
-            return redirect(route('admin.settings.roles.index'));
-        }
     }
 
-    public function edit()
+    // FINISHED
+    public function edit(Request $request, RoleService $roleService)
     {
+        $role = $roleService->getRoles()->firstWhere('id', $request->id);
+
+        if (!$role) {
+            return redirect()->back()->with('alert', [
+                'status' => 'danger',
+                'message' => 'Role non trouvé',
+            ]);
+        }
+
+        return Inertia::render('Admin/Role/Edit', [
+            'role' => $role,
+        ]);
     }
 
+    // FINISHED
     public function update(UpdateRequest $request)
     {
         DB::transaction(
@@ -72,34 +79,46 @@ class RoleController extends Controller
             ])
         );
 
-        return session()->flash('');
+        $this->clearCacheRoles();
+
+        return redirect(route('admin.role.index'))->with('alert', [
+            'status' => 'success',
+            'message' => 'role editer avec succés',
+        ]);
     }
 
-
-    public function destroy(Request $request)
+    // FINISHED
+    public function destroy(Request $request, RoleService $roleService)
     {
-        $role = Role::where('id', $request->id)->withCount('users')->firstOrFail();
+        $role = $roleService->getRoles()->firstWhere('id', $request->id)->loadCount('users');
 
-        if (!$role->users_count) {
-
-            $deleted = DB::transaction(fn () => $role->delete());
-
-            if (!$deleted) {
-                return session()->flash('alert', [
-                    'status' => 'danger',
-                    'message' => 'something went wrong, please retry later.',
-                ]);
-            }
-
-            return session()->flash('alert', [
-                'status' => 'success',
-                'message' => 'role supprimé avec succés',
+        if (!$role) {
+            return redirect()->back()->with('alert', [
+                'status' => 'danger',
+                'message' => 'Role non trouvé',
             ]);
         }
 
-        return session()->flash('alert', [
+        if (!$role->users_count) {
+            DB::transaction(fn () => $role->delete());
+
+            $this->clearCacheRoles();
+
+            return redirect()->back()->with('alert', [
+                'status' => 'success',
+                'message' => 'role supprimé avec succés'
+            ]);
+        }
+
+        return redirect()->back()->with('alert', [
             'status' => 'danger',
-            'message' => 'Impossible de supprimé ce role, plusieurs utilisateur dépends de ce role',
+            'message' => 'Impossible de supprimé ce role, plusieurs utilisateur en dépends'
         ]);
+    }
+
+    // FINISHED
+    private function clearCacheRoles()
+    {
+        Cache::forget('roles');
     }
 }

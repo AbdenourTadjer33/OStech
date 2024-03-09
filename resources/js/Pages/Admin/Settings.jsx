@@ -16,7 +16,7 @@ const Settings = () => {
 
                     <div className="grid gap-4 my-5 lg:grid-cols-4">
                         {SettingsData.map((setting, idx) => (
-                            <SettingCard key={idx} link={route(setting.route)}>
+                            <SettingCard key={idx} link={setting.route}>
                                 <SettingCard.Title>
                                     {setting.title}
                                 </SettingCard.Title>

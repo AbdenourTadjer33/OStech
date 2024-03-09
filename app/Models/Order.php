@@ -71,11 +71,6 @@ class Order extends Model
         return $this->belongsTo(Coupon::class, 'coupon_id', 'id');
     }
 
-    public function shippingCompany(): BelongsTo
-    {
-        return $this->belongsTo(ShippingCompany::class, 'shipping_company_id', 'id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

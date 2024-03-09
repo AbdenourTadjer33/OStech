@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Services\CategoryService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -22,7 +23,7 @@ class LoadData
     {
         if (!$request->routeIs('admin*')) {
 
-            $categories = Cache::get('categories', fn () => Category::get());
+            $categories = (new CategoryService)->getCategories();
 
             $request->merge(['categories' => $categories]);
 
