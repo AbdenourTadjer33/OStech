@@ -18,7 +18,7 @@ const EditForm = ({ role }) => {
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		post(`/admin/role/edit/${role.id}`, {
+		post(`/role/edit/${role.id}`, {
 			onSuccess: () => reset(),
 		});
 	};

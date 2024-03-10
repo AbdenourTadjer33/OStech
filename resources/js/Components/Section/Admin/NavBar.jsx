@@ -14,7 +14,7 @@ export default function NavBar() {
 			<div className="px-3 py-3 lg:px-5 lg:pl-3">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center justify-start rtl:justify-end">
-						<Link href="/admin" className="flex ms-2 md:me-24">
+						<Link href="/" className="flex ms-2 md:me-24">
 							<ApplicationLogo
 								type="white"
 								className="h-8 w-auto me-3"
@@ -85,21 +85,21 @@ export default function NavBar() {
 									<ul>
 										<li>
 											<Dropdown.Link
-												href={route("profile.index")}
+												href={"/profile"}
 											>
 												Profile
 											</Dropdown.Link>
 										</li>
-										<li>
+										{/* <li>
 											<Dropdown.Link
 												href={route("welcome")}
 											>
 												Site web
 											</Dropdown.Link>
-										</li>
+										</li> */}
 										<li>
 											<Dropdown.Link
-												href={route("logout")}
+												href={"/logout"}
 												method="post"
 												as="button"
 											>

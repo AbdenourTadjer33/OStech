@@ -66,7 +66,7 @@ const LogoUpload = ({ data, setData }) => {
 
 		try {
 			const response = await axios.post(
-				"/admin/upload/save-temp",
+				"/upload/save-temp",
 				formData,
 				{
 					headers: {
@@ -98,7 +98,7 @@ const LogoUpload = ({ data, setData }) => {
 		setIsLoading(true);
 
 		try {
-			const response = await axios.post("/admin/upload/destroy-temp", {
+			const response = await axios.post("/upload/destroy-temp", {
 				path: data.image,
 			});
 			if (response.status === 200) {
@@ -123,7 +123,7 @@ const LogoUpload = ({ data, setData }) => {
 	const editImg = async (cropInfo) => {
 		setIsLoading(true);
 		try {
-			const response = await axios.post("/admin/upload/edit-temp", {
+			const response = await axios.post("/upload/edit-temp", {
 				path: data.image,
 				cropInfo,
 			});

@@ -17,7 +17,7 @@ const EditForm = ({ brand }) => {
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		post(`/admin/brand/edit/${brand.id}`, {
+		post(`/brand/edit/${brand.id}`, {
 			onSuccess: () => reset(),
 		});
 	};

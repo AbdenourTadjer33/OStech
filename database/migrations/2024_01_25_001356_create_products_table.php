@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('catalog')->default(false);
             $table->json('colors')->nullable();
             $table->json('choices')->nullable();
-            $table->integer('ordered_times')->default(0);
+            $table->integer('total_sales')->default(0);
             $table->json('features')->nullable();
             $table->foreignId('category_id')->nullable()->constrained('categories', 'id')->cascadeOnDelete();
             $table->foreignId('brand_id')->nullable()->constrained('brands', 'id')->nullOnDelete();

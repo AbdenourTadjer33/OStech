@@ -6,26 +6,26 @@ use Inertia\Inertia;
 use App\Models\Brand;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Traits\HttpResponses;
+use App\Services\BrandService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Brand\StoreRequest;
 use App\Http\Requests\Brand\UpdateRequest;
-use App\Traits\HttpResponses;
 
 class BrandController extends Controller
 {
     use HttpResponses;
 
     // FINISHED
-    public function index(Request $request)
+    public function index(BrandService $brandService)
     {
-        $brandQuery = Brand::withCount('products')->orderBy('id', 'asc');
-
-        $brands = $brandQuery->paginate($request->pagination ?? 10)->appends(request()->query());
+        $brands = $brandService->getBrands();
 
         return Inertia::render('Admin/Brand/Index', [
-            'brands' => $brands,
+            'brands' => $brands->loadCount('products'),
         ]);
     }
 
@@ -50,6 +50,8 @@ class BrandController extends Controller
                 'logo' => $path,
             ]);
         });
+
+        $this->clearCacheBrand();
 
         return redirect(route('admin.brand.index'))->with('alert', [
             'status' => 'success',
@@ -90,6 +92,8 @@ class BrandController extends Controller
             ]);
         });
 
+        $this->clearCacheBrand();
+
         return redirect(route('admin.brand.index'))->with('alert', [
             'status' => 'success',
             'message' => 'Brand editer avec succés'
@@ -112,9 +116,16 @@ class BrandController extends Controller
 
         $brand->delete();
 
+        $this->clearCacheBrand();
+
         return redirect(route('admin.brand.index'))->with('alert', [
             'status' => 'success',
             'message' => 'brand supprimé avec succés',
         ]);;
+    }
+
+    private function clearCacheBrand()
+    {
+        Cache::forget('brands');
     }
 }

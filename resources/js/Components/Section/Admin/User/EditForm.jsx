@@ -27,7 +27,7 @@ const EditForm = ({ user, roles }) => {
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		post(`/admin/administrateur/edit/${user.uuid}`, {
+		post(`/administrateur/edit/${user.uuid}`, {
 			onSuccess: () => reset(),
 		});
 	};

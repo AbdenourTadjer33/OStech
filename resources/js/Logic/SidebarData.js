@@ -13,52 +13,52 @@ import Sales from "@/Components/Icons/Sales";
 export default [
 	{
 		name: "dashboard",
-		route: "/admin/dashboard",
+		route: "/dashboard",
 		icon: Dashboard,
 	},
 	{
 		name: "Brand",
-		route: "/admin/brand",
+		route: "/brand",
 		icon: AiOutlineAppstoreAdd,
 	},
 	{
 		name: "Categorie",
-		route: "/admin/category",
+		route: "/category",
 		icon: FaFolderPlus,
 	},
 	{
 		name: "Produit",
-		route: "/admin/product",
+		route: "/product",
 		icon: Product,
 	},
 	{
 		name: "Coupon",
-		route: "/admin/coupon",
+		route: "/coupon",
 		icon: RiCoupon3Line,
 	},
 	{
 		name: "ventes",
-		route: "/admin/orders",
+		route: "/orders",
 		icon: TbChecklist,
 	},
 	{
 		name: "Livraison",
-		route: "/admin/shipping",
+		route: "/shipping",
 		icon: MdOutlineLocalShipping,
 	},
 	{
 		name: "Utilisateur",
-		route: "/admin/users",
+		route: "/users",
 		icon: FaUsers,
 	},
 	{
 		name: "Inbox",
-		route: "/admin/inbox",
+		route: "/inbox",
 		icon: Inbox,
 	},
 	{
 		name: "configuration",
-		route: "/admin/settings",
+		route: "/settings",
 		icon: Setting,
 	},
 ];

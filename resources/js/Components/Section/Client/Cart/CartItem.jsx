@@ -50,7 +50,7 @@ const CartItem = ({ item }) => {
 		<div className="relative transition duration-200 hover:bg-gray-100 p-3 flex w-full">
 			<div className="h-20 sm:h-24 object-contain overflow-hidden rounded ">
 				<img
-					src={media(item?.product?.images[0])}
+					src={media(item?.product?.images?.[0] ?? "default.png")}
 					alt={item?.product?.name}
 					className="h-full w-full object-cover object-center"
 				/>

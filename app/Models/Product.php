@@ -30,6 +30,7 @@ class Product extends Model
         'catalog',
         'colors',
         'options',
+        'total_sales',
         'category_id',
         'brand_id',
     ];
@@ -55,6 +56,28 @@ class Product extends Model
         });
     }
 
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class, 'brand_id', 'id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class)->withPivot(['qte', 'prices']);
+    }
+
+    public function orderProducts(): HasMany
+    {
+        return $this->hasMany(OrderProduct::class, 'product_id', 'id');
+    }
+
+
+
     public function scopeActive(Builder $query)
     {
         $query->where('status', true);
@@ -65,14 +88,37 @@ class Product extends Model
         $query->where('status', false);
     }
 
-    public function scopeCatalog(Builder $query)
+    public function scopeActiveCatalog(Builder $query)
     {
         $query->where('catalog', true);
     }
 
-    public function scopeNotCatalog(Builder $query)
+    public function scopeNotActiveCatalog(Builder $query)
     {
         $query->where('catalog', false);
+    }
+
+    public function scopeAdmin(Builder $query)
+    {
+        $query->select([
+            'id',
+            'slug',
+            'name',
+            'description',
+            'sku',
+            'qte',
+            'price',
+            'promo',
+            'status',
+            'catalog',
+            'total_sales',
+            'category_id',
+            'brand_id',
+            'images',
+            'created_at',
+            'updated_at',
+            'deleted_at',
+        ]);
     }
 
     public function scopeShoppingCart(Builder $query)
@@ -102,27 +148,6 @@ class Product extends Model
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
             ->orderBy('products.id', 'desc');
-    }
-
-
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(Brand::class, 'brand_id', 'id');
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(Order::class)->withPivot(['qte', 'prices']);
-    }
-
-    public function orderProducts(): HasMany
-    {
-        return $this->hasMany(OrderProduct::class, 'product_id', 'id');
     }
 
     /**

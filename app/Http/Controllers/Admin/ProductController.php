@@ -27,32 +27,62 @@ class ProductController extends Controller
         $this->middleware('precognitive',)->only(['store', 'update']);
     }
 
-    public function index(Request $request)
+    public function index(Request $request, CategoryService $categoryService, BrandService $brandService)
     {
+        $categories = $categoryService->getCategories();
+        $brands = $brandService->getBrands();
         /**
          * @var \App\Models\Product
          */
-        $productQuery = Product::with(['category:id,name,parent_id', 'category.parentCategory:id,name,parent_id', 'brand:id,name']);
-        $productQuery->withTrashed();
+        $productQuery = Product::admin();
 
-        // if ($request->has('status')) {
-        //     $request->status ? $productQuery->active() : $productQuery->notActive();
-        // } 
+        if ($request->has('orderby')) {
+            $request->input('orderby') ? $productQuery->latest() : $productQuery->oldest();
+        } else {
+            $productQuery->latest();
+        }
 
-        // if ($request->input('count_orders')) {
-        //     $productQuery->loadCount('orders');
-        // }
+        if ($request->has('category') && $request->input('category')) {
+            $selectedCategories = explode(',', $request->input('category'));
+            $productQuery->whereIn('category_id', $selectedCategories);
+        }
 
-        // if ($request->input('only_trash')) {
-        //     $productQuery->onlyTrashed();
-        // }
+        if ($request->has('brand') && $request->input('brand')) {
+            $selectedBrands = explode(',', $request->input('brand'));
+            $productQuery->whereIn('brand_id', $selectedBrands);
+        }
 
-        // if (!$request->input('no_trash')) {
-        // }
+        if ($request->has('status') && $request->input('status') !== 'all') {
+            $request->input('status') ? $productQuery->active() : $productQuery->notActive();
+        }
 
-        $products = $productQuery->paginate($request->pagination ?? 10)->appends(request()->query());
+        if ($request->has('catalog') && $request->input('catalog') !== 'all') {
+            $request->input('catalog') ? $productQuery->activeCatalog() : $productQuery->notActiveCatalog();
+        }
+
+        if ($request->has('archive') && $request->input('archive') !== 'all') {
+            !$request->input('archive') ?: $productQuery->onlyTrashed();
+        } else {
+            $productQuery->withTrashed();
+        }
+
+        $products = $productQuery->paginate($request->pagination ?? 15)->appends(request()->query());
+
+        $products->map(function (Product $product) use ($categories, $brands) {
+            $subCategory = $categories->firstWhere('id', $product->category_id);
+            $mainCategory = $categories->firstWhere('id', $subCategory->parent_id);
+
+            $product->brand = $brands->firstWhere('id', $product->brand_id);
+            $product->subCategory = $subCategory->only(['id', 'name', 'slug']);
+            $product->mainCategory = $mainCategory->only(['id', 'name', 'slug']);
+        });
+
+        session()->put('products_url', $request->fullUrl());
+
         return Inertia::render('Admin/Product/Index', [
-            'products' => $products
+            'products' => $products,
+            'subCategories' => $categoryService->subCategories($categories),
+            'brands' => $brands,
         ]);
     }
 
@@ -122,10 +152,9 @@ class ProductController extends Controller
         ]);
     }
 
-    // handle images change
+    // FINISHED
     public function update(UpdateRequest $request)
     {
-
         DB::transaction(function () use ($request) {
 
             $subCategory = $request->subCategory;
@@ -139,7 +168,7 @@ class ProductController extends Controller
                 $paths[] = $newPath;
             }
 
-            Product::where('id', $request->id)->update([
+            Product::withTrashed()->where('id', $request->id)->update([
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),
                 'sku' => $request->input('sku'),
@@ -155,10 +184,16 @@ class ProductController extends Controller
             ]);
         });
 
-        return redirect(route('admin.product.index'))->with('alert', [
+        session()->flash('alert', [
             'status' => 'success',
             'massage' => 'Produit créer avec succés',
         ]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
+        return redirect(route('admin.product.index'));
     }
 
     // FINISHED
@@ -177,6 +212,10 @@ class ProductController extends Controller
             'status' => 'success',
             'message' => 'Produit restoré avec succés',
         ]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
 
         return redirect(route('admin.product.index'));
     }
@@ -200,13 +239,17 @@ class ProductController extends Controller
             'message' => 'Produit archivé avec succés',
         ]);
 
-        return redirect(route('admin.product.index'));
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
+        return redirect(route('admin.product.index', $request->query()));
     }
 
     // FINISHED
     public function forceDestroy(Request $request)
     {
-        $product = Product::where('id', $request->id)->first();
+        $product = Product::withTrashed()->where('id', $request->id)->first();
 
         if (!$product) {
             return session()->flash('alert', [
@@ -215,9 +258,11 @@ class ProductController extends Controller
             ]);
         }
 
-        foreach ($product->images as $imagePath) {
-            if (Storage::disk('media')->exists($imagePath)) {
-                Storage::disk('media')->delete($imagePath);
+        if (is_array($product->images)) {
+            foreach ($product->images as $imagePath) {
+                if (Storage::disk('media')->exists($imagePath)) {
+                    Storage::disk('media')->delete($imagePath);
+                }
             }
         }
 
@@ -228,34 +273,58 @@ class ProductController extends Controller
             'message' => 'produit supprimé avec succés',
         ]);
 
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
         return redirect(route('admin.product.index'));
     }
 
     // FINISHED
     public function activeStatus(Request $request)
     {
-        Product::where('id', $request->id)->update(['status' => true]);
+        Product::withTrashed()->where('id', $request->id)->update(['status' => true]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
         return redirect(route('admin.product.index'));
     }
 
     // FINISHED
     public function disableStatus(Request $request)
     {
-        Product::where('id', $request->id)->update(['status' => false]);
+        Product::withTrashed()->where('id', $request->id)->update(['status' => false]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
         return redirect(route('admin.product.index'));
     }
 
     // FINISHED
     public function activeCatalog(Request $request)
     {
-        Product::where('id', $request->id)->update(['catalog' => true]);
+        Product::withTrashed()->where('id', $request->id)->update(['catalog' => true]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
         return redirect(route('admin.product.index'));
     }
 
     // FINISHED
     public function disableCatalog(Request $request)
     {
-        Product::where('id', $request->id)->update(['catalog' => false]);
+        Product::withTrashed()->where('id', $request->id)->update(['catalog' => false]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
         return redirect(route('admin.product.index'));
     }
 }

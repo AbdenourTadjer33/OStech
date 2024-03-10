@@ -12,6 +12,6 @@ class BrandService
      */
     public function getBrands(): \Illuminate\Database\Eloquent\Collection
     {
-        return Cache::get('brands', fn () => Brand::get());
+        return Cache::remember('brands', now()->addDay(), fn () => Brand::get());
     }
 }

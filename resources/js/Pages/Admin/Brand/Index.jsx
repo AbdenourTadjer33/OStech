@@ -13,30 +13,20 @@ import InlineButton from "@/Components/InlineButton";
 import { FaSpinner } from "react-icons/fa";
 import { useEffect } from "react";
 import Heading from "@/Components/Heading";
+import { media } from "@/Logic/helper";
 
 const Index = ({ brands }) => {
 	const { delete: destroy, processing } = useForm();
 
-	const {
-		data,
-		current_page,
-		next_page_url,
-		prev_page_url,
-		links,
-		total,
-		last_page,
-		per_page,
-	} = brands;
-
 	const [deleteModal, setDeleteModal] = useState({ status: false });
 	const [searchQuery, setSearchQuery] = useState("");
-	const [filteredData, setFilteredData] = useState(data);
+	const [filteredData, setFilteredData] = useState(brands);
 
 	const handleSearch = (e) => {
 		const query = e.target.value.toLowerCase();
 		setSearchQuery(query);
 
-		const filtered = data.filter((record) =>
+		const filtered = brands.filter((record) =>
 			record.name.toLowerCase().includes(query)
 		);
 
@@ -48,14 +38,14 @@ const Index = ({ brands }) => {
 	};
 
 	const deleteBrand = () => {
-		destroy(`/admin/brand/destroy/${deleteModal?.brand?.id}`, {
+		destroy(`/brand/destroy/${deleteModal?.brand?.id}`, {
 			onSuccess: () => setDeleteModal({ status: false }),
 		});
 	};
 
 	useEffect(() => {
-		setFilteredData(data);
-	}, [data]);
+		setFilteredData(brands);
+	}, [brands]);
 
 	return (
 		<AdminLayout>
@@ -68,7 +58,7 @@ const Index = ({ brands }) => {
 				<div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-visible">
 					<div className="p-4">
 						<h4 className="text-xl">
-							Total brands : <span>{total}</span>
+							Total brands : <span>{brands.length}</span>
 						</h4>
 					</div>
 
@@ -89,7 +79,7 @@ const Index = ({ brands }) => {
 							</div>
 						</div>
 						<div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-							<Link href="/admin/brand/create">
+							<Link href="/brand/create">
 								<Button btn="primary" type="button">
 									Créer un Brand
 								</Button>
@@ -124,7 +114,7 @@ const Index = ({ brands }) => {
 											<Table.Title className="px-6 py-4 font-medium text-gray-900  dark:text-white">
 												<img
 													className="w-16 max-w-full max-h-full"
-													src={`/media/${record.logo}`}
+													src={media(record?.logo ?? 'default.png')}
 												/>
 											</Table.Title>
 											<Table.Column className="px-2 py-4 capitalize ">
@@ -156,7 +146,7 @@ const Index = ({ brands }) => {
 														>
 															<li>
 																<Link
-																	href={`/admin/brand/edit/${record.id}`}
+																	href={`/brand/edit/${record.id}`}
 																	className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 																>
 																	Éditer
@@ -186,7 +176,7 @@ const Index = ({ brands }) => {
 					</div>
 
 					<nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
-						<Pagination
+						{/* <Pagination
 							currentPage={current_page}
 							next={next_page_url}
 							prev={prev_page_url}
@@ -194,7 +184,7 @@ const Index = ({ brands }) => {
 							perPage={per_page}
 							total={total}
 							last_page={last_page}
-						/>
+						/> */}
 					</nav>
 				</div>
 			</div>

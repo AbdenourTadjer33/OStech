@@ -67,7 +67,7 @@ const AdminLayout = ({ children }) => {
 				{children}
 			</main>
 
-			<div className="fixed bottom-8 right-5 space-y-4 z-[90] max-w-xl min-w-[36rem]">
+			<div className="fixed top-20 right-5 space-y-4 z-[90] max-w-xl min-w-[36rem]">
 				{flash.alert && (
 					<Transition
 						show={isShown}

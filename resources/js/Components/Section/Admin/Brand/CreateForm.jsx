@@ -18,7 +18,7 @@ const CreateForm = ({}) => {
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		post("/admin/brand/create", {
+		post("/brand/create", {
 			onSuccess: () => reset(),
 		});
 	};

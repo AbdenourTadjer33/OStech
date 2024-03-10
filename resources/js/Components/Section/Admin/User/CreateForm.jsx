@@ -27,7 +27,7 @@ const CreateForm = ({ roles }) => {
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		post("/admin/administrateur/create", {
+		post("/administrateur/create", {
 			onSuccess: () => reset(),
 		});
 	};

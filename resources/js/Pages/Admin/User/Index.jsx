@@ -50,7 +50,7 @@ const Index = ({ users }) => {
 	};
 
 	const deleteAdmin = () => {
-		destroy(`/admin/administrateur/destroy/${deleteModal.admin?.uuid}`, {
+		destroy(`/administrateur/destroy/${deleteModal.admin?.uuid}`, {
 			preserveScroll: true,
 			onSuccess: () => setDeleteModal({ status: false }),
 		});
@@ -58,13 +58,13 @@ const Index = ({ users }) => {
 
 	const statusAdmin = (admin) => {
 		if (!admin.status) {
-			post(`/admin/administrateur/active/${admin.uuid}`, {
+			post(`/administrateur/active/${admin.uuid}`, {
 				preserveScroll: true,
 			});
 			return;
 		}
 
-		post(`/admin/administrateur/disable/${admin.uuid}`, {
+		post(`/administrateur/disable/${admin.uuid}`, {
 			preserveScroll: true,
 		});
 	};
@@ -105,7 +105,7 @@ const Index = ({ users }) => {
 							</form>
 						</div>
 						<div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-							<Link href="/admin/administrateur/create">
+							<Link href="/administrateur/create">
 								<Button btn="primary" type="button">
 									Créer un Admin
 								</Button>
@@ -185,7 +185,7 @@ const Index = ({ users }) => {
 														>
 															<li>
 																<Link
-																	href={`/admin/administrateur/edit/${record.uuid}`}
+																	href={`/administrateur/edit/${record.uuid}`}
 																	className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 																>
 																	Éditer

@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import Button from "@/Components/Button";
 import { FaFilter, FaSearch, FaSpinner } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Pagination from "@/Components/Pagination";
-import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import Table from "@/Components/Table";
-import ReadMore from "@/Components/ReadMore";
-import CurrencyFormat from "@/Components/CurrencyFormat";
 import { Dropdown } from "flowbite-react";
-import { BadgeStatus } from "@/Components/Badge";
 import Accordion from "@/Components/Accordion";
-import { media } from "@/Logic/helper";
 import Modal from "@/Components/Modal";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Search } from "@/Components/InputSearch";
-import { StatusCercle } from "@/Components/Status";
+import Checkbox from "@/Components/Checkbox";
+import RadioInput from "@/Components/RadioInput";
+import TextInput from "@/Components/TextInput";
+import ProductRow, {
+	ProductTitleRow,
+} from "@/Components/Section/Admin/Product/ProductRow";
 
-const Index = ({ products }) => {
+const Index = ({ products, subCategories, brands }) => {
 	const {
 		data,
 		current_page,
@@ -30,13 +30,85 @@ const Index = ({ products }) => {
 		last_page,
 	} = products;
 
-	const { delete: destroy, post, processing } = useForm();
+	const { delete: destroy, processing } = useForm();
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [filteredData, setFilteredData] = useState(data);
 
 	const [archiveModal, setArchiveModal] = useState({ status: false });
 	const [deleteModal, setDeleteModal] = useState({ status: false });
+
+	const [selectedCategories, setSelectedCategories] = useState([]);
+	const [selectedBrands, setSelectedBrands] = useState([]);
+	const [selectedStatus, setSelectedStatus] = useState();
+	const [selectedCatalog, setSelectedCatalog] = useState();
+	const [selectedArchive, setSelectedArchive] = useState();
+	const [pagination, setPagination] = useState(per_page);
+
+	const [selectedProducts, setSelectedProducts] = useState([]);
+
+	const handleSelectedProducts = (productId) => {
+		const index = selectedProducts.indexOf(productId);
+
+		if (index === -1) {
+			// If not selected, add it to the state
+			setSelectedProducts([...selectedProducts, productId]);
+		} else {
+			// If already selected, remove it from the state
+			const updatedSelectedProducts = [...selectedProducts];
+			updatedSelectedProducts.splice(index, 1);
+			setSelectedProducts(updatedSelectedProducts);
+		}
+	};
+
+	useEffect(() => {
+		console.log(selectedProducts);
+	}, [selectedProducts]);
+
+	const handleSelectedCategories = (categoryId) => {
+		// Check if the category is already selected
+		const index = selectedCategories.indexOf(categoryId);
+
+		if (index === -1) {
+			// If not selected, add it to the state
+			setSelectedCategories([...selectedCategories, categoryId]);
+		} else {
+			// If already selected, remove it from the state
+			const updatedCategories = [...selectedCategories];
+			updatedCategories.splice(index, 1);
+			setSelectedCategories(updatedCategories);
+		}
+	};
+
+	const handleSelectedBrands = (brandId) => {
+		const index = selectedBrands.indexOf(brandId);
+
+		if (index === -1) {
+			// If not selected, add it to the state
+			setSelectedBrands([...selectedBrands, brandId]);
+		} else {
+			// If already selected, remove it from the state
+			const updatedBrands = [...selectedBrands];
+			updatedBrands.splice(index, 1);
+			setSelectedBrands(updatedBrands);
+		}
+	};
+
+	const filter = () => {
+		router.visit("/product", {
+			method: "get",
+			preserveScroll: true,
+			preserveState: true,
+			data: {
+				category: selectedCategories.toString(),
+				brand: selectedBrands.toString(),
+				archive: selectedArchive,
+				status: selectedStatus,
+				catalog: selectedCatalog,
+				pagination: pagination,
+			},
+		});
+	};
 
 	const handleSearch = (e) => {
 		const query = e.target.value.toLowerCase();
@@ -52,39 +124,12 @@ const Index = ({ products }) => {
 		setFilteredData(filtered);
 	};
 
-	const statusProduct = (product) => {
-		if (!product.status) {
-			post(route("admin.product.activeStatus", { id: product.id }), {
-				preserveScroll: true,
-			});
-			return;
-		} else {
-			post(route("admin.product.disableStatus", { id: product.id }), {
-				preserveScroll: true,
-			});
-			return;
-		}
-	};
-
-	const catalogProduct = (product) => {
-		if (!product.catalog) {
-			post(route("admin.product.activeCatalog", { id: product.id }), {
-				preserveScroll: true,
-			});
-			return;
-		} else {
-			post(route("admin.product.disableCatalog", { id: product.id }), {
-				preserveScroll: true,
-			});
-			return;
-		}
-	};
-
 	const archive = () => {
 		destroy(
 			route("admin.product.destroy", { id: archiveModal.product.id }),
 			{
 				onSuccess: () => setArchiveModal({ status: false }),
+				preserveScroll: true,
 			}
 		);
 	};
@@ -96,12 +141,9 @@ const Index = ({ products }) => {
 			}),
 			{
 				onSuccess: () => setDeleteModal({ status: false }),
+				preserveScroll: true,
 			}
 		);
-	};
-
-	const restore = (productId) => {
-		post(route("admin.product.restore", { id: productId }));
 	};
 
 	useEffect(() => {
@@ -125,7 +167,7 @@ const Index = ({ products }) => {
 
 					<div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
 						<div className="w-full md:w-1/2">
-							<form className="flex items-center">
+							<div className="flex items-center">
 								<div className="relative w-full">
 									<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
 										<FaSearch className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -135,29 +177,11 @@ const Index = ({ products }) => {
 										onChange={handleSearch}
 									/>
 								</div>
-							</form>
+							</div>
 						</div>
+
 						<div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
 							<div className="flex items-center space-x-3 w-full md:w-auto">
-								<Dropdown
-									label=""
-									dismissOnClick={false}
-									renderTrigger={() => (
-										<button
-											id="actionsDropdownButton"
-											data-dropdown-toggle="actionsDropdown"
-											className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-											type="button"
-										>
-											<MdKeyboardArrowDown className="-ml-1 mr-1.5 w-5 h-5" />
-											Actions
-										</button>
-									)}
-								>
-									<Dropdown.Item>Mass Edit</Dropdown.Item>
-									<Dropdown.Item>Delete all</Dropdown.Item>
-								</Dropdown>
-
 								<Dropdown
 									label=""
 									dismissOnClick={false}
@@ -181,111 +205,316 @@ const Index = ({ products }) => {
 
 										<Accordion title="Categorie">
 											<Accordion.Body>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
+												{subCategories.map(
+													(category) => (
+														<Dropdown.Item
+															key={category.id}
+															as="label"
+															htmlFor={`category-${category.id}`}
+														>
+															<Checkbox
+																id={`category-${category.id}`}
+																value={
+																	category.id
+																}
+																onChange={() =>
+																	handleSelectedCategories(
+																		category.id
+																	)
+																}
+																checked={selectedCategories.includes(
+																	category.id
+																)}
+															/>
+															<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+																{category.name}
+															</span>
+														</Dropdown.Item>
+													)
+												)}
 											</Accordion.Body>
 										</Accordion>
 
 										<Dropdown.Divider />
 
-										<Accordion title="Categorie">
+										<Accordion title="Brand">
 											<Accordion.Body>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+												{brands.map((brand) => (
+													<Dropdown.Item
+														key={brand.id}
+														as="label"
+														htmlFor={`brand-${brand.id}`}
 													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
+														<Checkbox
+															id={`brand-${brand.id}`}
+															value={brand.id}
+															onChange={() =>
+																handleSelectedBrands(
+																	brand.id
+																)
+															}
+															checked={selectedBrands.includes(
+																brand.id
+															)}
+														/>
+														<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+															{brand.name}
+														</span>
+													</Dropdown.Item>
+												))}
 											</Accordion.Body>
 										</Accordion>
 
 										<Dropdown.Divider />
 
-										<Accordion title="Categorie">
+										<Accordion title="Archive">
 											<Accordion.Body>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+												<Dropdown.Item
+													as="label"
+													htmlFor="archive-all"
+												>
+													<RadioInput
+														id="archive-all"
+														name="archive"
+														value="all"
+														checked={
+															selectedArchive ==
+															"all"
+														}
+														onChange={(e) =>
+															setSelectedArchive(
+																e.target.value
+															)
+														}
 													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Tous les produits
+													</span>
 												</Dropdown.Item>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+												<Dropdown.Item
+													as="label"
+													htmlFor="archive-1"
+												>
+													<RadioInput
+														id="archive-1"
+														name="archive"
+														value="1"
+														checked={
+															selectedArchive ==
+															"1"
+														}
+														onChange={(e) =>
+															setSelectedArchive(
+																e.target.value
+															)
+														}
 													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Produit archivé
+													</span>
+												</Dropdown.Item>
+												<Dropdown.Item
+													as="label"
+													htmlFor="archive-0"
+												>
+													<RadioInput
+														id="archive-0"
+														name="archive"
+														value="0"
+														checked={
+															selectedArchive ==
+															"0"
+														}
+														onChange={(e) =>
+															setSelectedArchive(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Produit non-archivé
+													</span>
 												</Dropdown.Item>
 											</Accordion.Body>
 										</Accordion>
 
 										<Dropdown.Divider />
+
+										<Accordion title="Status">
+											<Accordion.Body>
+												<Dropdown.Item
+													as="label"
+													htmlFor="status-all"
+												>
+													<RadioInput
+														id="status-all"
+														name="status"
+														value="all"
+														checked={
+															selectedStatus ==
+															"all"
+														}
+														onChange={(e) =>
+															setSelectedStatus(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Tous
+													</span>
+												</Dropdown.Item>
+
+												<Dropdown.Item
+													as="label"
+													htmlFor="status-1"
+												>
+													<RadioInput
+														id="status-1"
+														name="status"
+														value="1"
+														checked={
+															selectedStatus ==
+															"1"
+														}
+														onChange={(e) =>
+															setSelectedStatus(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Active
+													</span>
+												</Dropdown.Item>
+
+												<Dropdown.Item
+													as="label"
+													htmlFor="status-0"
+												>
+													<RadioInput
+														id="status-0"
+														name="status"
+														value="0"
+														checked={
+															selectedStatus ==
+															"0"
+														}
+														onChange={(e) =>
+															setSelectedStatus(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Non active
+													</span>
+												</Dropdown.Item>
+											</Accordion.Body>
+										</Accordion>
+
+										<Dropdown.Divider />
+
+										<Accordion title="Catalogue">
+											<Accordion.Body>
+												<Dropdown.Item
+													as="label"
+													htmlFor="catalog-all"
+												>
+													<RadioInput
+														id="catalog-all"
+														name="catalog"
+														value="all"
+														checked={
+															selectedCatalog ==
+															"all"
+														}
+														onChange={(e) =>
+															setSelectedCatalog(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Tous
+													</span>
+												</Dropdown.Item>
+
+												<Dropdown.Item
+													as="label"
+													htmlFor="catalog-1"
+												>
+													<RadioInput
+														id="catalog-1"
+														name="catalog"
+														value="1"
+														checked={
+															selectedCatalog ==
+															"1"
+														}
+														onChange={(e) =>
+															setSelectedCatalog(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Active
+													</span>
+												</Dropdown.Item>
+												<Dropdown.Item
+													as="label"
+													htmlFor="catalog-0"
+												>
+													<RadioInput
+														id="catalog-0"
+														name="catalog"
+														value="0"
+														checked={
+															selectedCatalog ==
+															"0"
+														}
+														onChange={(e) =>
+															setSelectedCatalog(
+																e.target.value
+															)
+														}
+													/>
+													<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+														Non active
+													</span>
+												</Dropdown.Item>
+											</Accordion.Body>
+										</Accordion>
+
+										<Dropdown.Divider />
+
+										<Accordion title="Pagination">
+											<Accordion.Body>
+												<Dropdown.Item className="flex items-center gap-4">
+													<TextInput
+														type="range"
+														min="10"
+														step="1"
+														max="50"
+														value={pagination}
+														onChange={(e) =>
+															setPagination(
+																e.target.value
+															)
+														}
+													/>
+
+													<span>{pagination}</span>
+												</Dropdown.Item>
+											</Accordion.Body>
+										</Accordion>
 
 										<div className="flex justify-center py-2">
-											<Button type="button">
+											<Button
+												type="button"
+												onClick={filter}
+											>
 												Filtré les résultat
 											</Button>
 										</div>
@@ -301,109 +530,10 @@ const Index = ({ products }) => {
 						</div>
 					</div>
 
-					<hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700 mx-4" />
-
-					<div className="p-4 space-x-5">
-						some actions
-						
-						{/* <Link className="p-2 rounded-lg"
-							href={route('admin.product.index', {status: true})}
-						>
-							Status activé
-						</Link>
-
-						<Link className="p-2 rounded-lg"
-							href={route('admin.product.index', {status: false})}
-						>
-							Status désactiver
-						</Link>
-
-						<Link
-							className={`p-2 rounded-lg ${
-								route().current("admin.product.index", {
-									only_trash: true,
-								})
-									? "bg-green-500"
-									: "bg-red-500"
-							}`}
-							href={route("admin.product.index", {
-								only_trash: !route().current(
-									"admin.product.index",
-									{ only_trash: true }
-								),
-							})}
-						>
-							Produit archivé
-						</Link>
-
-						<Link
-							className={`p-2 rounded-lg ${
-								route().current("admin.product.index", {
-									no_trash: true,
-								})
-									? "bg-green-500"
-									: "bg-red-500"
-							}`}
-							href={route("admin.product.index", {
-								no_trash: !route().current(
-									"admin.product.index",
-									{ no_trash: true }
-								),
-							})}
-						>
-							Produit non archivé
-						</Link> */}
-
-						{/* <Link
-							className={`p-2 rounded-lg ${
-								route().current("admin.product.index", {
-									with_trash: true,
-								})
-									? "bg-green-500"
-									: "bg-red-500"
-							}`}
-							href={route("admin.product.index", {
-								with_trash: !route().current(
-									"admin.product.index",
-									{ with_trash: false }
-								),
-							})}
-						>
-							Produit non archivé
-						</Link> */}
-					</div>
-
 					<div className="overflow-x-auto">
-						<Table className="">
-							<Table.Head className=" sticky">
-								<Table.Row>
-									<Table.Title className="px-2 py-3"></Table.Title>
-									<Table.Title className="px-2 py-3">
-										Produit
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Prix
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Status
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Catalogue
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Categorie
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Brand
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Créer à
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Archive
-									</Table.Title>
-									<Table.Title className="px-2 py-3"></Table.Title>
-								</Table.Row>
+						<Table>
+							<Table.Head>
+								<ProductTitleRow />
 							</Table.Head>
 							<Table.Body>
 								{filteredData.map((record) => {
@@ -412,196 +542,15 @@ const Index = ({ products }) => {
 											key={record.id}
 											className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
 										>
-											<Table.Column className="px-2 py-3 w-16 md:w-32">
-												<img
-													className="w-fill h-full"
-													src={
-														record?.images?.[0]
-															? media(
-																	record
-																		?.images?.[0]
-															  )
-															: media(
-																	"default.png"
-															  )
-													}
-												/>
-											</Table.Column>
-											<Table.Column className="px-2 py-3">
-												{/* <ReadMore
-													content={record.name}
-												/> */}
-												{record.name}
-												{record.sku && (
-													<>
-														<br />
-														SKU: {record.sku}
-													</>
-												)}
-												{record.qte && (
-													<>
-														<br />
-														Qte: {record.qte}
-													</>
-												)}
-											</Table.Column>
-											<Table.Column className="px-2 py-3">
-												<CurrencyFormat
-													number={record.price}
-												/>
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												<BadgeStatus
-													isActive={record.status}
-												/>
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												<BadgeStatus
-													isActive={record.catalog}
-												/>
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												{record.category.name}
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												{record?.brand?.name}
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												{record.created_at}
-											</Table.Column>
-											<Table.Column className="px-2 py-4 ">
-												<StatusCercle
-													status={record.deleted_at}
-												/>
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												<Dropdown
-													label=""
-													dismissOnClick
-													renderTrigger={() => (
-														<button
-															className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-															type="button"
-														>
-															<PiDotsThreeOutlineVerticalFill className="w-5 h-5" />
-														</button>
-													)}
-												>
-													<div className="w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-														<ul
-															className="py-1 text-sm text-gray-700 dark:text-gray-200"
-															aria-labelledby="apple-imac-27-dropdown-button"
-														>
-															<li>
-																<Link
-																	href={route(
-																		"admin.product.edit",
-																		{
-																			id: record.id,
-																		}
-																	)}
-																	className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-																>
-																	Éditer
-																</Link>
-															</li>
-															<li>
-																<button
-																	className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-																	onClick={() =>
-																		statusProduct(
-																			record
-																		)
-																	}
-																>
-																	{record.status ? (
-																		<>
-																			Désactiver
-																			le
-																			status
-																		</>
-																	) : (
-																		<>
-																			Activé
-																			le
-																			status
-																		</>
-																	)}
-																</button>
-															</li>
-															<li>
-																<button
-																	className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-																	onClick={() =>
-																		catalogProduct(
-																			record
-																		)
-																	}
-																>
-																	{record.catalog ? (
-																		<>
-																			Désactiver
-																			dans
-																			catalogue
-																		</>
-																	) : (
-																		<>
-																			Activé
-																			dans
-																			catalogue
-																		</>
-																	)}
-																</button>
-															</li>
-														</ul>
-														<div className="py-1">
-															{record.deleted_at && (
-																<button
-																	onClick={() =>
-																		restore(
-																			record.id
-																		)
-																	}
-																	className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-																>
-																	Restorer
-																</button>
-															)}
-															{!record.deleted_at && (
-																<button
-																	onClick={() =>
-																		setArchiveModal(
-																			{
-																				status: true,
-																				product:
-																					record,
-																			}
-																		)
-																	}
-																	className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-																>
-																	Archivé
-																</button>
-															)}
-
-															<button
-																onClick={() =>
-																	setDeleteModal(
-																		{
-																			status: true,
-																			product:
-																				record,
-																		}
-																	)
-																}
-																className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-															>
-																Supprimé
-															</button>
-														</div>
-													</div>
-												</Dropdown>
-											</Table.Column>
+											<ProductRow
+												record={record}
+												setArchiveModal={
+													setArchiveModal
+												}
+												setDeleteModal={setDeleteModal}
+												handleSelectedProducts={handleSelectedProducts}
+												selectedProducts={selectedProducts}
+											/>
 										</Table.Row>
 									);
 								})}
