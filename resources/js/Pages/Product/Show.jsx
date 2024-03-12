@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import { calculatePrice, currencyFormat } from "@/Logic/helper";
-import Button from "@/Components/Button";
+import Button, { IndigoButton } from "@/Components/Button";
 import Container from "@/Components/Container";
 import { ProductDetails } from "@/Components/Section/Client/Product/DetailsProduct";
 import { ProductFeatures } from "@/Components/Section/Client/Product/DetailsProduct";
@@ -143,9 +143,9 @@ export const MinProductCard = ({
 					</div>
 					<div className="flex gap-3">
 						<Link href={route("products.show", { slug })}>
-							<Button btn="info" type="button">
+							<IndigoButton type="button">
 								Affiché
-							</Button>
+							</IndigoButton>
 						</Link>
 					</div>
 				</div>

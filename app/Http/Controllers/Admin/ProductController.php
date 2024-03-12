@@ -31,9 +31,7 @@ class ProductController extends Controller
     {
         $categories = $categoryService->getCategories();
         $brands = $brandService->getBrands();
-        /**
-         * @var \App\Models\Product
-         */
+
         $productQuery = Product::admin();
 
         if ($request->has('orderby')) {
@@ -66,7 +64,12 @@ class ProductController extends Controller
             $productQuery->withTrashed();
         }
 
-        $products = $productQuery->paginate($request->pagination ?? 15)->appends(request()->query());
+        $pagination = 15;
+        if ($request->pagination && is_numeric($request->pagination)  && $request->pagination <= 50) {
+            $pagination = $request->pagination;
+        }
+
+        $products = $productQuery->paginate($pagination)->appends(request()->query());
 
         $products->map(function (Product $product) use ($categories, $brands) {
             $subCategory = $categories->firstWhere('id', $product->category_id);
@@ -275,6 +278,49 @@ class ProductController extends Controller
 
         if (session()->has('products_url')) {
             return redirect(session()->get('products_url'));
+        }
+
+        return redirect(route('admin.product.index'));
+    }
+
+    public function massForceDestroy(Request $request)
+    {
+        $totalDeleted = Product::withTrashed()->whereIn('id', $request->ids)->forceDelete();
+
+        session()->flash('alert', [
+            'status' => 'success',
+            'message' => $totalDeleted . ' produits supprimé avec succés',
+        ]);
+
+        if (session()->has('products_url')) {
+            return redirect(session()->get('products_url'));
+        }
+
+        return redirect(route('admin.product.index'));
+    }
+
+    public function massDestroy(Request $request)
+    {
+        $totalDeleted = Product::withTrashed()->whereIn('id', $request->ids)->delete();
+
+        session()->flash('alert', [
+            'status' => 'success',
+            'message' => $totalDeleted . ' produits archivé avec succés',
+        ]);
+
+        if (session()->has('product_url')) {
+            return redirect(session()->get('product_url'));
+        }
+
+        return redirect(route('admin.product.index'));
+    }
+
+    public function massActiveStatus(Request $request) 
+    {
+        Product::withTrashed()->whereIn('id', $request->ids)->update(['status' => true]);
+
+        if (session()->has('product_url')) {
+            return redirect(session()->get('product_url'));
         }
 
         return redirect(route('admin.product.index'));

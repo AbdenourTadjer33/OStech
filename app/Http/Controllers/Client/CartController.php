@@ -4,23 +4,26 @@ namespace App\Http\Controllers\Client;
 
 use Inertia\Inertia;
 use App\Models\Product;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 
 class CartController extends Controller
 {
-    public function index(Request $request)
-    {
-        return Inertia::render('Cart/Index');
-    }
-
     public function addItem(Request $request)
     {
-        $product = Product::where('id', $request->id)->first();
+        if (session('cart') && count(session('cart')) >= 5) {
+            return session()->flash('alert', [
+                'status' => 'danger',
+                'message' => 'Cinq produits au maximum dans le panier.',
+            ]);
+        }
+
+        $product = Cache::remember(
+            "product-$request->id",
+            now()->addMinutes(3),
+            fn () => Product::where('id', $request->id)->shoppingCart()->first()
+        );
 
         $cartItem = [
             'product_id' => $product->id,
@@ -61,7 +64,7 @@ class CartController extends Controller
 
     public function handleQte(Request $request)
     {
-        $cart = session()->get('cart');
+        $cart = session('cart');
 
         $cart[array_search($request->id, array_column($cart, 'product_id'))]['qte'] = $request->qte;
 

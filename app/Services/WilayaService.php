@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Cache;
 
 class WilayaService
 {
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getWilayas()
     {
-        return Cache::driver('file')->rememberForever('wilaya', fn () => DB::table('wilayas')->get());
+        return Cache::rememberForever('wilaya', fn () => DB::table('wilayas')->get());
     }
 
     public function getWilayaByCode($code)
@@ -19,6 +22,6 @@ class WilayaService
 
     public function clearWilayaCache()
     {
-        Cache::driver('file')->forget('wilaya');
+        Cache::forget('wilaya');
     }
 }

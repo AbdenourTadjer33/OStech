@@ -47,7 +47,8 @@ class DatabaseSeeder extends Seeder
         // DB::table('shipping_pricings')->insert(Storage::json('data/yalidinePrices.json'));
 
 
-        \App\Models\Product::factory(5000)->create();
+        // \App\Models\Product::factory(100)->create();
+        
 
         // Cache::clear();
         // Cache::driver('file')->clear();

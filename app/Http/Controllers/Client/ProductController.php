@@ -13,12 +13,24 @@ use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $productsQuery = Product::active()->client();
 
-        $products = Product::active()
-            ->client()
-            ->cursorPaginate(15);
+        if ($request->has('sort') && in_array($request->input('sort'), ['name', 'price_asc', 'price_desc', 'sales'])) {
+            $productsQuery->orderBy();
+        }
+
+        $products = $productsQuery->paginate(15);
+
+        $products->map(function (Product $product) use($request) {
+            $subCategory = $request?->categories->firstWhere('id', $product->category_id);
+            $mainCategory = $request?->categories->firstWhere('id', $subCategory->parent_id);
+            $product->brand = $request->brands->firstWhere('id', $product->brand_id)?->name;
+
+            $product->subCategory = $subCategory->name;
+            $product->mainCategory = $mainCategory->name;
+        });
 
         return Inertia::render('Product/Products', [
             'products' => $products,
@@ -27,19 +39,17 @@ class ProductController extends Controller
 
     public function show(Request $request)
     {
-        $product = Product::where('products.slug', $request->slug)
-            ->active()
-            ->select([
-                'products.id', 'products.slug', 'products.name', 'products.price', 'products.promo', 'products.images', 'products.description', 'products.features',
-                'brands.name as brand',
-                'categories.name as category',
-                'categories.id as category_id',
-                'parent_categories.name as parent_category'
-            ])
-            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
-            ->firstOrFail();
+        $product = Product::active()
+            ->where('slug', $request->slug)
+            ->details()->firstOrFail();
+
+
+        $subCategory = $request?->categories->firstWhere('id', $product->category_id);
+        $mainCategory = $request?->categories->firstWhere('id', $subCategory->parent_id);
+
+        $product->brand = $request->brands->firstWhere('id', $product->brand_id)?->name;
+        $product->subCategory = $subCategory->name;
+        $product->mainCategory = $mainCategory->name;
 
         $similairProducts = Product::sample()
             ->where('category_id', $product->category_id)
@@ -53,31 +63,5 @@ class ProductController extends Controller
             'product' => $product,
             'similairProducts' => $similairProducts
         ]);
-    }
-
-    public function subCategory(Request $request)
-    {
-        DB::table('products')
-            ->where('status', true)
-            ->select([
-                'products.id',
-                'products.slug',
-                'products.name',
-                'products.price',
-                'products.promo',
-                DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"),
-                'brands.name as brand_name',
-                'categories.name as category',
-                'parent_categories.name as parent_category'
-            ])
-            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id');
-
-
-        $products = Category::where('slug', $request->subCategory)->first()->load('products');
-
-
-        dump($products);
     }
 }

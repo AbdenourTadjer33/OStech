@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'alert' => fn () => $request->session()->get('alert'),
             ],
+            'mainUrl' => config('app.main_url')
         ];
     }
 }

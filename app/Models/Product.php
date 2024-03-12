@@ -76,8 +76,6 @@ class Product extends Model
         return $this->hasMany(OrderProduct::class, 'product_id', 'id');
     }
 
-
-
     public function scopeActive(Builder $query)
     {
         $query->where('status', true);
@@ -134,20 +132,32 @@ class Product extends Model
     public function scopeClient(Builder $query)
     {
         $query->select([
-            'products.id',
-            'products.slug',
-            'products.name',
-            'products.price',
-            'products.promo',
+            'id',
+            'slug',
+            'name',
+            'price',
+            'promo',
             DB::raw("JSON_UNQUOTE(JSON_EXTRACT(products.images, '$[0]')) as image"),
-            'brands.name as brand_name',
-            'categories.name as category',
-            'parent_categories.name as parent_category'
-        ])
-            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->leftJoin('categories as parent_categories', 'categories.parent_id', '=', 'parent_categories.id')
-            ->orderBy('products.id', 'desc');
+            'brand_id',
+            'category_id',
+        ]);
+    }
+
+    public function scopeDetails(Builder $query)
+    {
+        $query->select([
+            'id',
+            'slug',
+            'name',
+            'description',
+            'features',
+            'price',
+            'promo',
+            'images',
+            'brand_id',
+            'category_id',
+
+        ]);
     }
 
     /**

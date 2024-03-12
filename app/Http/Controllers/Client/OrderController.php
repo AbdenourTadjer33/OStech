@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreRequest;
+use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 
 class OrderController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('precognitive')->only('store');
         $this->middleware('auth')->only('index');
         $this->middleware('signed')->only(['newOrder', 'show']);
     }
@@ -104,7 +105,7 @@ class OrderController extends Controller
 
     public function newOrder(Request $request)
     {
-        
+
         $order = Order::where('ref', $request->ref)->first();
         return Inertia::render('Order/NewOrder', [
             'order' => $order->load('orderProducts'),
@@ -126,7 +127,6 @@ class OrderController extends Controller
 
     public function find()
     {
-        
     }
 
     public function pdf(Request $request)
@@ -135,7 +135,7 @@ class OrderController extends Controller
         $order->orderProducts = OrderProduct::where('order_id', $order->id)->get();
 
         // $pdf = Pdf::setOption(['dpi' => 150, 'defaultFont' => 'sans-serif'])->loadView('pdf.order', [
-            // 'order' => $order,
+        // 'order' => $order,
         // ]);
         // return $pdf->download("commande-{$order->ref}.pdf");
         // return $pdf->stream('doc.pdf');

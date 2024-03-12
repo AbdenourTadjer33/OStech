@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useForm } from "@inertiajs/react";
 import { calculatePrice, currencyFormat, media } from "@/Logic/helper";
 import { TbShoppingCartPlus } from "react-icons/tb";
-import Button from "@/Components/Button";
+import Button, { IndigoButton } from "@/Components/Button";
 
 const ProductCard = ({
 	id,
@@ -86,13 +86,11 @@ const ProductCard = ({
 					</div>
 					<div className="flex gap-3">
 						<Link href={route("products.show", { slug })}>
-							<Button btn="info" type="button">
-								Affiché
-							</Button>
+							<IndigoButton type="button">Affiché</IndigoButton>
 						</Link>
 
 						<button
-							className="text-info-800 hover:text-info-500"
+							className="text-info-600 hover:text-info-500"
 							onClick={() => addToCart(id)}
 						>
 							<TbShoppingCartPlus className="w-6 h-6" />

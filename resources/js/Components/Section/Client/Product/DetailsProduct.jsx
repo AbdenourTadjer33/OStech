@@ -1,6 +1,7 @@
 import React, { createRef, useRef } from "react";
+import { Link } from "@inertiajs/react";
 import { media, currencyFormat, calculatePrice } from "@/Logic/helper";
-import Button from "@/Components/Button";
+import Button, { IndigoButton } from "@/Components/Button";
 import { TbShoppingCartPlus } from "react-icons/tb";
 
 export const ProductDetails = ({
@@ -19,8 +20,8 @@ export const ProductDetails = ({
 		brand,
 		colors,
 		options,
-		category,
-		parent_category,
+		subCategory,
+		mainCategory,
 	} = product;
 
 	const mainImgRef = createRef();
@@ -33,20 +34,21 @@ export const ProductDetails = ({
 			<div className="flex flex-col md:flex-row gap-4">
 				<div className="flex flex-row w-full md:w-1/2 gap-4 justify-center">
 					<div className="flex flex-col items-center justify-start gap-4 overflow-y-auto">
-						{images.map((img, idx) => (
-							<img
-								key={idx}
-								src={media(img)}
-								className="h-16 cursor-pointer"
-								onClick={visualize}
-							/>
-						))}
+						{Array.isArray(images) &&
+							images.map((img, idx) => (
+								<img
+									key={idx}
+									src={media(img)}
+									className="h-16 cursor-pointer"
+									onClick={visualize}
+								/>
+							))}
 					</div>
 
 					<div className="relative h-[30vh] w-[30vh]">
 						<img
 							ref={mainImgRef}
-							src={media(images?.[0])}
+							src={media(images?.[0] ?? "default.png")}
 							className="h-full w-full object-contain object-center"
 						/>
 						{promo && (
@@ -60,7 +62,7 @@ export const ProductDetails = ({
 				</div>
 				<div className="space-y-3 md:mt-4 md:ms-2">
 					<h6 className="text-sm text-gray-500">
-						{parent_category} {">"} {category}
+						{mainCategory} {">"} {subCategory}
 					</h6>
 					<h2 className="text-xl font-medium text-info-950">
 						{name}
@@ -86,17 +88,14 @@ export const ProductDetails = ({
 					</div>
 
 					<div className="flex gap-2 items-center justify-start">
-						<Button btn="info" className="capitalize">
-							Commander maintenant
-						</Button>
-						<button
+						<IndigoButton
+							className="flex items-center gap-3"
 							disabled={processing}
-							className="text-info-800 hover:text-info-500"
 							onClick={() => addToCart(product.id)}
 						>
-							<span className="sr-only">add product to cart</span>
-							<TbShoppingCartPlus className="w-6 h-6" />
-						</button>
+							<TbShoppingCartPlus className="w-5 h-5" />
+							Ajouté au panier
+						</IndigoButton>
 					</div>
 				</div>
 			</div>
@@ -206,7 +205,7 @@ export const PreviewProductDetails = ({
 };
 
 export const ProductFeatures = ({ features }) => {
-	if (features.length > 0)
+	if (Array.isArray(features) && features.length > 0)
 		return (
 			<div className="mt-5 sm:mt-10">
 				<ul className="rounded-lg overflow-hidden w-full mx-auto border border-gray-200 shadow">

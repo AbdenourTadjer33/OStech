@@ -54,9 +54,20 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/create', 'store')->name('store');
         Route::get('/edit/{id}', 'edit')->name('edit');
         Route::post('/edit/{id}', 'update')->name('update');
+
         Route::post('/restore/{id}', 'restore')->name('restore');
         Route::delete('/destroy/{id}', 'destroy')->name('destroy');
+
         Route::delete('/force-destroy/{id}', 'forceDestroy')->name('forceDestroy');
+
+        Route::delete('/mass-destroy', 'massDestroy')->name('massDestroy');
+        Route::delete('/mass-force-destroy', 'massForceDestroy')->name('massForceDestroy');
+
+        Route::post('/mass-active/status', 'massActive')->name('massActive');
+        Route::post('/mass-disable/status', 'massDisable')->name('massDisable');
+
+        Route::post('/mass-active/status', 'massActive')->name('massActive');
+        Route::post('/mass-disable/status', 'massDisable')->name('massDisable');
 
         Route::post('/active/status/{id}', 'activeStatus')->name('activeStatus');
         Route::post('/disable/status/{id}', 'disableStatus')->name('disableStatus');
@@ -122,6 +133,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     });
 });
 
-Route::fallback(function () {
-    dd("404");
-});
+Route::get("{catchall}", function () {
+    dd("404 page from subdomain");
+})->where('catchall', '(.*)');

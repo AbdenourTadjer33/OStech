@@ -17,16 +17,10 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 Route::controller(WelcomeController::class)->group(function () {
     Route::get('/', 'index')->name('welcome');
-    Route::get('/contact-us', 'contact')->name('contact');
-    Route::get('/our-catalogue', 'catalogue')->name('catalogue');
-
-
-    Route::get('/terms-and-conditions', 'termAndCondition');
-});
-
-Route::prefix('products')->controller(ProductController::class)->group(function () {
-    Route::get('/', 'index')->name('products');
-    Route::get('/slug', 'show')->name('products.show');
+    Route::get('/contact', 'contact')->name('contact');
+    Route::post('/contact', 'storeContact')->name('contact.store');
+    Route::get('/catalogue', 'catalogue')->name('catalogue');
+    Route::get('/terms-and-conditions', 'termAndCondition')->name('termAndCondition');
 });
 
 Route::prefix('products')->controller(ProductController::class)->as('products.')->group(function () {
@@ -37,12 +31,10 @@ Route::prefix('products')->controller(ProductController::class)->as('products.')
 Route::prefix('category')->controller(CategoryController::class)->as('category.')->group(function () {
     Route::get('/{category:slug}/{subCategory:slug}', 'show')->name('show');
 
-
     Route::get('/', 'getByCategory')->name('get');
 });
 
 Route::prefix('cart')->controller(CartController::class)->group(function () {
-    Route::get('/', 'index')->name('cart');
     Route::post('/add-prodouct/{id}', 'addItem')->name('cart.add');
     Route::post('/handle-product-qte/{id}', 'handleQte')->name('cart.handle.qte');
     Route::post('/remove-from-cart/{id}', 'destroyItem')->name('cart.remove');
@@ -56,11 +48,10 @@ Route::prefix('order')->controller(OrderController::class)->as('order.')->group(
 
     Route::get('new/{ref}', 'newOrder')->name('new');
     Route::get('/show/{ref}', 'show')->name('show');
-
     Route::get('/find', 'find')->name('find');
-
     Route::get('/download/pdf/{ref}', 'pdf')->name('pdf');
 });
+
 
 Route::get('/shipping-pricing', [ShippingController::class, 'getPricings'])->name('shipping.pricings');
 

@@ -5,30 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Shipping\StoreRequest;
-use App\Http\Requests\Shipping\UpdateRequest;
-use App\Models\ShippingCompany;
 use App\Models\ShippingPricing;
+use App\Services\ShippingService;
 use App\Services\WilayaService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ShippingController extends Controller
 {
-
-    public function __construct()
+    public function index(WilayaService $wilayaService, ShippingService $shippingService)
     {
-
-        $this->middleware('precognitive')->only(['store', 'update']);
-    }
-
-    public function index(WilayaService $wilayaService)
-    {
-        /**
-         *@var \Illuminate\Database\Eloquent\Collection
-         */
-        $shippings = Cache::remember('shipping_pricings', now()->addWeek(), fn () => ShippingPricing::get());
+        $shippings = $shippingService->getShippings();
         $wilayas = $wilayaService->getWilayas();
 
         $shippings->map(
@@ -45,7 +32,7 @@ class ShippingController extends Controller
     {
         $request->validate([
             'delay' => ['nullable', 'string'],
-            'cost_home' => ['nullable', 'numeric'], 
+            'cost_home' => ['nullable', 'numeric'],
             'cost_stop_desk' => ['nullable', 'numeric'],
         ]);
 

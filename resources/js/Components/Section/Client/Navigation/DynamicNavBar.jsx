@@ -71,7 +71,7 @@ const DynamicNavBar = () => {
 					</Transition.Child>
 					<div className="fixed inset-0 overflow-hidden">
 						<div className="absolute inset-0 overflow-hidden">
-							<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pb-10">
+							<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pb-[26rem]">
 								<Transition.Child
 									as={Fragment}
 									enter="transform transition ease-in-out duration-500"
@@ -155,7 +155,7 @@ const ProductSlider = ({ category, isOpen }) => {
 
 	const getProductByCategory = async (slug) => {
 		const cachedData = JSON.parse(localStorage.getItem(`category-${slug}`));
-		if (cachedData && Date.now() - cachedData.timestamp < 86400000) {
+		if (cachedData && Date.now() - cachedData.timestamp < 300000) {
 			setProducts(cachedData.products);
 			return;
 		}

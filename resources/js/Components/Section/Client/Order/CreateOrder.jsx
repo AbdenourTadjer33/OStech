@@ -145,7 +145,7 @@ const CreateOrder = () => {
 									setData("phone", e.target.value)
 								}
 							/>
-							<div className="absolute right-2 top-1/2 -translate-y-1/2 z-[51]">
+							<div className="absolute right-2 top-1/2 -translate-y-1/2 z-40">
 								<PopoverInput>
 									Le champ n° téléphone est requis. Ce champ
 									doit commencé avec 05, 06 ou 07. et ne
@@ -171,7 +171,7 @@ const CreateOrder = () => {
 									setData("email", e.target.value)
 								}
 							/>
-							<div className="absolute right-2 top-1/2 -translate-y-1/2 z-50">
+							<div className="absolute right-2 top-1/2 -translate-y-1/2 z-30">
 								<PopoverInput>
 									Le champ d'addresse e-mail n'est pas requis
 									mais en le fournissant, nous pouvons vous

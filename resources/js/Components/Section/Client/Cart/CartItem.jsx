@@ -10,7 +10,6 @@ import Minus from "@/Components/Icons/Minus";
 import Plus from "@/Components/Icons/Plus";
 import { FaRegTrashCan } from "react-icons/fa6";
 
-
 const CartItem = ({ item }) => {
 	const { post, processing, data, setData } = useForm({
 		qte: item.qte,
@@ -20,7 +19,9 @@ const CartItem = ({ item }) => {
 	useEffect(() => {
 		if (!isFirstRender.current) {
 			const debouncedApiCall = debounce(() => {
-				post(route("cart.handle.qte", { id: item?.product?.id }));
+				post(route("cart.handle.qte", { id: item?.product?.id }), {
+					preserveScroll: true,
+				});
 			}, 250);
 
 			debouncedApiCall();
@@ -42,7 +43,7 @@ const CartItem = ({ item }) => {
 
 	const destroyItem = () => {
 		post(route("cart.remove", { id: item?.product?.id }), {
-			preserveScroll: true
+			preserveScroll: true,
 		});
 	};
 
@@ -52,7 +53,7 @@ const CartItem = ({ item }) => {
 				<img
 					src={media(item?.product?.images?.[0] ?? "default.png")}
 					alt={item?.product?.name}
-					className="h-full w-full object-cover object-center"
+					className="w-20 object-cover"
 				/>
 			</div>
 

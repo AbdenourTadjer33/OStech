@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import { Head, Link, useForm, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import Button from "@/Components/Button";
@@ -17,6 +17,9 @@ import TextInput from "@/Components/TextInput";
 import ProductRow, {
 	ProductTitleRow,
 } from "@/Components/Section/Admin/Product/ProductRow";
+import Heading from "@/Components/Heading";
+
+export const ProductIndexContext = createContext();
 
 const Index = ({ products, subCategories, brands }) => {
 	const {
@@ -61,9 +64,14 @@ const Index = ({ products, subCategories, brands }) => {
 		}
 	};
 
-	useEffect(() => {
-		console.log(selectedProducts);
-	}, [selectedProducts]);
+	const selectAllProducts = (e) => {
+		if (e.target.checked) {
+			const allIds = data.map((item) => item.id);
+			setSelectedProducts(allIds);
+		} else {
+			setSelectedProducts([]);
+		}
+	};
 
 	const handleSelectedCategories = (categoryId) => {
 		// Check if the category is already selected
@@ -124,6 +132,15 @@ const Index = ({ products, subCategories, brands }) => {
 		setFilteredData(filtered);
 	};
 
+	const deleteMass = () => {
+		router.delete("/product/mass-destroy", {
+			preserveScroll: true,
+			data: {
+				ids: selectedProducts,
+			},
+		});
+	};
+
 	const archive = () => {
 		destroy(
 			route("admin.product.destroy", { id: archiveModal.product.id }),
@@ -153,7 +170,9 @@ const Index = ({ products, subCategories, brands }) => {
 	return (
 		<AdminLayout>
 			<Head title="Gestion De Produit" />
-			<h1 className="text-4xl font-bold mb-3">Produits</h1>
+			<Heading level={3} className="mb-5">
+				Gestion de produit
+			</Heading>
 
 			<div className="w-full">
 				<div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-visible">
@@ -181,6 +200,28 @@ const Index = ({ products, subCategories, brands }) => {
 						</div>
 
 						<div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+							<Dropdown
+								renderTrigger={() => (
+									<button
+										className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+										type="button"
+									>
+										<FaFilter className="h-4 w-4 mr-2 text-gray-400" />
+										Action
+										<MdKeyboardArrowDown className="-mr-1 ml-1.5 w-5 h-5" />
+									</button>
+								)}
+							>
+								<div className="w-40">
+									<Dropdown.Item>Tous Archivé</Dropdown.Item>
+									<Dropdown.Item>
+										Tous désactiver
+									</Dropdown.Item>
+									<Dropdown.Item onClick={deleteMass}>
+										Tous supprimé
+									</Dropdown.Item>
+								</div>
+							</Dropdown>
 							<div className="flex items-center space-x-3 w-full md:w-auto">
 								<Dropdown
 									label=""
@@ -531,31 +572,31 @@ const Index = ({ products, subCategories, brands }) => {
 					</div>
 
 					<div className="overflow-x-auto">
-						<Table>
-							<Table.Head>
-								<ProductTitleRow />
-							</Table.Head>
-							<Table.Body>
-								{filteredData.map((record) => {
-									return (
-										<Table.Row
-											key={record.id}
-											className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-										>
+						<ProductIndexContext.Provider
+							value={{
+								selectAllProducts,
+								setArchiveModal,
+								setDeleteModal,
+								handleSelectedProducts,
+								selectedProducts,
+							}}
+						>
+							<Table>
+								<Table.Head>
+									<ProductTitleRow />
+								</Table.Head>
+								<Table.Body>
+									{filteredData.map((record) => {
+										return (
 											<ProductRow
+												key={record.id}
 												record={record}
-												setArchiveModal={
-													setArchiveModal
-												}
-												setDeleteModal={setDeleteModal}
-												handleSelectedProducts={handleSelectedProducts}
-												selectedProducts={selectedProducts}
 											/>
-										</Table.Row>
-									);
-								})}
-							</Table.Body>
-						</Table>
+										);
+									})}
+								</Table.Body>
+							</Table>
+						</ProductIndexContext.Provider>
 					</div>
 
 					<nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">

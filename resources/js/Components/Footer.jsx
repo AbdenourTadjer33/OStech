@@ -89,14 +89,14 @@ const Footer = () => {
 								</h2>
 								<ul className="text-gray-500 dark:text-gray-400 font-medium space-y-2">
 									<li>
-										<a href="#" className="hover:underline">
+										<Link href={route("termAndCondition")} className="hover:underline">
 											politique de confidentialité
-										</a>
+										</Link>
 									</li>
 									<li>
-										<a href="#" className="hover:underline">
+										<Link href={route('termAndCondition')} className="hover:underline">
 											Termes & conditions
-										</a>
+										</Link>
 									</li>
 								</ul>
 							</div>

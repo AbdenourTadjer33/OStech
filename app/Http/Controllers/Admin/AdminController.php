@@ -42,7 +42,6 @@ class AdminController extends Controller
     // FINISHED
     public function store(StoreRequest $request)
     {
-
         /**
          * @var \App\Models\User
          */

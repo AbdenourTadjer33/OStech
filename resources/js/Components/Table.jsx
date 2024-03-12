@@ -35,8 +35,8 @@ const Title = ({ className = "", children }) => (
     <th className={`${className}`}>{children}</th>
 );
 
-const Column = ({ className = "", children }) => (
-    <td className={`${className}`}>{children}</td>
+const Column = ({ className = "", children, ...props }) => (
+    <td className={`${className}`} {...props}>{children}</td>
 );
 
 Table.Row = Row;

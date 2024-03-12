@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Services\BrandService;
 use App\Services\CategoryService;
 use Closure;
 use Illuminate\Http\Request;
@@ -24,19 +25,14 @@ class LoadData
         if (!$request->routeIs('admin*')) {
 
             $categories = (new CategoryService)->getCategories();
-
             $request->merge(['categories' => $categories]);
 
-            $hierarchicalCategories = $categories->filter(function ($category) {
-                return $category->isMainCategory();
-            })->map(function (Category $mainCategory) use ($categories) {
-                $subCategories = $categories->where('parent_id', $mainCategory->id)->values()->all();
-                $clonedCategory = clone $mainCategory;
-                $clonedCategory->subCategories = $subCategories;
-                return $clonedCategory;
-            })->values();
-
+            $hierarchicalCategories = (new CategoryService)->hierarchicalCategories($categories);
             Inertia::share('categories', $hierarchicalCategories);
+
+            $brands = (new BrandService)->getBrands();
+            $request->merge(['brands' => $brands]);
+
 
             $cart = [];
             if (session()->has('cart') && count(session('cart')) > 0) {
