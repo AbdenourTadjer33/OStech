@@ -5,7 +5,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "fedeisas/laravel-mail-css-inliner": "^5.2",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.3",
@@ -13,6 +13,7 @@
         "laravel/breeze": "^1.28",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
+        "laravel/scout": "^10.8",
         "laravel/socialite": "^5.12",
         "laravel/tinker": "^2.8",
         "predis/predis": "^2.2",
