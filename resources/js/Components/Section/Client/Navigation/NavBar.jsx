@@ -32,7 +32,7 @@ const NavBar = () => {
 		},
 		{
 			label: "Contact",
-			link: "contact",
+			link: "contact.create",
 		},
 	];
 

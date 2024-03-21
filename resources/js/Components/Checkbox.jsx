@@ -11,6 +11,6 @@ export const BigCheckbox = ({ className = "", ...props }) => (
 	<input
 		{...props}
 		type="checkbox"
-		className={`me-2 w-6 h-6 cursor-pointer text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ${className}`}
+		className={`w-6 h-6 cursor-pointer text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ${className}`}
 	/>
 );

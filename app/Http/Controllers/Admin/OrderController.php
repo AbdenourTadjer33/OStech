@@ -6,47 +6,55 @@ use Inertia\Inertia;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Order\GetRequest;
+use App\Http\Requests\Order\UpdateRequest;
 use App\Models\OrderProduct;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-	public function index(Request $request)
+	public function index(GetRequest $request)
 	{
 		/**
 		 * @var \App\Models\Order
 		 */
-		$orderQuery = Order::withCount('products')->admin();
+		$orderQuery = Order::admin()->interval($request->input('interval'))->with('orderProducts');
 
-		if ($request->input('latest')) {
-			$orderQuery->latest();
+		if ($request->has('online') && $request->input('online') !== "all") {
+			$orderQuery->online($request->input('online'));
 		}
 
-		if ($request->input('oldest')) {
-			$orderQuery->latest();
+		if ($request->has('status') && $request->input('status') !== "all") {
+			$orderQuery->status($request->input('status'));
 		}
 
-		$orders = $orderQuery->paginate((int) $request->input('pagination') ?? 15);
+		$orders = $orderQuery->paginate(15)->appends(request()->query());
 
-		$orderIds = $orders->pluck('id');
-
-		$orderProduct = OrderProduct::whereIn('order_id', $orderIds)->get();
-
-		$orderProductsGrouped = $orderProduct->groupBy('order_id');
-
-		$orders->map(function ($order) use ($orderProductsGrouped) {
-			// Retrieve order products for this order
-			$orderProduct = $orderProductsGrouped[$order->id] ?? collect();
-
-			// Add orderProducts key to the order and assign order products
-			$order->orderProducts = $orderProduct;
-
-			return $order;
-		});
-
+		session()->put('orders_url', $request->fullUrl());
 		return Inertia::render('Admin/Order/Index', [
-			'orders' => $orders->appends($request->query()),
+			'orders' => $orders,
 		]);
+	}
+
+	public function editStatus(UpdateRequest $request)
+	{
+		DB::transaction(
+			fn () =>
+			Order::where('ref', $request->ref)->update([
+				'status' => $request->input('status'),
+			])
+		);
+
+		session()->flash('alert', [
+			'status' => 'success',
+			'message' => 'status changé aves succés',
+		]);
+
+		if (session()->has('orders_url')) {
+			return redirect(session()->get('orders_url'));
+		}
+
+		return redirect(route('admin.order.index'));
 	}
 
 	public function show()

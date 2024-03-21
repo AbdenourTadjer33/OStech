@@ -24,7 +24,7 @@ const Index = ({ products, categoryName }) => {
 		<AppLayout>
 			<Head title={categoryName} />
 
-			<Container className="space-y-10">
+			<Container className="space-y-10 rounded-sm">
 				<div className="space-y-4">
 					<Heading level={2} className="font-light text-gray-800">
 						{categoryName}

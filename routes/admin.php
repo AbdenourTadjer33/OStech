@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MyEvent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\AdminController;
@@ -23,7 +24,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/', fn () => to_route('admin.dashboard'));
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // FINISHED
+    // FINISHED 
     Route::prefix('brand')->controller(BrandController::class)->as('brand.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -47,6 +48,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('/destroy/{mainCategory}/{subCategory}', 'destroySubCategory')->name('destroySubCategory');
     });
 
+    Route::get('test-broadcast', function () {
+        broadcast(new MyEvent('test messaeg'));
+    });
+
     // FINISHED
     Route::prefix('product')->controller(ProductController::class)->as('product.')->group(function () {
         Route::get('/', 'index')->name('index');
@@ -54,6 +59,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/create', 'store')->name('store');
         Route::get('/edit/{id}', 'edit')->name('edit');
         Route::post('/edit/{id}', 'update')->name('update');
+
 
         Route::post('/restore/{id}', 'restore')->name('restore');
         Route::delete('/destroy/{id}', 'destroy')->name('destroy');
@@ -74,6 +80,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         Route::post('active/catalog/{id}', 'activeCatalog')->name('activeCatalog');
         Route::post('/disable/catalog/{id}', 'disableCatalog')->name('disableCatalog');
+        Route::get('/{id}', 'show')->name('show');
     });
 
     // FINISHED
@@ -89,7 +96,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::prefix('orders')->controller(OrderController::class)->as('order.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/{ref}', 'show')->name('show');
+        // Route::get('/{ref}', 'show')->name('show');
+
+        Route::post('/edit-status/{ref}', 'editStatus')->name('editStatus');
     });
 
     // FINISHED

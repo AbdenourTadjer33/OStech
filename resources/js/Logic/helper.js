@@ -109,3 +109,6 @@ export const generatePassword = (length = 10) => {
 	}
 	return password;
 };
+
+export const hasObjectWithKeyValue = (array, key, value) =>
+	array.some((obj) => obj.hasOwnProperty(key) && obj[key] === value);

@@ -4,10 +4,15 @@ import { Transition } from "@headlessui/react";
 import Alert from "@/Components/Alert";
 import NavBar from "@/Components/Section/Admin/NavBar";
 import SideBar from "@/Components/Section/Admin/SideBar";
+// import { useRoute } from "ziggy-js";
+import route from "ziggy-js";
+import { Ziggy } from "@/ziggy";
+
 
 export const AdminLayoutContext = createContext();
 
 const AdminLayout = ({ children }) => {
+
 	const { user, flash } = usePage().props;
 	const [isShown, setIsShown] = useState(false);
 	const [isOpen, SetIsOpen] = useState(
@@ -18,7 +23,7 @@ const AdminLayout = ({ children }) => {
 		JSON.parse(localStorage.getItem("darkMode")) == true ? true : false
 	);
 
-	const toggleSideBar = (e) => {
+	const toggleSideBar = () => {
 		localStorage.setItem("sideBar", !isOpen);
 		SetIsOpen(!isOpen);
 	};
@@ -26,7 +31,7 @@ const AdminLayout = ({ children }) => {
 	const toggleDarkMode = () => {
 		localStorage.setItem("darkMode", !isDark);
 		setIsDark(!isDark);
-	}
+	};
 
 	useEffect(() => {
 		if (isDark) {
@@ -61,7 +66,7 @@ const AdminLayout = ({ children }) => {
 
 			<main
 				className={`p-4 mt-16 transform transition-all duration-200 ease-in-out text-gray-900 dark:text-white  ${
-					isOpen ? "ml-64" : "ml-20"
+					isOpen ? "ml-64" : "sm:ml-20 ml-0"
 				}`}
 			>
 				{children}

@@ -34,7 +34,7 @@ class OrderService
             $product = $cartItem['product'];
             $orderProducts[$cartItem['product']?->id] = [
                 'qte' => $cartItem['qte'],
-                'product' => collect($product->only('id', 'name', 'price', 'promo'))->toJson(),
+                'product' => collect($product->only('id', 'slug', 'name', 'price', 'promo'))->toJson(),
                 'total' => $product?->calculateFinalPrice() * $cartItem['qte'],
             ];
         }

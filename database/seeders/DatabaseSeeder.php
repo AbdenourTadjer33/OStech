@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -48,9 +50,23 @@ class DatabaseSeeder extends Seeder
 
 
         // \App\Models\Product::factory(100)->create();
-        
 
-        // Cache::clear();
-        // Cache::driver('file')->clear();
+        // \App\Models\Order::factory(10)->create();
+// 
+        // $orders = Order::get();
+        // foreach ($orders as $order)
+        // {
+            // $product = Product::active()->get()->random();
+            // $order->orderProducts()->create([
+                // 'product_id' => $product->id,
+                // 'qte' => 4,
+                // 'total' => $product->price * 4,
+                // 'product' => $product->only(['id', 'slug', 'name', 'price', 'promo']),
+            // ]);
+        // }
+
+        
+        Cache::clear();
+        Cache::driver('file')->clear();
     }
 }

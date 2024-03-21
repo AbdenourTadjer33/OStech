@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Order;
 
+use App\Enums\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\PhoneNumber;
-class ContactRequest extends FormRequest
+use Illuminate\Validation\Rule;
+
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +24,7 @@ class ContactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'name' => ['required', 'min:4'],
-            // 'email' => ['required', 'email'],
-            // 'phone' => ['required', new PhoneNumber],
-            // 'subject' => ['required', 'string', 'min:2'],
-            // 'message' => ['required', 'string', 'min:4'],
+            'status' => ['required', Rule::enum(OrderStatus::class)],
         ];
     }
 }

@@ -58,7 +58,6 @@ const Contact = () => {
 									onChange={(e) =>
 										setData("email", e.target.value)
 									}
-									required
 								/>
 								<InputError
 									message={errors.email}
@@ -78,7 +77,6 @@ const Contact = () => {
 										onChange={(e) =>
 											setData("name", e.target.value)
 										}
-										required
 									/>
 									<InputError
 										message={errors.name}

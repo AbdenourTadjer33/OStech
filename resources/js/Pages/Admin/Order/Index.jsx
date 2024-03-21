@@ -1,28 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { Head, Link } from "@inertiajs/react";
+import React, {
+	useState,
+	useEffect,
+	useContext,
+	createContext,
+	useRef,
+} from "react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
-
 import Button from "@/Components/Button";
-import { FaFilter, FaSearch } from "react-icons/fa";
+import { FaCheck, FaFilter, FaSearch } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Pagination from "@/Components/Pagination";
-import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import Table from "@/Components/Table";
-import ReadMore from "@/Components/ReadMore";
-import CurrencyFormat from "@/Components/CurrencyFormat";
 import { Dropdown } from "flowbite-react";
 import Accordion from "@/Components/Accordion";
-import { currencyFormat, media } from "@/Logic/helper";
-import Modal from "@/Components/Modal";
-import { IoMdInformationCircleOutline } from "react-icons/io";
-import { FaSpinner } from "react-icons/fa";
-import TrueIcon from "@/Components/Icons/TrueIcon";
-import FalseIcon from "@/Components/Icons/FalseIcon";
-
+import { debounce, hasObjectWithKeyValue } from "@/Logic/helper";
 import { Search } from "@/Components/InputSearch";
-import Badge from "@/Components/Badge";
-import { StatusCercle } from "@/Components/Status";
-import wilaya from "@/data/wilaya.json";
+import {
+	OrderRow,
+	OrderTitleRow,
+} from "@/Components/Section/Admin/Order/OrderRow";
+import Heading from "@/Components/Heading";
+import { Listbox, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { HiMiniChevronUpDown } from "react-icons/hi2";
+import RadioInput from "@/Components/RadioInput";
+import { RangeSlider } from "@/Components/TextInput";
+import useUrlParam from "@/Logic/useUrlParamState";
+import {
+	intervalOptions,
+	statusOptions,
+	onlineOptions,
+} from "@/Logic/OrderOptions";
+import Checkbox from "@/Components/Checkbox";
+
+const OrderIndexContext = createContext();
 
 const Index = ({ orders }) => {
 	const {
@@ -36,8 +48,29 @@ const Index = ({ orders }) => {
 		last_page,
 	} = orders;
 
-	const [searchQuery, setSearchQuery] = useState("");
+	const { url } = usePage();
 	const [filteredData, setFilteredData] = useState(data);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [interval, setInterval] = useUrlParam(
+		intervalOptions[0].name,
+		"interval",
+		intervalOptions,
+		"name"
+	);
+
+	const [selectedStatus, setSelectedStatus] = useUrlParam(
+		[],
+		"status",
+		statusOptions,
+		"value"
+	);
+
+	const [online, setOnline] = useUrlParam(
+		"all",
+		"online",
+		onlineOptions,
+		"value"
+	);
 
 	const handleSearch = (e) => {
 		const query = e.target.value.toLowerCase();
@@ -53,393 +86,330 @@ const Index = ({ orders }) => {
 	};
 
 	useEffect(() => {
-		setFilteredData(data);
-	}, [data]);
-
-	const findWilaya = (wilayaCode) => {
-		return wilaya.find((state) => state.code === wilayaCode).name;
-	};
+		setFilteredData(orders.data);
+	}, [orders]);
 
 	return (
-		<AdminLayout>
-			<Head title="Gestion de ventes" />
-			<h1 className="text-4xl font-bold mb-3">Commande et ventes</h1>
+		<OrderIndexContext.Provider
+			value={{
+				url,
+				intervalOptions,
+				statusOptions,
+				onlineOptions,
+				selectedStatus,
+				setSelectedStatus,
+				online,
+				setOnline,
+				interval,
+				setInterval,
+			}}
+		>
+			<AdminLayout>
+				<Head title="Gestion de ventes" />
+				<Heading level={3} className="mb-5">
+					Commande et ventes
+				</Heading>
 
-			<div className="w-full">
-				<div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-visible">
-					<div className="p-4">
-						<h4 className="text-xl">
-							Total commande : <span>{total}</span>
-						</h4>
-					</div>
-
-					<hr className="h-px mb-2 bg-gray-200 border-0 dark:bg-gray-700 mx-4" />
-
-					<div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-						<div className="w-full md:w-1/2">
-							<form className="flex items-center">
-								<div className="relative w-full">
-									<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-										<FaSearch className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-									</div>
-									<Search
-										value={searchQuery}
-										onChange={handleSearch}
-									/>
-								</div>
-							</form>
+				<div className="w-full">
+					<div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-visible">
+						<div className="p-4">
+							<h4 className="text-xl">
+								Total commande : <span>{total}</span>
+							</h4>
 						</div>
-						<div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-							<div className="flex items-center space-x-3 w-full md:w-auto">
-								<Dropdown
-									label=""
-									dismissOnClick={false}
-									renderTrigger={() => (
-										<button
-											id="actionsDropdownButton"
-											data-dropdown-toggle="actionsDropdown"
-											className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-											type="button"
-										>
-											<MdKeyboardArrowDown className="-ml-1 mr-1.5 w-5 h-5" />
-											Actions
-										</button>
-									)}
-								>
-									<Dropdown.Item>Mass Edit</Dropdown.Item>
-									<Dropdown.Item>Delete all</Dropdown.Item>
-								</Dropdown>
 
-								<Dropdown
-									label=""
-									dismissOnClick={false}
-									renderTrigger={() => (
-										<button
-											className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-											type="button"
-										>
-											<FaFilter className="h-4 w-4 mr-2 text-gray-400" />
-											Filter
-											<MdKeyboardArrowDown className="-mr-1 ml-1.5 w-5 h-5" />
-										</button>
-									)}
-								>
-									<div className="w-80">
-										<Dropdown.Header>
-											<span className="text-base font-medium text-gray-900 dark:text-white">
-												Filter
-											</span>
-										</Dropdown.Header>
+						<hr className="h-px mb-2 bg-gray-200 border-0 dark:bg-gray-700 mx-4" />
 
-										<Accordion title="Categorie">
-											<Accordion.Body>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-											</Accordion.Body>
-										</Accordion>
-
-										<Dropdown.Divider />
-
-										<Accordion title="Categorie">
-											<Accordion.Body>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-											</Accordion.Body>
-										</Accordion>
-
-										<Dropdown.Divider />
-
-										<Accordion title="Categorie">
-											<Accordion.Body>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-												<Dropdown.Item>
-													<input
-														id="apple"
-														type="checkbox"
-														value=""
-														className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-													/>
-													<label
-														htmlFor="apple"
-														className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-													>
-														Apple (56)
-													</label>
-												</Dropdown.Item>
-											</Accordion.Body>
-										</Accordion>
-
-										<Dropdown.Divider />
-
-										<div className="flex justify-center py-2">
-											<Button type="button">
-												Filtré les résultat
-											</Button>
+						<div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+							<div className="w-full md:w-1/2">
+								<form className="flex items-center">
+									<div className="relative w-full">
+										<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+											<FaSearch className="w-4 h-4 text-gray-500 dark:text-gray-400" />
 										</div>
+										<Search
+											value={searchQuery}
+											onChange={handleSearch}
+										/>
 									</div>
-								</Dropdown>
+								</form>
 							</div>
+							<div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+								<div className="flex items-center space-x-3 w-full md:w-auto">
+									<Filter />
+								</div>
 
-							<Link href={route("admin.product.create")}>
-								<Button btn="primary" type="button">
-									Créer un produit
-								</Button>
-							</Link>
+								<Link href={"/"}>
+									<Button btn="primary" type="button">
+										Créer une commande
+									</Button>
+								</Link>
+							</div>
 						</div>
+
+						<hr className="h-px mb-2 bg-gray-200 border-0 dark:bg-gray-700 mx-4" />
+
+						<div className="px-4 py-2 flex flex-col sm:flex-row items-center justify-end gap-4">
+							<div className="w-full sm:max-w-xs">
+								<IntervalSelection />
+							</div>
+						</div>
+
+						<div className="overflow-x-auto" id="table-container">
+							<Table className="table-auto">
+								<OrderTitleRow />
+								<Table.Body>
+									{filteredData.map((record) => {
+										return (
+											<OrderRow
+												key={record.ref}
+												record={record}
+											/>
+										);
+									})}
+								</Table.Body>
+							</Table>
+						</div>
+
+						<nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
+							<Pagination
+								currentPage={current_page}
+								next={next_page_url}
+								prev={prev_page_url}
+								links={links}
+								perPage={per_page}
+								total={total}
+								last_page={last_page}
+							/>
+						</nav>
 					</div>
-
-					<div className="overflow-x-auto">
-						<Table className="table-auto">
-							<Table.Head>
-								<Table.Row>
-									<Table.Title className="px-2 py-3">
-										ref
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										client
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										adresse
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Livraison
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Total
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										status
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Online
-									</Table.Title>
-									<Table.Title className="px-2 py-3">
-										Créer à
-									</Table.Title>
-									<Table.Title className="px-2 py-3"></Table.Title>
-								</Table.Row>
-							</Table.Head>
-							<Table.Body>
-								{filteredData.map((record) => {
-									return (
-										<Table.Row
-											key={record.ref}
-											className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-										>
-											<Table.Column className="px-2 py-3">
-												{record.ref}
-											</Table.Column>
-											<Table.Column className="px-2 py-3">
-												{record?.client?.name}
-												<br />
-												{record?.client?.phone}
-												<br />
-												{record?.client?.email}
-											</Table.Column>
-
-											<Table.Column className="px-2 py-4">
-												{record?.client?.address},{" "}
-												{record?.client?.city}
-												<br />
-												{findWilaya(
-													record?.client?.wilaya
-												)}
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												{record?.shipping_type}
-												<br />
-												{currencyFormat(
-													record?.shipping_cost
-												)}
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												{currencyFormat(record.total)}
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												<Badge>{record.status}</Badge>
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												<StatusCercle
-													status={record.is_online}
-												/>
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												{record.created_at}
-											</Table.Column>
-											<Table.Column className="px-2 py-4">
-												<Dropdown
-													label=""
-													dismissOnClick
-													renderTrigger={() => (
-														<button
-															className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-															type="button"
-														>
-															<PiDotsThreeOutlineVerticalFill className="w-5 h-5" />
-														</button>
-													)}
-												>
-													<div className="w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-														<ul
-															className="py-1 text-sm text-gray-700 dark:text-gray-200"
-															aria-labelledby="apple-imac-27-dropdown-button"
-														>
-															<li>
-																<button className="w-full text-start py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-																	Afficher
-																</button>
-															</li>
-															<li>
-																<Link
-																	href={route(
-																		"admin.product.edit",
-																		{
-																			id: record.id,
-																		}
-																	)}
-																	className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-																>
-																	Éditer
-																</Link>
-															</li>
-														</ul>
-														<div className="py-1">
-															{record.deleted_at && (
-																<button
-																	onClick={() =>
-																		restore(
-																			record.id
-																		)
-																	}
-																	className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-																>
-																	Restorer
-																</button>
-															)}
-															{!record.deleted_at && (
-																<button
-																	onClick={() =>
-																		setArchiveModal(
-																			{
-																				status: true,
-																				product:
-																					record,
-																			}
-																		)
-																	}
-																	className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-																>
-																	Archivé
-																</button>
-															)}
-
-															<button
-																onClick={() =>
-																	setDeleteModal(
-																		{
-																			status: true,
-																			product:
-																				record,
-																		}
-																	)
-																}
-																className="w-full text-start py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-															>
-																Supprimé
-															</button>
-														</div>
-													</div>
-												</Dropdown>
-											</Table.Column>
-										</Table.Row>
-									);
-								})}
-							</Table.Body>
-						</Table>
-					</div>
-
-					<nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
-						<Pagination
-							currentPage={current_page}
-							next={next_page_url}
-							prev={prev_page_url}
-							links={links}
-							perPage={per_page}
-							total={total}
-							last_page={last_page}
-						/>
-					</nav>
 				</div>
-			</div>
-
-			{/* <pre>{JSON.stringify(order, null, 2)}</pre> */}
-		</AdminLayout>
+			</AdminLayout>
+		</OrderIndexContext.Provider>
 	);
 };
 
 export default Index;
+
+const StatusSelection = () => {};
+
+const IntervalSelection = () => {
+	const {
+		url,
+		interval,
+		setInterval,
+		intervalOptions: options,
+	} = useContext(OrderIndexContext);
+
+	const isFirstRender = useRef(true);
+	useEffect(() => {
+		if (!isFirstRender.current) {
+			const debouncedApiCall = debounce(() => {
+				router.visit(url, {
+					method: "get",
+					preserveScroll: true,
+					preserveState: true,
+					data: {
+						interval,
+					},
+					only: ["orders"],
+				});
+			}, 250);
+
+			debouncedApiCall();
+
+			return () => debouncedApiCall.cancel();
+		}
+		isFirstRender.current = false;
+	}, [interval]);
+
+	return (
+		<Listbox value={interval} onChange={(e) => setInterval(e)}>
+			<div className="relative">
+				<Listbox.Button className="relative w-full p-2.5 text-sm sm:text-base text-start font-medium text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+					<span className="block truncate">
+						{
+							options.find((option) => option.name === interval)
+								?.label
+						}
+					</span>
+					<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+						<HiMiniChevronUpDown className="w-5 h-5 text-gray-400" />
+					</span>
+				</Listbox.Button>
+				<Transition
+					as={Fragment}
+					leave="transition ease-in duration-100"
+					leaveFrom="opacity-100"
+					leaveTo="opacity-0"
+				>
+					<Listbox.Options className="absolute mt-1.5 max-h-60 w-full overflow-auto rounded-md bg-gray-50 dark:bg-gray-700 py-1 text-base sm:text-lg shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
+						{options.map(({ name, label }, idx) => (
+							<Listbox.Option
+								key={idx}
+								className={({ active, selected }) =>
+									`relative cursor-default select-none py-2 pl-10 pr-4 text-gray-900 dark:text-white  ${
+										active
+											? " bg-gray-100 dark:bg-gray-500"
+											: ""
+									}
+									${" "}
+									${selected ? "bg-gray-100 dark:bg-gray-500/75" : ""}
+									`
+								}
+								value={name}
+							>
+								{({ selected }) => (
+									<>
+										<span
+											className={`block truncate ${
+												selected
+													? "font-medium"
+													: "font-normal"
+											}`}
+										>
+											{label}
+										</span>
+										{selected ? (
+											<span className="absolute inset-y-0 left-0 flex items-center pl-3">
+												<FaCheck className="h-5 w-5" />
+											</span>
+										) : null}
+									</>
+								)}
+							</Listbox.Option>
+						))}
+					</Listbox.Options>
+				</Transition>
+			</div>
+		</Listbox>
+	);
+};
+
+const Filter = () => {
+	const {
+		url,
+		selectedStatus,
+		setSelectedStatus,
+		online,
+		setOnline,
+		onlineOptions,
+		statusOptions,
+	} = useContext(OrderIndexContext);
+	const [pagination, setPagination] = useState(15);
+
+	const submitHandler = (e) => {
+		e.preventDefault();
+		router.visit(url, {
+			method: "get",
+			preserveScroll: true,
+			preserveState: true,
+			data: {
+				status: selectedStatus.toString(),
+				online,
+				pagination,
+			},
+			only: ["orders"],
+		});
+	};
+
+	return (
+		<Dropdown
+			label=""
+			dismissOnClick={false}
+			renderTrigger={() => (
+				<button
+					className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+					type="button"
+				>
+					<FaFilter className="h-4 w-4 mr-2 text-gray-400" />
+					Filter
+					<MdKeyboardArrowDown className="-mr-1 ml-1.5 w-5 h-5" />
+				</button>
+			)}
+		>
+			<form className="block w-80" onSubmit={submitHandler}>
+				<Dropdown.Header>
+					<span className="text-base font-medium text-gray-900 dark:text-white">
+						Filter
+					</span>
+				</Dropdown.Header>
+
+				<Accordion title="Status">
+					<Accordion.Body>
+						{statusOptions.map((option, idx) => (
+							<Dropdown.Item
+								key={idx}
+								as="label"
+								htmlFor={"status" + idx}
+							>
+								<RadioInput
+									id={"status" + idx}
+									name="status"
+									value={option.value}
+									checked={selectedStatus == option.value}
+									onChange={(e) =>
+										setSelectedStatus(e.target.value)
+									}
+								/>
+								<span className="ml-2 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
+									{option.label}
+								</span>
+							</Dropdown.Item>
+						))}
+					</Accordion.Body>
+				</Accordion>
+
+				<Dropdown.Divider />
+
+				<Accordion title="Online">
+					<Accordion.Body>
+						{onlineOptions.map((option, idx) => (
+							<Dropdown.Item
+								key={idx}
+								as="label"
+								htmlFor={"online" + idx}
+							>
+								<RadioInput
+									id={"online" + idx}
+									name="online"
+									checked={online == option.value}
+									value={option.value}
+									onChange={(e) => setOnline(e.target.value)}
+								/>
+								<span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+									{option.label}
+								</span>
+							</Dropdown.Item>
+						))}
+					</Accordion.Body>
+				</Accordion>
+
+				<Dropdown.Divider />
+
+				<Accordion title="Pagination" state>
+					<Accordion.Body>
+						<Dropdown.Item>
+							<RangeSlider
+								name="pagination"
+								min="10"
+								step="1"
+								max="50"
+								className="me-2"
+								value={pagination}
+								onChange={(e) => setPagination(e.target.value)}
+							/>
+							<span>{pagination}</span>
+						</Dropdown.Item>
+					</Accordion.Body>
+				</Accordion>
+
+				<Dropdown.Divider />
+
+				<div className="flex justify-center py-2">
+					<Button>Filtré les résultat</Button>
+				</div>
+			</form>
+		</Dropdown>
+	);
+};

@@ -52,27 +52,6 @@ class WelcomeController extends Controller
         ]);
     }
 
-    public function contact(Request $request)
-    {
-        return Inertia::render('Contact');
-    }
-
-    public function storeContact(ContactRequest $request)
-    {
-        Contact::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'subject' => $request->subject,
-            'message' => $request->message,
-        ]);
-
-        return redirect()->back()->with('alert', [
-            'status' => 'success',
-            'message' => 'Merci de nous avoir contacté'
-        ]);
-    }
-
     public function catalogue(Request $request)
     {
     }

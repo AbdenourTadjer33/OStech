@@ -34,15 +34,13 @@ class RouteServiceProvider extends ServiceProvider
                 ->as('api.')
                 ->group(base_path('routes/api.php'));
 
-            Route::middleware([
-                'web',
-            ])
+            Route::middleware('web')
                 ->domain("admin.localhost")
                 ->as('admin.')
                 ->group(base_path('routes/admin.php'));
 
             Route::middleware('web')
-            ->group(base_path('routes/web.php'));
+                ->group(base_path('routes/web.php'));
         });
     }
 }

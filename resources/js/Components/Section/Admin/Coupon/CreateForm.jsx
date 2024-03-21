@@ -25,7 +25,7 @@ const CreateForm = ({ setCreateModal}) => {
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		post(route("admin.coupon.store"), {
+		post("/coupon/create", {
 			onSuccess: () => setCreateModal(false),
 		});
 	};

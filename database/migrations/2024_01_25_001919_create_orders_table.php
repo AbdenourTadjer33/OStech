@@ -33,6 +33,7 @@ return new class extends Migration
 
             $table->boolean('is_online')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

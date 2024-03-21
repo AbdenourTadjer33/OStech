@@ -81,3 +81,13 @@ export const PopoverInput = ({ children }) => {
 		</Popover>
 	);
 };
+
+export const RangeSlider = ({ className, ...props }) => {
+	return (
+		<input
+			type="range"
+			className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600 ${className}`}
+			{...props}
+		/>
+	);
+};

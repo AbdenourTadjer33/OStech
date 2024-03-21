@@ -27,7 +27,7 @@ class ProductFactory extends Factory
             'status' => rand(0,1),
             'catalog' => rand(0,1),
             'category_id' => (new CategoryService)->subCategories($categories)->random()->id,
-            'brand_id' => (new BrandService)->getBrands()->random()->id,
+            // 'brand_id' => (new BrandService)->getBrands()?->random()?->id,
             'total_sales' => rand(0, 100),
 
         ];

@@ -50,6 +50,8 @@ class LoadData
                         $newSessionCart[] = $cartItem;
 
                         $cartItem['product'] = $product;
+
+
                         $cart[] = $cartItem;
                     }
                 }
@@ -62,7 +64,7 @@ class LoadData
 
             if (session()->has('coupon')) {
                 Inertia::share('coupon', session()->get('coupon'));
-                $request->merge(['coupon' => session()->get('coupon')]);
+                // $request->merge(['coupon' => session()->get('coupon')]);
             }
         }
         return $next($request);

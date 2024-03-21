@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\Admin\NewAdmin;
+use App\Events\MyEvent;
 use App\Events\Order\NewOrder;
 use App\Listeners\SendAdminCredentials;
 use App\Listeners\SendNewOrderNotification;
@@ -19,6 +20,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+        MyEvent::class => [],
+
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],

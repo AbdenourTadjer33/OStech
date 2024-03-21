@@ -36,7 +36,7 @@ const Footer = () => {
 									</li>
 									<li>
 										<Link
-											href={route("contact")}
+											href={route("contact.create")}
 											className="hover:underline"
 										>
 											Nous contacter

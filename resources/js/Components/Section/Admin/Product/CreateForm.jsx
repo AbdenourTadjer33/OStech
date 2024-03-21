@@ -28,7 +28,7 @@ const CreateForm = ({ mainCategories, subCategories, brands }) => {
 		validate,
 		forgetError,
 		reset,
-	} = useForm("post", route("admin.product.store"), {
+	} = useForm("post", "/product/create", {
 		mainCategory: [],
 		subCategory: [],
 		brand: [],
@@ -93,7 +93,7 @@ const CreateForm = ({ mainCategories, subCategories, brands }) => {
 
 	const submitHandler = (e) => {
 		e.preventDefault();
-		post(route("admin.product.store"), {
+		post("/product/create", {
 			onSuccess: () => reset(),
 		});
 	};

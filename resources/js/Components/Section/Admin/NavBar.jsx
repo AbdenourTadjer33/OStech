@@ -1,22 +1,28 @@
 import { AdminLayoutContext } from "@/Layouts/AdminLayout";
-
 import React, { useContext } from "react";
 import { Link } from "@inertiajs/react";
 import ApplicationLogo from "../../ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import Avatar from "../../Avatar";
+import { BiMenuAltLeft } from "react-icons/bi";
 
 export default function NavBar() {
-	const { user, isDark, toggleDarkMode } = useContext(AdminLayoutContext);
+	const { user, isDark, toggleDarkMode, toggleSideBar } =
+		useContext(AdminLayoutContext);
 
 	return (
 		<nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
 			<div className="px-3 py-3 lg:px-5 lg:pl-3">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center justify-start rtl:justify-end">
+						<div className="block sm:hidden">
+							<button onClick={toggleSideBar} className="text-gray-800 hover:text-gray-900 dark:text-white dark:hover:text-gray-200">
+								<BiMenuAltLeft className="w-8 h-8"/>
+							</button>
+						</div>
 						<Link href="/" className="flex ms-2 md:me-24">
 							<ApplicationLogo
-								type="white"
+								type="indigo"
 								className="h-8 w-auto me-3"
 							/>
 						</Link>
@@ -84,9 +90,7 @@ export default function NavBar() {
 									</div>
 									<ul>
 										<li>
-											<Dropdown.Link
-												href={"/profile"}
-											>
+											<Dropdown.Link href={"/profile"}>
 												Profile
 											</Dropdown.Link>
 										</li>

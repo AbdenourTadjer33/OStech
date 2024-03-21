@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreRequest;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 class OrderController extends Controller

@@ -152,15 +152,10 @@ const Index = ({ products, subCategories, brands }) => {
 	};
 
 	const forceDelete = () => {
-		destroy(
-			route("admin.product.forceDestroy", {
-				id: deleteModal.product.id,
-			}),
-			{
-				onSuccess: () => setDeleteModal({ status: false }),
-				preserveScroll: true,
-			}
-		);
+		destroy(`product/force-destroy/${deleteModal.product.id}`, {
+			onSuccess: () => setDeleteModal({ status: false }),
+			preserveScroll: true,
+		});
 	};
 
 	useEffect(() => {
@@ -563,7 +558,7 @@ const Index = ({ products, subCategories, brands }) => {
 								</Dropdown>
 							</div>
 
-							<Link href={route("admin.product.create")}>
+							<Link href={"/product/create"}>
 								<Button btn="primary" type="button">
 									Créer un produit
 								</Button>

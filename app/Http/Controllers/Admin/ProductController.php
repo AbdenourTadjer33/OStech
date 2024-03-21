@@ -89,6 +89,22 @@ class ProductController extends Controller
         ]);
     }
 
+    public function show(Request $request)
+    {
+        $product = Product::where('id', $request->id)->get();
+        if (!$product) {
+            return redirect()->back()->with('alert', [
+                'status' => 'success',
+                'message' => 'This product does not exist',
+            ]);
+        }
+
+        // dd($product);
+        return Inertia::view('Admin/Product/Index', [
+            'product' => $product,
+        ]);
+    }
+
     // FINISHED
     public function create(CategoryService $categoryService, BrandService $brandService)
     {
@@ -117,7 +133,7 @@ class ProductController extends Controller
                 $paths[] = $newPath;
             }
 
-            Product::create([
+            Product::create([   
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),
                 'sku' => $request->input('sku'),
@@ -315,7 +331,7 @@ class ProductController extends Controller
         return redirect(route('admin.product.index'));
     }
 
-    public function massActiveStatus(Request $request) 
+    public function massActiveStatus(Request $request)
     {
         Product::withTrashed()->whereIn('id', $request->ids)->update(['status' => true]);
 

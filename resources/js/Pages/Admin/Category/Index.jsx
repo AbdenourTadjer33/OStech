@@ -42,7 +42,7 @@ const Index = ({
 			return;
 		}
 
-		post(route("admin.category.storeCategory"), {
+		post("/category/create", {
 			preserveScroll: true,
 			onSuccess: () => {
 				reset();

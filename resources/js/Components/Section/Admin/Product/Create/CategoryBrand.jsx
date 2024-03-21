@@ -18,7 +18,10 @@ const CategoryBrand = () => {
 		setSubCategoriesToSelect([]);
 		subCategories.forEach((subCategory) => {
 			if (subCategory.parent_id == data.mainCategory.id) {
-				setSubCategoriesToSelect((prevData) => [...prevData, subCategory]);
+				setSubCategoriesToSelect((prevData) => [
+					...prevData,
+					subCategory,
+				]);
 			}
 		});
 		setData("subCategory", "");
@@ -100,6 +103,20 @@ const CategoryBrand = () => {
 										<Combobox.Option
 											value={""}
 											className="relative cursor-default select-none py-2 px-4 hover:bg-gray-200 dark:hover:bg-gray-500"
+											onClick={() => {
+												const url = new URL('/category', window.location.href).href;
+												const newWindow = window.open(
+													url,
+													"_blank",
+													"menubar=no,toolbar=no,location=yes,status=no,scrollbars=yes,resizable=yes,width=800,height=600"
+												);
+												newWindow.onpagehide =
+													function () {
+														alert(
+															"The new window has been closed."
+														);
+													};
+											}}
 										>
 											Créer la catégorie{" "}
 											<span className="text-sm">

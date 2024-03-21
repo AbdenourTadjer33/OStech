@@ -29,14 +29,14 @@ const Aside = ({ children }) => {
 	const { isOpen } = useContext(AdminLayoutContext);
 	return (
 		<aside
-			className={`fixed top-0 left-0 z-40 ${
-				isOpen ? "w-64" : "w-16"
-			} h-screen pt-20 transition-all duration-100 ease-in bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700`}
+			className={`fixed  top-0 left-0 z-40 ${
+				isOpen ? "w-64" : "w-16 "
+			} h-screen pt-20 transition-all duration-100 ease-in bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 ${
+				!isOpen && "-translate-x-16"
+			} sm:translate-x-0`}
 			aria-label="Sidebar"
 		>
-			<div className="relative h-full px-3 pb-4 bg-white dark:bg-gray-800">
-				{children}
-			</div>
+			<div className="relative h-full px-3 pb-4 ">{children}</div>
 		</aside>
 	);
 };
@@ -84,7 +84,7 @@ const SideBarToggler = () => {
 		<button
 			type="button"
 			onClick={toggleSideBar}
-			className="absolute right-0 top-1/2 -translate-y-1/2  inline-flex items-center p-1 me-1 text-sm text-gray-500 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+			className="absolute -right-4 bg-gray-50 dark:bg-gray-600 top-1/2 -translate-y-1/2  inline-flex items-center p-0.5 border border-gray-200 dark:border-gray-800  text-sm text-gray-500 rounded-full focus:outline-none focus:ring-2 dark:text-gray-400 focus:ring-transparent"
 		>
 			<svg
 				className={`w-6 h-6 transform transition-transform duration-300 ease-in-out ${

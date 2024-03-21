@@ -11,16 +11,18 @@ use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\Client\SettingController;
 use App\Http\Controllers\Client\WelcomeController;
 use App\Http\Controllers\Client\CategoryController;
+use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\ShippingController;
-
-Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 Route::controller(WelcomeController::class)->group(function () {
     Route::get('/', 'index')->name('welcome');
-    Route::get('/contact', 'contact')->name('contact');
-    Route::post('/contact', 'storeContact')->name('contact.store');
     Route::get('/catalogue', 'catalogue')->name('catalogue');
     Route::get('/terms-and-conditions', 'termAndCondition')->name('termAndCondition');
+});
+
+Route::prefix('contact')->controller(ContactController::class)->as('contact.')->group(function () {
+    Route::get('/', 'create')->name('create');
+    Route::post('/', 'store')->name('store');
 });
 
 Route::prefix('products')->controller(ProductController::class)->as('products.')->group(function () {
